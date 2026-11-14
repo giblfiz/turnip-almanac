@@ -1,0 +1,794 @@
+[
+  {
+    "page": 1,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 24,
+    "label": "Name:"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 24,
+    "top": 555.0,
+    "width": 366.0,
+    "height": 88.5,
+    "label": "['<b>Body ____</b>', '<b>Coordination ____</b>', '<b>Mental ____</b>', '<b>Social ____</b>']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 24,
+    "top": 461.5,
+    "width": 366.0,
+    "height": 17.7,
+    "label": "['Actions ____', 'Armor ____', 'Health ____', 'Essence ____']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 24,
+    "top": 437.8,
+    "width": 194,
+    "height": 199.29,
+    "label": "['<b>Social<br/>Circles</b>', 'Contact<br/>[6L]', 'Friend<br/>[9M]', 'Patron<br/>[12S]']"
+  },
+  {
+    "page": 1,
+    "kind": "paragraph",
+    "x": 230,
+    "top": 437.8,
+    "width": 160.0,
+    "height": 65,
+    "label": "<b>Start with 100 points and 60 Essence.</b><br/>Circle purchases on this sheet.<br/>Actio"
+  },
+  {
+    "page": 1,
+    "kind": "paragraph",
+    "x": 230,
+    "top": 362.8,
+    "width": 160.0,
+    "height": 65,
+    "label": "<b>Skill increases:</b> ratings 2\u20133: 1 pt; 4\u20136: 2; 7\u20139: 3.<br/>Start at 1 free; buy up to "
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 24,
+    "top": 226.51000000000002,
+    "width": 366.0,
+    "height": 103.329,
+    "label": "['<b>Metatype</b>', '<b>Bonuses</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 24,
+    "top": 115.18100000000003,
+    "width": 216,
+    "height": 49.59,
+    "label": "['<b>Body</b>', '<b>Coordination</b>', '<b>Mental</b>', '<b>Social</b>']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 248,
+    "top": 115.18100000000003,
+    "width": 142.0,
+    "height": 64.52,
+    "label": "['<b>Lifestyle</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 402.0,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 237.55199999999996,
+    "label": "['<b>Cyberware</b>', '<b>Effect</b>', '<b>Ess</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 1,
+    "kind": "table",
+    "x": 402.0,
+    "top": 341.44800000000004,
+    "width": 366.0,
+    "height": 311.787,
+    "label": "['<b>Weapons &amp; Gear</b>', '<b>Effect</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 24,
+    "top": 588.0,
+    "width": 366,
+    "height": 234.70499999999998,
+    "label": "['<b>Vehicles &amp; Drones</b>', '<b>Form</b>', '<b>HP</b>', '<b>Armor</b>', '<b>Speed</b>', '<b>Mounts</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 346.295,
+    "width": 366.0,
+    "height": 21.762,
+    "label": "Mounted weapons are bought separately. Each attack uses its operator\u2019s action; passengers "
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 24,
+    "top": 314.533,
+    "width": 248,
+    "height": 121.77000000000001,
+    "label": "['<b>Chips</b>', '<b>Destroy</b>', '<b>Read</b>', '<b>Edit</b>', '<b>Control</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 282,
+    "top": 314.533,
+    "width": 108,
+    "height": 127.17,
+    "label": "['<b>Decks</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 24,
+    "top": 176.363,
+    "width": 366.0,
+    "height": 104.262,
+    "label": "['<b>Summons</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 402.0,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 80.74499999999999,
+    "label": "['<b>Magic</b>', '<b>Abilities</b>', '<b>Pts</b>']"
+  },
+  {
+    "page": 2,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 502.255,
+    "width": 366.0,
+    "height": 11.7,
+    "label": "Astral Projection (10 pts) &nbsp;&nbsp;&nbsp;&nbsp; Elemental Summoning (10 pts)"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 402.0,
+    "top": 484.555,
+    "width": 366.0,
+    "height": 165.778,
+    "label": "['<b>Each spell costs 3 points</b>', '', '']"
+  },
+  {
+    "page": 2,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 313.77700000000004,
+    "width": 366.0,
+    "height": 21.996,
+    "label": "* Bonuses may increase the effect by +1. \u2020 Bonuses add +1 recovery die.<br/>Speed sets Act"
+  },
+  {
+    "page": 2,
+    "kind": "table",
+    "x": 402.0,
+    "top": 281.78100000000006,
+    "width": 366.0,
+    "height": 186.97799999999998,
+    "label": "['<b>Spirits &amp; Elementals</b>', '<b>Extra skills</b>', '<b>Special / spells</b>', '<b>Act.</b>']"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 14,
+    "label": "Rules"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 569.0,
+    "width": 366.0,
+    "height": 14,
+    "label": "Attempt rolls"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 550.0,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Choose a skill and its associated attribute. The target number (TN) is normally <b>6 \u2212 att"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 521.558,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Roll as many six-sided dice as your skill. Each die equal to or above the TN is a success."
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 493.116,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Modified rule of six:</b> a 6 may be rerolled and added to reach TNs above 6, or genera"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 456.674,
+    "width": 366.0,
+    "height": 14,
+    "label": "Challenges & bonuses"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 437.674,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Challenges have a rating and armor. Tools have penetration and effect, such as [9M]. An ac"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 409.23199999999997,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "If penetration is below the challenge\u2019s armor, the attempt has no effect. On success, redu"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 380.78999999999996,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Spend each bonus to <b>reduce effective armor by 2 for this attempt</b>, increase effect b"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 344.34799999999996,
+    "width": 366.0,
+    "height": 14,
+    "label": "Turns & actions"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 325.34799999999996,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "A turn is about 6 seconds. Characters normally have <b>2 Actions</b>. Each round, everyone"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 296.90599999999995,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Order each round by <b>total Actions, then Coordination, then Palming</b>, highest first. "
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 268.46399999999994,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Aim:</b> spend an action; a scoped rifle ignores range penalties on its next shot. <b>S"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 232.02199999999993,
+    "width": 366.0,
+    "height": 14,
+    "label": "Downtime"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 213.02199999999993,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Downtime requires <b>a few uninterrupted hours</b> and access to homes and tools. It inclu"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 184.57999999999993,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Downtime checks represent best effort. They cannot be rerolled until significant play occu"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 143.91699999999992,
+    "width": 366.0,
+    "height": 12.221,
+    "label": "Adepts may change the skill enhanced by Buff during downtime."
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 14,
+    "label": "Combat & damage"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 569.0,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Health is <b>3 + Body</b>. Damage beyond health causes unconsciousness, or death if entire"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 540.558,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Any damage raises all TNs by <b>1</b>; four or more damage raises them by <b>3</b> instead"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 512.116,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "On a successful attack, apply weapon damage: <b>L 1 / M 2 / S 3 / D 4</b>, plus bonuses sp"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 483.674,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "If armor is <b>greater than penetration</b>, no damage gets through. If armor is <b>greate"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 443.01099999999997,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Wear one armor outfit; racial and cyber armor add. Cover usually supplies armor. Poison us"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 406.56899999999996,
+    "width": 366.0,
+    "height": 14,
+    "label": "Soak"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 387.56899999999996,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Once per turn</b>, after incoming damage is determined, roll Soak using Body. On succes"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 359.12699999999995,
+    "width": 366.0,
+    "height": 12.221,
+    "label": "Vehicles cannot Soak. Soak does not prevent spell Drain."
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 334.90599999999995,
+    "width": 366.0,
+    "height": 14,
+    "label": "Healing & recovery"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 315.90599999999995,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "A <b>recovery roll</b> uses Soak and Body. On success, gain <b>1 recovery point, +1 per bo"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 275.24299999999994,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Each character may receive <b>one medical treatment and one Heal spell per day</b>. Each s"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 246.80099999999993,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>First aid:</b> use Tools with a medkit; treatment takes 10 minutes. <b>Heal:</b> use Ma"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 218.35899999999992,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Between-session downtime:</b> one free recovery roll, before other downtime activities."
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 181.91699999999992,
+    "width": 366.0,
+    "height": 14,
+    "label": "Specific skill checks"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 162.91699999999992,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Intimidation: Interrogate. Perception: Palming, Etiquette or Tools, as appropriate to what"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 134.4749999999999,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Attribute swaps:</b> keep the skill, but may use Body for strength-based Athletics or p"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 14,
+    "label": "Magic"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 569.0,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Casting takes one action and causes <b>2 bashing Drain</b>, even on failure. Each bonus sp"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 540.558,
+    "width": 366.0,
+    "height": 12.221,
+    "label": "A spirit or elemental may spend an action to take <b>1 point of its summoner\u2019s Drain</b>, "
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 524.337,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "One summon at a time; summoning requires downtime. It may hide in a palm or pocket; releas"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 495.895,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Self spells affect the caster; Touch requires contact; LoS means line of sight. Adepts may"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 455.23199999999997,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Astral sight / projection:</b> perceive astral beings and magic, or travel without your"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 418.78999999999996,
+    "width": 366.0,
+    "height": 14,
+    "label": "Wards & Ward Working"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 399.78999999999996,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Wards add their rating to TNs for spells <b>cast within or targeting within</b>, including"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 359.12699999999995,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "<b>Ward Working</b> affects a 15 ft radius centered on the caster. Make a ward rated at ca"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 330.68499999999995,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Temporary wards last <b>the rest of the round</b>; duration bonuses may extend this in rou"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 282.02199999999993,
+    "width": 366.0,
+    "height": 14,
+    "label": "Hacking"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 263.02199999999993,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Hacking normally requires an on-site wired connection. Remote hacking has <b>Actions 1</b>"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 234.57999999999993,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Devices on the network can be hacked: cameras, alarms, turrets, drones, microphones, phone"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 206.13799999999992,
+    "width": 366.0,
+    "height": 61.105000000000004,
+    "label": "Each operation is a separate challenge using its matching chip:<br/><b>Destroy:</b> disabl"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 141.0329999999999,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "The first such action activates ICE, usually white ICE, with further waves possible as act"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 588.0,
+    "width": 366.0,
+    "height": 14,
+    "label": "Legwork & social circles"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 569.0,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "During downtime, gather information, buy special equipment and make arrangements. These ch"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 540.558,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "A missing contact can be hired for <b>\u00a5200 per roll</b>; friends and patrons cannot. Gener"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 512.116,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Social circles can supply appropriate <b>identities, credentials, disguises, tools and wor"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 483.674,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Blending in uses Etiquette, with clothing or a disguise as the tool. These may come from a"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 435.01099999999997,
+    "width": 366.0,
+    "height": 14,
+    "label": "Legality, concealment & stealth"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 416.01099999999997,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Runners work outside the law. Gear costing 20 points or more, or dealing S or D damage, ge"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 375.34799999999996,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Police may seize noticed contraband and fine you <b>\u00a53,000</b>; they are not always lookin"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 346.90599999999995,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "A Palming check can get a concealable item past a simple pat-down. Scanners are challenges"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 310.46399999999994,
+    "width": 366.0,
+    "height": 14,
+    "label": "Tools"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 291.46399999999994,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Repair damaged equipment as a Tools challenge during downtime. Appropriate tools and shops"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 242.80099999999993,
+    "width": 366.0,
+    "height": 14,
+    "label": "ICE & deckers"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 223.80099999999993,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "ICE has health, armor, Computer skill and a Destroy chip. <b>White ICE</b> boots the user "
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 195.35899999999992,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Other deckers may be present. Attack them using white, grey or black methods, or attempt t"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 158.91699999999992,
+    "width": 366.0,
+    "height": 14,
+    "label": "Karma & purchases"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 139.91699999999992,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Award <b>1\u20132 karma</b> after successful\u2014or merely survived\u2014sessions. Spend it as character"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 99.25399999999992,
+    "width": 366.0,
+    "height": 36.663,
+    "label": "Ordinary belongings (clothes, wallet, phone/headset, knife) are free. Objects and cyberwar"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 58.59099999999992,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Sell gear for <b>70%</b> of list price; add 5% for a fixer contact or 10% for a fixer frie"
+  }
+]

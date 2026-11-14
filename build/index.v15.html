@@ -1,0 +1,1075 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Turnip Almanac</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one infinite canvas. x = time (shelf → campaign → sessions → now), zoom = abstraction. HUD floats over it. */
+:root {
+  --paper: #fcfbf8;      /* cards, sheets */
+  --ground: #efece5;     /* the canvas itself */
+  --ink: #1a1917;
+  --ink-2: #5f5c55;
+  --ink-3: #8e8a80;
+  --rule: #ddd8cd;
+  --ochre: #a8770f;      /* Turnip Works' accent: links, now line, threads */
+  --ochre-soft: #a8770f22;
+  --band: #e6e2d8;
+  --note: #f6e7a8;
+  --note-ink: #3d3420;
+  --crease: #e4dfd3;
+  --shadow: 0 1px 2px #1a191714, 0 6px 18px #1a19170f;
+  --f-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #24231f; --ground: #181715; --ink: #ece9e2; --ink-2: #b4afa4; --ink-3: #7f7a70; --rule: #3a3833;
+  --ochre: #e0aa45; --ochre-soft: #e0aa4526; --band: #1f1e1b; --note: #4a4226; --note-ink: #f1e6c0; --crease: #2e2c27;
+  --shadow: 0 1px 2px #0006, 0 6px 18px #0005; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #24231f; --ground: #181715; --ink: #ece9e2; --ink-2: #b4afa4; --ink-3: #7f7a70; --rule: #3a3833;
+  --ochre: #e0aa45; --ochre-soft: #e0aa4526; --band: #1f1e1b; --note: #4a4226; --note-ink: #f1e6c0; --crease: #2e2c27;
+  --shadow: 0 1px 2px #0006, 0 6px 18px #0005; color-scheme: dark }
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--f-body); overflow: hidden; }
+#vp { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px); }
+#vp.panning { cursor: grabbing; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.n { position: absolute; box-sizing: border-box; }
+h1, h2, h3, .disp { font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+button { font: inherit; color: inherit; }
+img { max-width: none; }
+
+/* --- semantic zoom: every node is far / mid / near by its size ON SCREEN --- */
+/* f = far only, m = mid and near, nr = near only, fm = far and mid. Set per element by JS, so nested zoomable things never inherit their parent's level. */
+.lodoff { display: none !important; }
+
+/* zones: big quiet labels you read from far away */
+.zone { border-radius: 28px; }
+.zone > .zl { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--f-display); font-weight: 700; color: var(--ink-3); opacity: .55; pointer-events: none; }
+
+/* bands: lanes and session columns */
+.lane { background: var(--band); border-radius: 18px; }
+.lane.alt { background: transparent; }
+.col { border-left: 1px dashed var(--rule); }
+.colhead { padding: 18px 20px; }
+.colhead .num { font: 600 15px var(--f-body); color: var(--ochre); letter-spacing: .08em; text-transform: uppercase; }
+.colhead h2 { font-size: 34px; margin-top: 4px; }
+.colhead .date { color: var(--ink-2); font-size: 15px; margin-top: 4px; }
+.colhead .recap { color: var(--ink-2); font-size: 16px; line-height: 1.45; margin-top: 10px; }
+.colhead.prep h2 { font-style: italic; }
+.nowline { background: var(--ochre); width: 4px; border-radius: 2px; }
+.nowtag { background: var(--ochre); color: var(--paper); font: 700 22px var(--f-display); padding: 6px 14px; border-radius: 999px; white-space: nowrap; }
+.prepwash { background: linear-gradient(180deg, var(--ochre-soft), transparent 60%); border-radius: 18px; }
+
+/* cards */
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); padding: 16px 18px; overflow: hidden; }
+.card h3 { font-size: 22px; }
+.card .t { color: var(--ink-2); font-size: 15px; line-height: 1.45; margin-top: 6px; }
+.fl { font-family: var(--f-display); font-weight: 700; line-height: 1.05; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 6px; background: var(--ochre-soft); color: var(--ochre); font-weight: 600; cursor: pointer; white-space: nowrap; }
+.chip:hover { text-decoration: underline; }
+.chip img { width: 1.2em; height: 1.2em; }
+.chip::after { content: "↗"; font-size: .8em; opacity: .75; }
+
+/* books */
+.book { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px 18px 18px 10px; box-shadow: var(--shadow); border-left: 14px solid var(--ochre); }
+.book .cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; text-align: center; padding: 40px; }
+.book .cover img { width: 160px; height: 160px; }
+.book .cover .fl { font-size: 54px; overflow-wrap: normal; }
+.book .cover .sub { font-size: 30px; color: var(--ink-2); }
+.book .bhead { padding: 20px 24px 6px; display: flex; gap: 14px; align-items: center; }
+.book .bhead img { width: 44px; height: 44px; }
+.book .bhead h2 { font-size: 30px; }
+.chap { position: absolute; font: 700 22px var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.entry { padding: 10px 12px; border-radius: 10px; }
+.entry .fm h3 { font-size: 34px; line-height: 1.05; }
+.entry h3 { font-size: 17px; display: flex; align-items: center; gap: 6px; }
+.entry h3 img { width: 22px; height: 22px; }
+.entry .t { font-size: 12.5px; margin-top: 4px; }
+.entry .fl { font-size: 26px; }
+.entry .backs { margin-top: 6px; font-size: 11px; color: var(--ink-3); }
+.entry .backs .chip { font-size: 11px; }
+.hl { outline: 3px solid var(--ochre); outline-offset: 3px; }
+
+/* overmap */
+.overmap { background: var(--paper); border: 1px solid var(--rule); border-radius: 22px; box-shadow: var(--shadow);
+  background-image: radial-gradient(circle at 70% 30%, var(--ochre-soft), transparent 45%), radial-gradient(circle at 20% 80%, var(--ochre-soft), transparent 40%); background-color: var(--paper); }
+.overmap .omh { position: absolute; left: 32px; top: 24px; }
+.overmap .omh h2 { font-size: 40px; }
+.overmap .omh .t { color: var(--ink-2); font-size: 17px; margin-top: 4px; }
+.overmap svg { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.overmap .road { stroke: var(--ink-3); stroke-width: 3; stroke-dasharray: 2 10; stroke-linecap: round; fill: none; }
+.place { width: 200px; height: 150px; margin: -75px 0 0 -100px; text-align: center; border-radius: 16px; padding: 8px; }
+.place:hover { background: var(--ochre-soft); }
+.place img.pi { width: 72px; height: 72px; }
+.place .pn { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.place .fl { font-size: 40px; }
+.place .pnote { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+.place .tw { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 600; color: var(--ochre); text-decoration: none; border: 1px solid var(--ochre); border-radius: 999px; padding: 1px 6px; }
+.place .backs { font-size: 9px; color: var(--ink-3); margin-top: 3px; }
+.place .backs .chip { font-size: 9px; }
+
+/* the book on the shelf: an index of rules beside the real pages */
+.bk { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px 22px 22px 12px; box-shadow: var(--shadow); border-left: 18px solid var(--ochre); }
+.bk .cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; padding: 80px; }
+.bk .cover .fl { font-size: 190px; }
+.bk .cover .sub { font-size: 80px; color: var(--ink-2); }
+.bk .cover img { width: 260px; height: 260px; }
+.bk .bhead { position: absolute; left: 30px; top: 26px; right: 30px; display: flex; gap: 16px; align-items: center; }
+.bk .bhead h2 { font-size: 46px; }
+.bk .bhead .t { color: var(--ink-2); font-size: 20px; margin-top: 4px; }
+.chap { position: absolute; font: 700 26px var(--f-display); color: var(--ochre); }
+.entry { padding: 12px 14px; border-radius: 12px; }
+.entry .fm h3 { font-size: 36px; line-height: 1.05; }
+.entry h3 { font-size: 19px; }
+.entry .t { font-size: 13.5px; margin-top: 4px; line-height: 1.4; }
+.entry .pg { margin-top: 6px; font-size: 12px; }
+.entry .backs { margin-top: 4px; font-size: 11px; color: var(--ink-3); }
+.entry .backs .chip { font-size: 11px; }
+.pagef { background: #fff; border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 4px; overflow: hidden; }
+.pagef .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 120px var(--f-display); color: #c9c3b6; background: repeating-linear-gradient(0deg, #f4f2ec 0 22px, #fff 22px 44px); }
+.pagef .ph small { display: block; font: 500 34px var(--f-body); color: #a8a296; text-align: center; }
+.pagef .cv { position: absolute; inset: 0; }
+.pagef .cv canvas { width: 100%; height: 100%; display: block; }
+.pagef .pnum { position: absolute; right: -2px; bottom: -40px; font: 600 22px var(--f-body); color: var(--ink-3); }
+.region { position: absolute; border-radius: 4px; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .3s, background .3s; }
+.region:hover { box-shadow: inset 0 0 0 2px #a8770f88; background: #a8770f10; }
+.region.hl { outline: none; box-shadow: inset 0 0 0 4px #a8770f; background: #a8770f22; }
+.region .rt { position: absolute; left: 0; top: -22px; font: 600 13px var(--f-body); color: #7a5608; background: #fff8e6; border: 1px solid #a8770f66; border-radius: 6px 6px 0 0; padding: 1px 7px; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.region:hover .rt, .region.hl .rt { opacity: 1; }
+
+/* sheets */
+.sheet { background: var(--paper); border: 1px solid var(--rule); border-radius: 22px; box-shadow: var(--shadow); }
+.sheet .sh-far { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; padding: 60px; }
+.sheet .sh-far .fl { font-size: 200px; }
+.sheet .sh-far .sub { font-size: 70px; color: var(--ink-2); }
+.sheet .sh-far .lv { font-size: 54px; color: var(--ochre); font-weight: 600; }
+.sheet .main { position: absolute; left: 30px; top: 28px; width: 680px; display: flex; flex-direction: column; gap: 22px; }
+.sheet .nm { font-size: 54px; line-height: 1; }
+.sheet .nm.empty { color: var(--ink-3); font-style: italic; }
+.sheet .who { color: var(--ink-2); font-size: 18px; margin-top: 8px; }
+.budget { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.budget > div { border: 1px solid var(--rule); border-radius: 12px; padding: 8px 12px; }
+.budget .k, .sk .k, .der .k { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.budget .bv { font: 700 30px var(--f-display); font-variant-numeric: tabular-nums; }
+.budget .bar { height: 6px; border-radius: 3px; background: var(--rule); margin-top: 6px; overflow: hidden; }
+.budget .bar i { display: block; height: 100%; background: var(--ochre); }
+.budget .over .bar i { background: #b3412c; }
+.asof { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; align-items: center; font-size: 13px; color: var(--ink-3); }
+.asof button { border: 1px solid var(--rule); background: transparent; border-radius: 999px; padding: 2px 9px; font-size: 13px; cursor: pointer; color: var(--ink-2); }
+.asof button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.asof button.has { border-color: var(--ochre); }
+.warn { border: 1px solid #b3412c; color: #b3412c; border-radius: 12px; padding: 8px 12px; font-size: 14px; line-height: 1.5; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.acol { border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+.ahead { background: var(--band); padding: 10px 12px; display: flex; justify-content: space-between; align-items: baseline; }
+.ahead .an { font: 700 17px var(--f-display); }
+.pv { font: 700 44px var(--f-display); line-height: 1; font-variant-numeric: tabular-nums; cursor: help; border-radius: 6px; padding: 0 4px; }
+.pv.sm { font-size: 24px; }
+.pv:hover, .pv.pinned { background: var(--ochre-soft); color: var(--ochre); }
+.pv.changed { animation: bump .6s ease-out; }
+@keyframes bump { 0% { color: var(--ochre); transform: scale(1.25); } 100% { transform: none; } }
+.tn { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.sk { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; padding: 7px 10px; border-top: 1px solid var(--rule); }
+.sk .k { text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--ink); }
+.sk.zero .k, .sk.zero .pv { color: var(--ink-3); }
+.die { border: 1px solid var(--rule); background: transparent; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 15px; padding: 0; color: var(--ink-2); }
+.die:hover { border-color: var(--ochre); color: var(--ochre); }
+.der { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.der > div { border: 1px solid var(--rule); border-radius: 12px; padding: 8px 10px; text-align: center; }
+.der small { display: block; font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.track { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.track button { width: 34px; height: 34px; border-radius: 8px; border: 2px solid var(--ink-2); background: transparent; cursor: pointer; font: 700 15px var(--f-body); color: var(--paper); padding: 0; }
+.track button.B { background: #c98a1b; border-color: #c98a1b; }
+.track button.L { background: #b3412c; border-color: #b3412c; }
+.track .wound { font-size: 14px; color: #b3412c; font-weight: 600; margin-left: 8px; }
+.rolls { display: flex; flex-direction: column; gap: 6px; }
+.roll { border: 1px solid var(--rule); border-radius: 10px; padding: 7px 10px; font-size: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.roll b { font-weight: 600; }
+.roll .dd { display: flex; gap: 3px; flex-wrap: wrap; }
+.roll .dd i { font-style: normal; min-width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--rule); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-variant-numeric: tabular-nums; padding: 0 3px; }
+.roll .dd i.ok { background: var(--ochre); color: var(--paper); border-color: var(--ochre); }
+.roll .verdict { margin-left: auto; font-weight: 600; color: var(--ochre); }
+.roll .verdict.fail { color: var(--ink-3); }
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; }
+.sec { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-bottom: 6px; display: flex; gap: 8px; align-items: center; }
+.sec .chip { font-size: 11px; letter-spacing: 0; text-transform: none; }
+.list { display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.35; }
+.list b { font-weight: 600; }
+.list .e { color: var(--ink-2); }
+.list .none { color: var(--ink-3); }
+.ledger { font-size: 13px; columns: 2; column-gap: 22px; }
+.ledger div { display: flex; justify-content: space-between; gap: 8px; break-inside: avoid; padding: 1px 0; border-bottom: 1px dotted var(--rule); }
+.ledger span:last-child { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.pinbtn { position: absolute; right: 270px; top: 18px; border: 0; background: transparent; cursor: pointer; font-size: 22px; color: var(--ink-3); z-index: 2; }
+.pinbtn.on { color: var(--ochre); }
+
+/* builder: a region ON the sheet; zoom in, then scroll down through the steps */
+.builder { position: absolute; right: 16px; top: 16px; width: 240px; border: 2px dashed var(--ochre); border-radius: 14px; overflow: hidden; background: var(--ochre-soft); }
+.builder .bf { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 120px; text-align: center; gap: 14px; color: var(--ochre); }
+.builder .bf .fl { font-size: 46px; }
+.builder .bf .t { font-size: 17px; color: var(--ink-2); padding: 0 16px; }
+.binner { position: absolute; left: 0; top: 0; width: 960px; transform-origin: 0 0; transform: scale(.25); padding: 30px; box-sizing: border-box; font-size: 22px; }
+.bstep { border-radius: 22px; padding: 22px 26px; margin-bottom: 30px; background: var(--paper); border: 1px solid var(--rule); }
+.bstep .q { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.bstep .q .no { font: 700 30px var(--f-display); color: var(--ochre); }
+.bstep .q h3 { font-size: 36px; }
+.bstep .q .sub { margin-left: auto; font-size: 20px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bstep .q .chip { font-size: 18px; }
+.bstep .hint { color: var(--ink-2); font-size: 21px; margin: 8px 0 16px; line-height: 1.4; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opts.three { grid-template-columns: 1fr 1fr 1fr; }
+.opt { border: 2px solid var(--rule); border-radius: 16px; padding: 14px 16px; text-align: left; background: transparent; cursor: pointer; color: var(--ink); }
+.opt b { font: 700 26px var(--f-display); display: flex; justify-content: space-between; gap: 8px; }
+.opt b em { font: 600 20px var(--f-body); font-style: normal; color: var(--ochre); }
+.opt span { font-size: 18px; color: var(--ink-2); display: block; margin-top: 4px; line-height: 1.35; }
+.opt.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.opt:disabled { opacity: .4; cursor: not-allowed; }
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.rows.one { grid-template-columns: 1fr; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border: 1px solid var(--rule); border-radius: 14px; padding: 10px 12px; }
+.row.on { border-color: var(--ochre); background: var(--ochre-soft); }
+.row b { font: 600 22px var(--f-body); display: block; }
+.row span { font-size: 17px; color: var(--ink-2); display: block; line-height: 1.3; }
+.row .cost { font-size: 17px; color: var(--ochre); font-weight: 600; }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--rule); background: var(--paper); font: 700 26px var(--f-body); cursor: pointer; color: var(--ink); padding: 0; }
+.stepper button:hover:not(:disabled) { border-color: var(--ochre); color: var(--ochre); }
+.stepper button:disabled { opacity: .3; cursor: not-allowed; }
+.stepper output { min-width: 40px; text-align: center; font: 700 30px var(--f-display); font-variant-numeric: tabular-nums; }
+.grouph { font: 700 24px var(--f-display); margin: 14px 0 8px; display: flex; justify-content: space-between; color: var(--ink-2); }
+.seg { display: flex; border: 2px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 8px 12px; font: 600 17px var(--f-body); cursor: pointer; color: var(--ink-2); border-left: 1px solid var(--rule); }
+.seg button:first-child { border-left: 0; }
+.seg button.sel { background: var(--ochre); color: var(--paper); }
+.chipgrid { display: grid; grid-template-columns: 150px repeat(4, 1fr); gap: 8px; font-size: 18px; align-items: stretch; }
+.chipgrid .h { font-weight: 600; color: var(--ink-2); align-self: end; }
+.chipgrid button { border: 2px solid var(--rule); border-radius: 12px; background: transparent; padding: 8px; font: 600 18px var(--f-body); cursor: pointer; color: var(--ink); }
+.chipgrid button span { display: block; font-weight: 500; font-size: 15px; color: var(--ochre); }
+.chipgrid button.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.bstep input, .bstep select { width: 100%; box-sizing: border-box; font: 600 30px var(--f-display); padding: 12px 14px; border: 2px solid var(--rule); border-radius: 14px; background: var(--paper); color: var(--ink); }
+.bstep select { font: 500 22px var(--f-body); width: auto; }
+.crease { border-radius: 18px; background: repeating-linear-gradient(135deg, var(--crease) 0 12px, transparent 12px 24px); border: 2px dashed var(--ink-3); display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-2); font-size: 24px; padding: 20px; box-sizing: border-box; }
+.interp { font-size: 18px; color: var(--ink-2); border-left: 4px solid var(--ochre); padding: 6px 12px; margin-top: 10px; line-height: 1.4; }
+.bpts { position: absolute; left: 30px; right: 30px; top: 0; }
+.place .pn { background: var(--paper); border-radius: 8px; padding: 0 6px; display: inline-block; }
+.place .pnote, .place .tw { background: var(--paper); }
+#toast { position: fixed; z-index: 15; transform: translate(-50%, calc(-100% - 14px)); pointer-events: none; transition: opacity .25s; }
+#toast .roll { background: var(--paper); box-shadow: var(--shadow); border-color: var(--ochre); font-size: 15px; max-width: min(520px, calc(100vw - 32px)); }
+/* notes in cells, advancement cards, loose notes */
+.cellnotes { display: flex; flex-direction: column; gap: 14px; }
+.cnote { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; font-size: 17px; line-height: 1.45; box-shadow: var(--shadow); }
+.cnote.idea { background: transparent; border-style: dashed; font-style: italic; color: var(--ink-2); box-shadow: none; }
+.adv { border: 2px solid var(--ochre); }
+.adv .lvl { font: 700 13px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.adv .what { font: 700 22px var(--f-display); margin-top: 2px; }
+.adv .why { color: var(--ink-2); font-size: 15px; }
+.lanehead { padding: 22px; }
+.lanehead h2 { font-size: 34px; }
+.lanehead .t { color: var(--ink-2); font-size: 16px; margin-top: 6px; line-height: 1.4; }
+.lanehead img { width: 64px; height: 64px; float: right; }
+.lanehead .fl { font-size: 54px; }
+.loose { background: var(--note); color: var(--note-ink); border-radius: 4px 4px 12px 4px; box-shadow: var(--shadow); width: 220px; min-height: 120px; }
+.loose .grip { height: 22px; cursor: move; border-bottom: 1px solid #0001; display: flex; justify-content: flex-end; }
+.loose .grip button { border: 0; background: transparent; cursor: pointer; color: inherit; opacity: .5; font-size: 14px; }
+.loose .body { padding: 10px 12px; font-size: 16px; line-height: 1.4; outline: none; min-height: 80px; }
+.inbox { background: transparent; border: 2px dashed var(--ink-3); border-radius: 18px; }
+.inbox .ih { padding: 16px 20px; color: var(--ink-2); }
+.inbox h2 { font-size: 28px; color: var(--ink); }
+
+/* --- HUD --- */
+#threads { position: fixed; inset: 0; pointer-events: none; overflow: visible; z-index: 5; }
+#threads path { fill: none; stroke: var(--ochre); stroke-width: 2.2; }
+#threads circle { fill: var(--ochre); }
+.tend { position: fixed; z-index: 6; transform: translate(-50%, -50%); background: var(--ochre); color: var(--paper); font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow); }
+#rulerT { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 0; z-index: 4; pointer-events: none; }
+#rulerL { position: fixed; top: 0; bottom: 0; left: 0; width: 0; z-index: 4; pointer-events: none; }
+.rl { position: absolute; white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--ink-2); background: color-mix(in srgb, var(--paper) 88%, transparent); border: 1px solid var(--rule); border-radius: 999px; padding: 3px 9px; transform: translateX(-50%); top: 10px; }
+.rl.now { color: var(--paper); background: var(--ochre); border-color: var(--ochre); }
+#rulerL .rl { transform: translateY(-50%); left: max(10px, env(safe-area-inset-left, 0px)); top: auto; writing-mode: vertical-rl; rotate: 180deg; padding: 9px 3px; }
+.arrow { position: fixed; z-index: 7; display: flex; align-items: center; gap: 8px; transform: translate(-50%, -50%); background: var(--paper); border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; font-weight: 600; font-size: 13px; transition: opacity .25s; white-space: nowrap; }
+.arrow img { width: 30px; height: 30px; }
+.arrow .dir { color: var(--ochre); font-size: 18px; display: inline-block; }
+.arrow:hover { border-color: var(--ochre); }
+#bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 8; display: flex; gap: 4px; align-items: center; background: var(--paper); border: 1px solid var(--rule); border-radius: 16px; box-shadow: var(--shadow); padding: 5px; max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
+#bar button { border: 0; background: transparent; border-radius: 11px; padding: 7px 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--ink); }
+#bar button:hover { background: var(--ochre-soft); }
+#bar button:focus-visible, .arrow:focus-visible, .opt:focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
+#bar button:disabled { opacity: .35; }
+#bar img { width: 20px; height: 20px; }
+#bar .sep { width: 1px; align-self: stretch; background: var(--rule); margin: 4px 2px; }
+#bar kbd { font: 11px var(--f-body); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+#title { position: fixed; z-index: 8; left: max(16px, env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 8px 14px; box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
+#title .disp { font-size: 20px; }
+#title .disp span { color: var(--ochre); }
+#title .sub { font-size: 12px; color: var(--ink-2); }
+#help { position: fixed; z-index: 8; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 10px 14px; box-shadow: var(--shadow); font-size: 12.5px; line-height: 1.6; color: var(--ink-2); max-width: 270px; }
+#help b { color: var(--ink); font-weight: 600; }
+#help button { border: 0; background: transparent; cursor: pointer; float: right; color: var(--ink-3); }
+#helpQ { position: fixed; z-index: 8; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); cursor: pointer; font: 600 16px var(--f-body); color: var(--ink-2); }
+#pal { position: fixed; inset: 0; z-index: 20; background: #0003; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 0; }
+#pal .box { width: min(560px, 100%); background: var(--paper); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--rule); overflow: hidden; }
+#pal input { width: 100%; box-sizing: border-box; border: 0; border-bottom: 1px solid var(--rule); padding: 16px 18px; font: 500 18px var(--f-body); background: transparent; color: var(--ink); outline: none; }
+#pal ul { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow: auto; }
+#pal li { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+#pal li.on { background: var(--ochre-soft); }
+#pal li img { width: 26px; height: 26px; }
+#pal li .k { margin-left: auto; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+@media (max-width: 640px) { #help { display: none; } #bar .lbl { display: none; } }
+@media (prefers-reduced-motion: reduce) { .v.changed { animation: none; } .arrow { transition: none; } }
+</style>
+
+<div id="vp" aria-label="Campaign canvas"><div id="world"></div></div>
+<svg id="threads"></svg>
+<div id="tends"></div>
+<div id="rulerT"></div><div id="rulerL"></div>
+<div id="arrows"></div>
+<div id="toast" hidden></div>
+<div id="title"><div class="disp">Turnip Almanac <span>·</span> Runs in the sprawl</div><div class="sub">Simplified Shadowrun 2e v2.1 · prototype with a sample campaign</div></div>
+<div id="help"><button id="helpX" aria-label="Hide help">✕</button>
+<b>Scroll</b> to pan · <b>pinch</b> or <b>ctrl-scroll</b> to zoom<br>
+<b>Double-click</b> a thing to fly to it, empty space for a note<br>
+<b>⌘K</b> or <b>/</b> to jump · <b>Alt ←</b> back<br>
+Hover a <b>number</b> on a sheet to see where it comes from · tap ⚄ to roll</div>
+<button id="helpQ" hidden aria-label="Show help">?</button>
+<div id="bar">
+  <button id="bBack" title="Back (Alt ←)" disabled>‹ <span class="lbl">Back</span></button>
+  <button id="bFwd" title="Forward (Alt →)" disabled><span class="lbl">Fwd</span> ›</button>
+  <button id="bAll" title="See everything (0)">◎ <span class="lbl">All</span></button>
+  <span class="sep"></span>
+  <span id="pins" style="display:flex;gap:4px"></span>
+  <span class="sep"></span>
+  <button id="bJump" title="Jump to (⌘K)">⌕ <span class="lbl">Jump</span> <kbd>⌘K</kbd></button>
+</div>
+<div id="pal" hidden><div class="box"><input id="palIn" placeholder="Jump to a runner, place, rule, session…" autocomplete="off"><ul id="palList"></ul></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="rigs/ssr2.js"></script>
+<script src="campaign.js"></script>
+<script>
+(() => {
+'use strict';
+const C = window.CAMPAIGN, R = window.RIG;
+const $ = (s, r = document) => r.querySelector(s);
+const vp = $('#vp'), world = $('#world');
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem('turnip-almanac-1') || '{}'); } catch { return {}; } },
+  set(v) { try { localStorage.setItem('turnip-almanac-1', JSON.stringify(v)); } catch {} },
+};
+const saved = store.get();
+const state = { notes: saved.notes || null, pins: saved.pins || ['pc-tusk', 'overmap', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, asof: {} };
+let dirty = true;
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls });
+
+// ------------------------------------------------------------------ node registry + semantic zoom ownership
+const nodes = {};
+const lodNodes = new Set();
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function place(e, x, y, w, h) { e.style.left = x + 'px'; e.style.top = y + 'px'; if (w != null) e.style.width = w + 'px'; if (h != null) e.style.height = h + 'px'; }
+function reg(id, o) { o.id = id; nodes[id] = o; if (o.el) o.el.dataset.id = id; if (o.lod) addLod(o); return o; }
+function addLod(o) { o.el.dataset.lod = 1; o._z = null; o.lodEls = null; lodNodes.add(o); }
+const LODSEL = '.f, .m, .nr, .fm';
+function ownLodEls(el) { return [...el.querySelectorAll(LODSEL)].filter(x => (x.dataset.lod != null ? x.parentElement.closest('[data-lod]') : x.closest('[data-lod]')) === el); }
+function add(parent, cls, x, y, w, h, html) { const e = el('div', 'n ' + cls, html); place(e, x, y, w, h); parent.appendChild(e); return e; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+const printIndex = Object.fromEntries(C.print.map(p => [p.id, p]));
+const placeIndex = Object.fromEntries(C.places.map(p => [p.id, p]));
+const npcIndex = Object.fromEntries(C.npcs.map(p => [p.id, p]));
+function titleOf(id) { return printIndex[id]?.title || placeIndex[id]?.name || npcIndex[id]?.name || nodes[id]?.title || id; }
+const backlinks = {};
+function linkify(text, fromId) {
+  return esc(text).replace(/\{\{([\w-]+)\}\}/g, (_, id) => {
+    (backlinks[id] = backlinks[id] || []).push(fromId);
+    const g = placeIndex[id]?.icon; const pg = printIndex[id] ? ` <small>p.${printIndex[id].page}</small>` : '';
+    return `<span class="chip" data-go="${id}">${g ? `<img src="${g}" alt="">` : ''}${esc(titleOf(id))}${pg}</span>`;
+  });
+}
+
+// ------------------------------------------------------------------ layout constants (world units)
+const SW = 1000;                                  // sheet width
+const L = { shelfX: -4500, overX: -2500, overY: 0, overW: 1400, overH: 1000, headX: 0, col0: 1120, colW: 640, colGap: 40 };
+const nS = C.sessions.length;
+const colX = i => L.col0 + i * (L.colW + L.colGap);
+L.nowX = colX(nS) - L.colGap / 2;
+
+// ------------------------------------------------------------------ the shelf: Harry's book, its index beside its real pages
+const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PGAP = 90;
+const bookX = L.shelfX, bookY = -500, IDXW = 580, pagesX = 660;
+const pageY = n => 150 + (n - 1) * (PH + PGAP);
+const bookH = pageY(BK.pages) + PH + 120, bookW = pagesX + PW + 60;
+const bk = add(world, 'bk', bookX, bookY, bookW, bookH, `
+  <div class="cover f"><img src="assets/genre-modern.png" alt=""><div class="fl">${esc(BK.title)}</div><div class="sub">${esc(BK.sub)}</div></div>
+  <div class="bhead m"><img src="assets/genre-modern.png" alt="" style="width:64px;height:64px"><div><h2>${esc(BK.title)}</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
+reg(BK.id, { el: bk, title: BK.title + ' 2e', kind: 'book', icon: 'assets/genre-modern.png', box: { x: bookX, y: bookY, w: bookW, h: bookH }, lod: [380, 99999] });
+// index column: one card per rule section, grouped by page
+let iy = 150;
+const regionsByPage = {};
+BK.chapters.forEach(ch => {
+  add(bk, 'chap m', 30, iy, IDXW - 40, 34, esc(ch.title)); iy += 44;
+  const es = C.print.filter(p => p.page === ch.page);
+  es.forEach((p, i) => {
+    const x = 30 + (i % 2) * 278, y = iy + Math.floor(i / 2) * 150;
+    const ce = add(bk, 'entry card m', x, y, 266, 138, `
+      <div class="fm"><h3>${esc(p.title)}</h3></div>
+      <div class="nr"><h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">Read it on page ${p.page}</span></div><div class="backs"></div></div>`);
+    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: { x: bookX + x, y: bookY + y, w: 266, h: 138 }, lod: [110, 330] });
+  });
+  iy += Math.ceil(es.length / 2) * 150 + 30;
+});
+// the pages: drawn by pdf.js only once you are close enough to read them
+const pageFrames = [];
+for (let n = 1; n <= BK.pages; n++) {
+  const pf = add(bk, 'pagef m', pagesX, pageY(n), PW, PH, `<div class="ph fm">${n}<small>page ${n} of ${BK.pages}</small></div><div class="cv nr"></div><div class="pnum">p.${n}</div>`);
+  const o = reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: { x: bookX + pagesX, y: bookY + pageY(n), w: PW, h: PH }, lod: [120, 300], n });
+  pageFrames.push(o);
+}
+// regions: each rule's one home is its box on the real page
+C.print.forEach(p => {
+  const k = PW / BK.pw, [x, y, w, h] = p.rect;
+  const pf = nodes['page-' + p.page].el;
+  const re = add(pf, 'region', x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}</span>`);
+  reg(p.id, { el: re, title: p.title, kind: 'rule', sub: `p.${p.page}`, text: p.text, box: { x: bookX + pagesX + x * k - 6, y: bookY + pageY(p.page) + y * k - 6, w: w * k + 12, h: h * k + 12 } });
+});
+
+// ------------------------------------------------------------------ overmap
+const om = add(world, 'overmap', L.overX, L.overY, L.overW, L.overH, `
+  <div class="omh m"><h2>The sprawl</h2><div class="t">Campaign map. Each place opens its table in Turnip Works.</div></div>
+  <div class="f" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div class="fl" style="font-size:150px;text-align:center">The sprawl<div style="font-size:70px;color:var(--ink-2);font-weight:500">campaign map</div></div></div>`);
+reg('overmap', { el: om, title: 'Campaign map', kind: 'map', icon: 'assets/type-OFC.png', box: { x: L.overX, y: L.overY, w: L.overW, h: L.overH }, lod: [300, 99999] });
+const svgNS = 'http://www.w3.org/2000/svg';
+const rs = document.createElementNS(svgNS, 'svg'); rs.setAttribute('class', 'm'); om.appendChild(rs);
+C.roads.forEach(([a, b]) => { const p = placeIndex[a], q = placeIndex[b]; const l = document.createElementNS(svgNS, 'path');
+  const mx = (p.x + q.x) / 2 + (q.y - p.y) * .12, my = (p.y + q.y) / 2 - (q.x - p.x) * .12;
+  l.setAttribute('d', `M${p.x},${p.y} Q${mx},${my} ${q.x},${q.y}`); l.setAttribute('class', 'road'); rs.appendChild(l); });
+
+// ------------------------------------------------------------------ characters: choices + karma log -> computed sheet
+const PCS = C.pcs;
+const pcById = Object.fromEntries(PCS.map(p => [p.id, p]));
+const clone = o => JSON.parse(JSON.stringify(o));
+function choicesOf(pc) { return state.choices[pc.id] || (state.choices[pc.id] = clone(pc.choices || R.blank(''))); }
+const sheetEls = {};
+const STEP_KEYS = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life'];
+const STEP_NAME = { meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
+const resolveSrc = (pc, id) => id.startsWith('B:') ? `b-${pc.id}-${id.slice(2)}` : id;
+
+function stepper(pc, path, v, min, max, label) {
+  return `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-1" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${label}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="1" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${label}">+</button></div>`;
+}
+function stepHead(pc, S, key, no, title, rule) {
+  const used = S.spend.filter(x => x.src[0] === 'B:' + key).reduce((s, x) => s + x.pts, 0);
+  return `<div class="q"><span class="no">${no}</span><h3>${title}</h3>${rule ? `<span class="chip" data-go="${rule}">p.${printIndex[rule].page}</span>` : ''}<span class="sub">${used ? used + ' pts here · ' : ''}${S.left} of 100 left</span></div>`;
+}
+function builderHtml(pc, S) {
+  const ch = choicesOf(pc), P = R.P;
+  const opt = (path, v, cur, title, eff, cost, disabled) => `<button class="opt${cur === v ? ' sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="${path}" data-v="${v}" aria-pressed="${cur === v}" ${disabled ? 'disabled' : ''}><b>${title}${cost != null ? `<em>${cost}</em>` : ''}</b><span>${eff}</span></button>`;
+  const row = (on, title, eff, cost, ctl) => `<div class="row${on ? ' on' : ''}"><div><b>${title}</b><span>${eff}</span><span class="cost">${cost}</span></div>${ctl}</div>`;
+  let h = '';
+  h += `<div class="bstep" data-id="b-${pc.id}-name">${stepHead(pc, S, 'name', '0', 'Name', P.sheet)}<div class="hint">What the street calls you.</div><input data-act="name" data-pc="${pc.id}" value="${esc(ch.name || '')}" placeholder="Runner name" aria-label="Runner name"></div>`;
+  // metatype + the human racial bonus panel (reserved: it creases when you are not human)
+  h += `<div class="bstep" data-id="b-${pc.id}-meta">${stepHead(pc, S, 'meta', '1', 'Metatype', P.meta)}<div class="hint">Start with 100 points and 60 Essence. Every attribute and skill starts at 1.</div><div class="opts">`;
+  Object.entries(R.META).forEach(([k, m]) => h += opt('meta', k, ch.meta, m.name, m.text, m.pts + ' pts'));
+  h += `</div><div style="height:300px;margin-top:16px">`;
+  if (ch.meta === 'human') {
+    h += `<div class="grouph"><span>Human racial bonuses</span><span>${(ch.human || []).length} of 3 · 3 pts each</span></div><div class="rows" style="grid-template-columns:repeat(4,1fr);gap:8px">`;
+    R.ALL_SKILLS.forEach(s => { const on = (ch.human || []).includes(s); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="human" data-v="${s}" data-max="3" aria-pressed="${on}"><b style="font-size:20px">+1 ${R.SK_NAME[s]}</b></button>`; });
+    h += `</div>`;
+  } else h += `<div class="crease" style="height:300px">Human racial bonuses · this opens if you choose Human</div>`;
+  h += `</div></div>`;
+  // attributes
+  h += `<div class="bstep" data-id="b-${pc.id}-attr">${stepHead(pc, S, 'attr', '2', 'Attributes', P.attr)}<div class="hint">+1 costs 7 points; +2 costs 25. Target numbers are 6 − attribute.</div><div class="rows">`;
+  R.ATTRS.forEach(a => { const v = ch.attr[a] || 0; h += row(v > 0, `${R.ATTR_NAME[a]} → ${S.attr[a]}`, `TN ${Math.max(1, 6 - S.attr[a])} for ${R.SKILLS[a].map(s => R.SK_NAME[s]).join(', ')}`, `+${v} · ${R.ATTR_COST[v]} pts`, stepper(pc, 'attr.' + a, v, 0, 2, R.ATTR_NAME[a])); });
+  h += `</div></div>`;
+  // skills
+  h += `<div class="bstep" data-id="b-${pc.id}-skills">${stepHead(pc, S, 'skills', '3', 'Skills', P.skillcost)}<div class="hint">Ratings 2–3 cost 1 each, 4–6 cost 2, 7–9 cost 3. Buy up to 9. Magic is capped at Essence ÷ 10 (now ${S.magicCap}).</div>`;
+  R.ATTRS.forEach(a => {
+    h += `<div class="grouph"><span>${R.ATTR_NAME[a]} ${S.attr[a]}</span><span>TN ${Math.max(1, 6 - S.attr[a])}</span></div><div class="rows">`;
+    R.SKILLS[a].forEach(s => { const v = Math.max(1, ch.skills[s] || 1); const max = s === 'magic' ? Math.min(9, Math.max(1, S.magicCap)) : 9;
+      h += row(v > 1, `${R.SK_NAME[s]}${S.skill[s] !== v ? ` → ${S.skill[s]}` : ''}`, v > 1 ? `${R.skillCost(1, v)} pts for ${v}` : 'free at 1', v < max ? `next: ${R.stepCost(v + 1)} pts` : 'at cap', stepper(pc, 'skills.' + s, v, 1, max, R.SK_NAME[s])); });
+    h += `</div>`;
+  });
+  h += `</div>`;
+  // magic: choose a tradition; spells and extras live in a reserved slot
+  h += `<div class="bstep" data-id="b-${pc.id}-magic">${stepHead(pc, S, 'magic', '4', 'Magic', P.magic)}<div class="hint">A tradition costs 30 points. Without one, skip this step.</div><div class="opts three">`;
+  Object.entries(R.TRAD).forEach(([k, t]) => h += opt('trad', k, ch.trad, t.name, t.text, t.pts + ' pts'));
+  h += `</div><div style="height:820px;margin-top:16px">`;
+  if (ch.trad) {
+    const T = R.TRAD[ch.trad];
+    h += `<div class="rows" style="margin-bottom:12px">`;
+    if (!T.projection) h += row(!!ch.extras?.projection, 'Astral Projection', 'Travel without your body through unwarded places.', '10 pts', `<button class="opt${ch.extras?.projection ? ' sel' : ''}" style="padding:8px 14px" data-act="flag" data-pc="${pc.id}" data-path="extras.projection">${ch.extras?.projection ? 'Bought' : 'Buy'}</button>`);
+    else h += row(true, 'Astral Projection', 'Included with Shaman.', '0 pts', '');
+    h += row(!!ch.extras?.elemental, 'Elemental Summoning', T.spirits ? 'Spirit summoning is free; elementals cost extra.' : 'Call elementals in downtime.', '10 pts', `<button class="opt${ch.extras?.elemental ? ' sel' : ''}" style="padding:8px 14px" data-act="flag" data-pc="${pc.id}" data-path="extras.elemental">${ch.extras?.elemental ? 'Bought' : 'Buy'}</button>`);
+    h += `</div><div class="grouph"><span>Spells · 3 pts each${T.freeSpells ? ` · first ${T.freeSpells} free` : ''}${T.selfOnly ? ' · self only' : ''}</span><span>${(ch.spells || []).length} chosen</span><span class="chip" data-go="${P.spells}">p.2</span></div><div class="opts three">`;
+    R.SPELLS.forEach(sp => { const on = (ch.spells || []).includes(sp.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:10px 12px" data-act="toggle" data-pc="${pc.id}" data-path="spells" data-v="${sp.id}" aria-pressed="${on}"><b style="font-size:21px">${sp.name}</b><span style="font-size:16px">${sp.eff}</span></button>`; });
+    h += `</div>`;
+  } else h += `<div class="crease" style="height:820px">Spells, projection and summoning · this opens when you choose a tradition</div>`;
+  h += `</div></div>`;
+  // cyberware
+  h += `<div class="bstep" data-id="b-${pc.id}-cyber">${stepHead(pc, S, 'cyber', '5', 'Cyberware', P.cyber)}<div class="hint">Essence ${S.essence} of 60 left. Every 10 Essence spent lowers the Magic cap by 1.</div><div class="rows">`;
+  R.CYBER.forEach(c => { const v = ch.cyber[c.id] || 0; h += row(v > 0, c.name, c.eff, `${c.ess} Ess · ${c.pts} pts`, stepper(pc, 'cyber.' + c.id, v, 0, c.max, c.name)); });
+  h += `</div><div class="grouph" style="margin-top:16px"><span>Skillwires set this skill to 5</span></div><select data-act="wire" data-pc="${pc.id}" ${ch.cyber.skillwires ? '' : 'disabled'} aria-label="Skillwire skill"><option value="">${ch.cyber.skillwires ? 'Choose a skill' : 'Needs skillwires'}</option>${R.ALL_SKILLS.map(s => `<option value="${s}" ${ch.wire === s ? 'selected' : ''}>${R.SK_NAME[s]}</option>`).join('')}</select></div>`;
+  // gear
+  h += `<div class="bstep" data-id="b-${pc.id}-gear">${stepHead(pc, S, 'gear', '6', 'Weapons & gear', P.gear)}<div class="hint">Wear one armor outfit; the best one counts. A knife, phone and clothes are free.</div><div class="rows">`;
+  R.GEAR.forEach(g => { const v = ch.gear[g.id] || 0; h += row(v > 0, g.name, g.eff, g.pts ? `${g.pts} pts` : 'free', stepper(pc, 'gear.' + g.id, v, 0, g.max, g.name)); });
+  h += `</div></div>`;
+  // vehicles
+  h += `<div class="bstep" data-id="b-${pc.id}-veh">${stepHead(pc, S, 'veh', '7', 'Vehicles & drones', P.veh)}<div class="hint">Mounted weapons are bought separately as gear. Vehicles cannot Soak.</div><div class="rows">`;
+  R.VEH.forEach(v => { const n = ch.veh[v.id] || 0; h += row(n > 0, v.name, `${v.form} · HP ${v.hp} · armor ${v.armor} · ${v.speed} mph · mounts ${v.mounts}`, `${v.pts} pts`, stepper(pc, 'veh.' + v.id, n, 0, v.max, v.name)); });
+  h += `</div></div>`;
+  // decks + chips
+  h += `<div class="bstep" data-id="b-${pc.id}-deck">${stepHead(pc, S, 'deck', '8', 'Deck & chips', P.decks)}<div class="hint">A deck sets hacking Actions and armor. Each operation needs its chip.</div><div class="opts three">`;
+  R.DECKS.forEach(d => h += opt('deck', d.id, ch.deck, d.name, `Actions ${d.actions}${d.armor ? ' · armor ' + d.armor : ''}`, d.pts + ' pts'));
+  h += `</div><div class="chipgrid" style="margin-top:18px"><span class="h"></span>${R.CHIP_KINDS.map(k => `<span class="h">${k}</span>`).join('')}`;
+  R.CHIPS.forEach((rowc, t) => { h += `<span class="h">${R.CHIP_TIERS[t][0]} ${R.CHIP_TIERS[t][1]}</span>`; rowc.forEach(c => { if (!c) { h += '<span class="h" style="text-align:center">—</span>'; return; } const on = !!ch.chips[c[0]];
+    h += `<button class="${on ? 'sel' : ''}" data-act="flag" data-pc="${pc.id}" data-path="chips.${c[0]}" aria-pressed="${on}">${c[1]}<span>${c[2]} pts</span></button>`; }); });
+  h += `</div></div>`;
+  // circles
+  h += `<div class="bstep" data-id="b-${pc.id}-circles">${stepHead(pc, S, 'circles', '9', 'Social circles', P.circles)}<div class="hint">Contact 1 pt [6L], friend 3 [9M], patron 5 [12S]. Your first two contacts are free.</div><div class="rows one">`;
+  R.CIRCLES.forEach(c => { const cur = ch.circles[c] || ''; h += `<div class="row${cur ? ' on' : ''}"><div><b>${c}</b></div><div class="seg">${['', 'contact', 'friend', 'patron'].map(l => `<button class="${cur === l ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="circles.${c}" data-v="${l}">${l ? R.CIRCLE_LV[l].name : 'None'}</button>`).join('')}</div></div>`; });
+  h += `</div></div>`;
+  // lifestyle
+  h += `<div class="bstep" data-id="b-${pc.id}-life">${stepHead(pc, S, 'life', '10', 'Lifestyle', P.life)}<div class="hint">You start with ¥100 plus your lifestyle’s cash.</div><div class="opts three">`;
+  Object.entries(R.LIFE).forEach(([k, l]) => h += opt('life', k, ch.life, l.name, `+¥${l.cash.toLocaleString()} · ${l.tool}`, l.pts + ' pts'));
+  h += `</div><div class="interp"><b>Where the rules are open, this rig decides:</b><br>${R.interpretations.map(esc).join('<br>')}</div></div>`;
+  return h;
+}
+
+function rollHtml(r) {
+  const dice = r.dice.map(d => `<i class="${d.ok ? 'ok' : ''}">${d.chain.join('+')}</i>`).join('');
+  return `<div class="roll"><b>${esc(r.label)}</b><span class="tn">${r.pool}d6 · TN ${r.tn}</span><span class="dd">${dice}</span><span class="verdict${r.succ ? '' : ' fail'}">${r.succ} · ${esc(r.verdict)}</span></div>`;
+}
+function renderSheet(pc) {
+  const box = sheetEls[pc.id];
+  const ch = choicesOf(pc);
+  const asOf = state.asof[pc.id] ?? 99;
+  const S = R.compute(ch, pc.karma, asOf);
+  const live = state.live[pc.id] || (state.live[pc.id] = { dmg: pc.id === 'pc-tusk' ? ['L', 'L', 'B'] : [] });
+  const filled = live.dmg.filter(Boolean).length, woundTN = S.adept ? 0 : filled >= 4 ? 3 : filled >= 1 ? 1 : 0;
+  const nm = ch.name || 'New runner';
+  const who = [S.meta?.name, pc.archetype].filter(Boolean).join(' · ');
+  const prev = box._prev || {};
+  const pv = (key, v, sm) => `<span class="pv${sm ? ' sm' : ''}${prev[key] != null && prev[key] !== v ? ' changed' : ''}" data-prov="${key}" tabindex="0">${v}</span>`;
+  const sessionsWith = new Set(pc.karma.map(k => k.s));
+  const asofBtns = ['Start', ...C.sessions.map(s => 'S' + s.n), 'Now'].map((lab, i) => { const val = lab === 'Now' ? 99 : i; const on = asOf === val;
+    return `<button data-act="asof" data-pc="${pc.id}" data-v="${val}" class="${on ? 'on' : ''}${sessionsWith.has(i) ? ' has' : ''}" aria-pressed="${on}">${lab}</button>`; }).join('');
+  const P = R.P, chip = (id, lab) => `<span class="chip" data-go="${id}">${lab || 'p.' + printIndex[id].page}</span>`;
+  const cols = R.ATTRS.map(a => `<div class="acol"><div class="ahead"><span class="an">${R.ATTR_NAME[a]}</span><span>${pv('a:' + a, S.attr[a], true)} <span class="tn">TN ${Math.max(1, 6 - S.attr[a])}</span></span></div>
+      ${R.SKILLS[a].map(s => `<div class="sk${S.skill[s] ? '' : ' zero'}"><span class="k">${R.SK_NAME[s]}</span><span>${pv('s:' + s, S.skill[s], true)}</span><button class="die nr" data-act="roll" data-pc="${pc.id}" data-skill="${s}" title="Roll ${R.SK_NAME[s]}: ${S.skill[s]}d6 at TN ${S.tn(s) + woundTN}" aria-label="Roll ${R.SK_NAME[s]}">⚄</button></div>`).join('')}</div>`).join('');
+  const track = Array.from({ length: S.health }, (_, i) => `<button class="${live.dmg[i] || ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Damage box ${i + 1}: ${live.dmg[i] === 'L' ? 'lethal' : live.dmg[i] === 'B' ? 'bashing' : 'empty'}">${live.dmg[i] || ''}</button>`).join('');
+  const listOr = (arr, f) => arr.length ? arr.map(f).join('') : '<div class="none">None</div>';
+  const kLeft = S.karma.earned - S.karma.spent;
+  box.innerHTML = `
+    <button class="pinbtn m${state.pins.includes(pc.id) ? ' on' : ''}" data-pin="${pc.id}" aria-label="Pin to bar">★</button>
+    <div class="sh-far f"><div class="fl">${esc(nm)}</div><div class="sub">${esc(who || 'Not built yet')}</div><div class="lv">${esc(pc.player)} · ${S.pts}/100 pts · Essence ${S.essence}</div></div>
+    <div class="main m">
+      <div><div class="nm disp${ch.name ? '' : ' empty'}">${esc(nm)}</div><div class="who">${esc(who || 'Not built yet')} · played by ${esc(pc.player)}</div>
+        <div class="asof nr">As of ${asofBtns}</div></div>
+      <div class="budget nr">
+        <div class="${S.left < 0 ? 'over' : ''}"><div class="k">Points</div><div class="bv">${pv('pts', S.pts, true)} <span class="tn">/ 100 · ${S.left} left</span></div><div class="bar"><i style="width:${Math.min(100, S.pts)}%"></i></div></div>
+        <div><div class="k">Essence</div><div class="bv">${pv('essence', S.essence, true)} <span class="tn">/ 60 · Magic cap ${S.magicCap}</span></div><div class="bar"><i style="width:${Math.max(0, S.essence) / 60 * 100}%"></i></div></div>
+        <div><div class="k">Karma ${chip(P.karma)}</div><div class="bv">${kLeft} <span class="tn">free · ${S.karma.earned} earned</span></div><div class="bar"><i style="width:${S.karma.earned ? S.karma.spent / S.karma.earned * 100 : 0}%"></i></div></div>
+      </div>
+      ${S.warn.length ? `<div class="warn nr">${S.warn.map(esc).join('<br>')}</div>` : ''}
+      <div class="grid4">${cols}</div>
+      <div class="der">
+        <div><div class="k">Actions</div>${pv('actions', S.actions)}${S.rig ? `<small>rigging ${S.actions + S.rig}</small>` : ''}${S.deck ? `<small>deck ${S.deck.actions}</small>` : ''}</div>
+        <div><div class="k">Armor</div>${pv('armor', S.armor)}<small>${S.outfit ? esc(S.outfit.name) : 'no outfit'}</small></div>
+        <div><div class="k">Health</div>${pv('health', S.health)}<small>3 + Body</small></div>
+        <div><div class="k">Essence</div>${pv('essence', S.essence)}<small>of 60</small></div>
+        <div><div class="k">Cash</div><span class="pv sm" data-prov="cash" tabindex="0">¥${S.cash.toLocaleString()}</span><small>${S.life ? esc(S.life.name) : 'no lifestyle'}</small></div>
+      </div>
+      <div class="nr"><div class="sec">Damage ${chip(P.combat)} <span style="text-transform:none;letter-spacing:0;font-weight:400">tap: bashing, lethal, clear</span></div><div class="track">${track}<span class="wound">${filled ? (S.adept ? 'Adept: no wound penalty' : `Wounded: TN +${woundTN}`) : ''}</span>
+        <button class="die" style="width:auto;padding:0 10px;margin-left:auto" data-act="roll" data-pc="${pc.id}" data-skill="soak" data-soak="1">Soak ⚄</button></div></div>
+      <div class="nr"><div class="sec">Rolls ${chip(P.rolls)}</div><div class="rolls">${(state.rolls[pc.id] || []).slice(0, 4).map(rollHtml).join('') || '<div class="list"><div class="none">Tap a die beside a skill to roll it. Sixes carry on, per the modified rule of six.</div></div>'}</div></div>
+      <div class="cols2 nr">
+        <div><div class="sec">Cyberware ${chip(P.cyber)}</div><div class="list">${listOr(S.cyber, c => `<div><b>${esc(c.name)}${c.n > 1 ? ' ×' + c.n : ''}</b> <span class="e">${esc(c.eff)}${c.id === 'skillwires' && ch.wire ? ` (${R.SK_NAME[ch.wire]})` : ''}</span></div>`)}</div></div>
+        <div><div class="sec">Weapons & gear ${chip(P.gear)}</div><div class="list">${listOr(S.gear, g => `<div><b>${esc(g.name)}${g.n > 1 ? ' ×' + g.n : ''}</b> <span class="e">${esc(g.eff)}</span></div>`)}${S.trollDmg ? '<div class="e">Troll: +1 damage with melee and unarmed.</div>' : ''}</div></div>
+        <div><div class="sec">Magic ${chip(P.magic)}</div><div class="list">${S.trad ? `<div><b>${esc(S.trad.name)}</b> <span class="e">${esc(S.trad.text)}</span></div>` + S.spells.map(sp => `<div><b>${esc(sp.name)}</b> <span class="e">[${esc(sp.eff)}]${sp.free ? ' · free' : ''}${sp.karma ? ` · ${chip(sp.karma, 'karma')}` : ''}</span></div>`).join('') : '<div class="none">No tradition</div>'}</div></div>
+        <div><div class="sec">Vehicles, deck & chips ${chip(P.veh)}</div><div class="list">${listOr([...S.veh.map(v => `<div><b>${esc(v.name)}${v.n > 1 ? ' ×' + v.n : ''}</b> <span class="e">HP ${v.hp}, armor ${v.armor}, ${v.speed} mph</span></div>`), ...(S.deck ? [`<div><b>${esc(S.deck.name)}</b> <span class="e">Actions ${S.deck.actions}${S.deck.armor ? ', armor ' + S.deck.armor : ''}</span></div>`] : []), ...S.chips.map(c => `<div><b>${esc(c.name)}</b> <span class="e">${c.kind} ${c.tier[1]}</span></div>`)], x => x)}</div></div>
+        <div><div class="sec">Social circles ${chip(P.circles)}</div><div class="list"></div></div>
+        <div><div class="sec">Lifestyle</div><div class="list">${S.life ? `<div><b>${esc(S.life.name)}</b> <span class="e">${S.life.tool} · ¥${S.life.cash.toLocaleString()}</span></div>` : '<div class="none">None</div>'}</div></div>
+      </div>
+      <div class="nr"><div class="sec">Where the ${S.pts} points went ${chip(P.start)}</div><div class="ledger">${S.spend.map(x => `<div><span>${esc(x.label)}</span><span>${x.pts}</span></div>`).join('') || '<div><span>Nothing bought yet</span><span>0</span></div>'}</div></div>
+    </div>
+    <div class="builder m" data-id="builder-${pc.id}">
+      <div class="bf fm"><div class="fl">Build</div><div class="t">${ch.meta ? 'Every choice behind this sheet. Zoom in to change one.' : 'Zoom in here to make this runner.'}</div><div style="font-size:30px">⤢</div><div class="t">${S.left} of 100 points left</div></div>
+      <div class="binner nr">${builderHtml(pc, S)}</div>
+    </div>`;
+  const cl = box.querySelector('.cols2 > div:nth-child(5) .list');
+  cl.innerHTML = S.circles.length ? S.circles.map(c => `<div><b>${esc(c.name)}</b> <span class="e">${esc(Object.values(R.CIRCLE_LV).find(l => l.tool === c.tool).name.toLowerCase())} ${c.tool}${c.free ? ' · free' : ''}</span></div>`).join('') : '<div class="none">None</div>';
+  // size the builder to its steps, the sheet to whichever is taller
+  const inner = box.querySelector('.binner'), bh = Math.ceil(inner.offsetHeight * 0.25);
+  box.querySelector('.builder').style.height = bh + 'px';
+  const mh = box.querySelector('.main').offsetHeight + 56;
+  box._h = Math.max(bh + 32, mh);
+  box.style.height = (box._fixedH || box._h) + 'px';
+  box._prev = Object.fromEntries([...R.ATTRS.map(a => ['a:' + a, S.attr[a]]), ...R.ALL_SKILLS.map(s => ['s:' + s, S.skill[s]]), ['actions', S.actions], ['armor', S.armor], ['health', S.health], ['essence', S.essence], ['pts', S.pts]]);
+  const prov = {}; Object.entries(S.prov).forEach(([k, ids]) => prov[k] = [...new Set(ids.flatMap(id => S.prov[id] && id !== k ? S.prov[id] : [id]).map(id => resolveSrc(pc, id)))]);
+  box._prov = prov;
+  if (nodes[pc.id]) { nodes[pc.id].title = nm; nodes[pc.id].sub = who; nodes[pc.id].lodEls = null; nodes[pc.id]._z = null; }
+  box.querySelectorAll('.bstep[data-id], [data-id^="b-"]').forEach(e => { const id = e.dataset.id; nodes[id] = Object.assign(nodes[id] || {}, { id, title: `${nm} · builder: ${STEP_NAME[id.split('-').pop()] || ''}`, kind: 'step', el: e }); });
+  addLod({ el: box.querySelector('.builder'), box: { w: 240 }, lod: [0, 300] });
+  dirty = true;
+}
+
+// sheets first (they set the lane height), then lanes
+PCS.forEach(pc => { const e = add(world, 'sheet', L.headX, 0, SW, null); sheetEls[pc.id] = e;
+  reg(pc.id, { el: e, title: '', kind: 'character', icon: 'assets/tool-pawns.png', box: { x: L.headX, y: 0, w: SW, h: 100 }, lod: [220, 480] }); renderSheet(pc); });
+const pcLaneH = Math.max(...PCS.map(pc => sheetEls[pc.id]._h)) + 60;
+const lanes = []; let ly = 0;
+PCS.forEach(p => { lanes.push({ id: p.id, kind: 'pc', y: ly, h: pcLaneH }); ly += pcLaneH + 60; });
+C.npcs.forEach(p => { lanes.push({ id: p.id, kind: 'npc', y: ly, h: 420 }); ly += 480; });
+C.threads.forEach(p => { lanes.push({ id: p.id, kind: 'thread', y: ly, h: 420 }); ly += 480; });
+L.lanesH = ly;
+lanes.filter(l => l.kind === 'pc').forEach(ln => { const e = sheetEls[ln.id]; e._fixedH = pcLaneH - 40; place(e, L.headX, ln.y, SW, pcLaneH - 40); nodes[ln.id].box = { x: L.headX, y: ln.y, w: SW, h: pcLaneH - 40 }; });
+
+// ------------------------------------------------------------------ zones (behind everything)
+function zone(id, title, x, y, w, h, labelSize, labelTop) {
+  const z = el('div', 'n zone', `<div class="zl f" style="font-size:${labelSize}px;top:${labelTop}px">${title}</div>`); place(z, x, y, w, h); world.prepend(z);
+  reg(id, { el: z, title, kind: 'zone', box: { x, y, w, h }, lod: [w * 0.5, 99999] });
+}
+zone('z-shelf', 'The Shelf', bookX - 80, bookY - 700, bookW + 160, bookH + 800, 380, 60);
+zone('z-camp', 'Campaign', L.overX - 40, -700, L.overW + 80, 1800, 260, 40);
+
+// ------------------------------------------------------------------ lanes, columns, now line, cells
+const bandsFrag = [];
+lanes.forEach((ln, i) => { const e = el('div', 'n lane' + (i % 2 ? ' alt' : '')); place(e, -20, ln.y - 20, colX(nS + 1) + 20, ln.h + 40); e.dataset.band = 1; bandsFrag.push(e); });
+C.sessions.forEach((s, i) => {
+  const c = el('div', 'n col'); place(c, colX(i) - L.colGap / 2, -340, 1, L.lanesH + 360); c.dataset.band = 1; bandsFrag.push(c);
+  const h = add(world, 'colhead card', colX(i), -320, L.colW, 250, `
+    <div class="f"><div class="fl" style="font-size:100px">S${s.n}</div><div class="fl" style="font-size:46px;color:var(--ink-2);font-weight:500;margin-top:6px">${esc(s.title)}</div></div>
+    <div class="m"><div class="num">Session ${s.n}</div><h2>${esc(s.title)}</h2><div class="date">${esc(s.date)}</div><div class="recap nr">${esc(s.recap)}</div></div>`);
+  reg('s' + s.n, { el: h, title: `S${s.n} · ${s.title}`, kind: 'session', box: { x: colX(i), y: -320, w: L.colW, h: 250 }, lod: [200, 520] });
+});
+{
+  const pw = el('div', 'n prepwash'); place(pw, colX(nS), -340, L.colW, L.lanesH + 320); pw.dataset.band = 1; bandsFrag.push(pw);
+  const h = add(world, 'colhead prep', colX(nS), -320, L.colW, 250, `
+    <div class="f"><div class="fl" style="font-size:100px;font-style:italic">S${C.prep.n}?</div></div>
+    <div class="m"><div class="num">Next session · prep</div><h2>${esc(C.prep.title)}</h2><div class="date">${esc(C.prep.date)}</div><div class="recap nr">Ideas sit up here, unsettled, until the table makes them true.</div></div>`);
+  reg('s' + C.prep.n, { el: h, title: `S${C.prep.n} · ${C.prep.title}`, kind: 'session', box: { x: colX(nS), y: -320, w: L.colW, h: 250 }, lod: [200, 520] });
+  const nl = el('div', 'n nowline'); place(nl, L.nowX - 2, -440, 4, L.lanesH + 460); nl.dataset.band = 1; bandsFrag.push(nl);
+  const nt = add(world, '', L.nowX - 60, -490, 120, 50, '<div class="nowtag">Now</div>');
+  reg('now', { el: nt, title: 'Now · next session', kind: 'now', icon: 'assets/tool-build.png', box: { x: L.nowX - 40, y: -340, w: L.colW + 80, h: 1600 } });
+  const ib = add(world, 'inbox', colX(nS), -1040, L.colW, 580, `<div class="ih"><h2>Inbox</h2>Loose notes land here. Drag them where they belong, or leave them.</div>`);
+  reg('inbox', { el: ib, title: 'Inbox · loose notes', kind: 'inbox', box: { x: colX(nS), y: -1040, w: L.colW, h: 580 } });
+}
+bandsFrag.reverse().forEach(e => world.insertBefore(e, world.querySelector('.n:not(.zone)')));
+// lane heads for people and threads
+lanes.filter(l => l.kind !== 'pc').forEach(ln => {
+  const o = ln.kind === 'npc' ? npcIndex[ln.id] : C.threads.find(t => t.id === ln.id);
+  const e = add(world, 'lanehead card', L.headX, ln.y, SW, ln.h, `
+    <div class="f"><div class="fl" style="font-size:80px">${esc(o.name)}</div></div>
+    <div class="m">${o.icon ? `<img src="${o.icon}" alt="">` : ''}<div class="num" style="font:600 13px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ochre)">${ln.kind === 'npc' ? 'Person' : 'Thread'}</div><h2>${esc(o.name)}</h2><div class="t">${esc(o.text || 'An open question the table keeps pulling on.')}</div><div class="t backs nr"></div></div>`);
+  reg(ln.id, { el: e, title: o.name, kind: ln.kind === 'npc' ? 'person' : 'thread', icon: o.icon, box: { x: L.headX, y: ln.y, w: SW, h: ln.h }, lod: [220, 99999] });
+});
+// places
+C.places.forEach(p => {
+  const e = add(om, 'place', p.x, p.y, null, null, `
+    <img class="pi" src="${p.icon}" alt=""><div class="fm"><div class="pn">${esc(p.name)}</div></div>
+    <div class="nr"><div class="pn">${esc(p.name)}</div><div class="pnote">${esc(p.note)}</div>
+    <a class="tw" href="https://turnipworks.net/" target="_blank" rel="noopener">Open table in Turnip Works ↗</a><div class="backs"></div></div>`);
+  reg(p.id, { el: e, title: p.name, kind: 'place', icon: p.icon, box: { x: L.overX + p.x - 100, y: L.overY + p.y - 75, w: 200, h: 150 }, lod: [60, 190] });
+});
+// cells: lane × session, with karma cards for the party
+lanes.forEach(ln => {
+  const row = C.cells[ln.id] || {}, pc = pcById[ln.id];
+  [...C.sessions.map(s => s.n), C.prep.n].forEach((n, i) => {
+    const notes = (row[n] || []).map((t, j) => ({ id: `c-${ln.id}-${n}-${j}`, text: t, idea: n === C.prep.n }));
+    const ks = pc ? pc.karma.filter(k => k.s === n) : [];
+    if (!notes.length && !ks.length) return;
+    const cell = add(world, 'cellnotes', colX(i), ln.y + (n === C.prep.n ? 0 : 40), L.colW, null);
+    ks.forEach(k => {
+      const buys = (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', ');
+      const e = el('div', 'cnote adv', `<div class="lvl">Karma +${k.award || 0}</div>${buys ? `<div class="what">${esc(buys)}</div>` : ''}<div class="why">${esc(k.note || 'Banked.')}</div>`);
+      cell.appendChild(e); reg(k.id, { el: e, title: `${titleOf(pc.id)} · karma S${n}${buys ? ': ' + buys : ''}`, kind: 'karma', sub: `S${n}` });
+    });
+    notes.forEach(nt => { const e = el('div', 'cnote' + (nt.idea ? ' idea' : ''), linkify(nt.text, nt.id)); cell.appendChild(e);
+      reg(nt.id, { el: e, title: e.textContent.slice(0, 70), kind: nt.idea ? 'idea' : 'note', sub: `S${n} · ${titleOf(ln.id)}` }); });
+  });
+});
+PCS.forEach(pc => { nodes[pc.id].title = choicesOf(pc).name || 'New runner'; });
+function backHtml(id) { const b = [...new Set(backlinks[id] || [])]; if (!b.length) return '';
+  return 'Mentioned in ' + b.map(f => { const m = f.match(/^c-(.+)-(\d+)-\d+$/); return `<span class="chip" data-go="${f}">S${m[2]}</span>`; }).join(' '); }
+Object.keys(backlinks).forEach(id => { const tgt = nodes['idx-' + id] || nodes[id]; const b = tgt?.el?.querySelector('.backs'); if (b) b.innerHTML = backHtml(id); });
+
+// loose notes
+let dragNote = null;
+function makeNote(nt) {
+  const e = add(world, 'loose', nt.x, nt.y, null, null, `<div class="grip"><button aria-label="Delete note">✕</button></div><div class="body" contenteditable="true" spellcheck="false"></div>`);
+  e.querySelector('.body').textContent = nt.text || '';
+  e.querySelector('.body').addEventListener('input', ev => { nt.text = ev.target.textContent; nodes[nt.id].title = nt.text.slice(0, 60) || 'Note'; persist(); });
+  e.querySelector('.grip button').addEventListener('click', () => { e.remove(); state.notes = state.notes.filter(n => n !== nt); delete nodes[nt.id]; persist(); });
+  e.querySelector('.grip').addEventListener('pointerdown', ev => { if (ev.target.closest('button')) return; ev.stopPropagation(); dragNote = { nt, e, sx: ev.clientX, sy: ev.clientY, ox: nt.x, oy: nt.y }; });
+  reg(nt.id, { el: e, title: (nt.text || 'Note').slice(0, 60), kind: 'loose note', box: { x: nt.x, y: nt.y, w: 220, h: 120 } });
+  return e;
+}
+if (!state.notes) state.notes = [
+  { id: 'n-1', x: colX(nS) + 30, y: -920, text: 'Ask Clutch’s player whether Clutch keeps the BigBeatle or trades up to a GunBug.' },
+  { id: 'n-2', x: colX(nS) + 300, y: -800, text: 'Grey paid ¥4,000 each. Where did that money come from?' },
+];
+state.notes.forEach(makeNote);
+
+// ------------------------------------------------------------------ camera
+const cam = { x: 0, y: 0, s: 0.2 };
+const MIN_S = 0.03, MAX_S = 9;
+function W() { return vp.clientWidth; } function H() { return vp.clientHeight; }
+function apply() {
+  world.style.transform = `translate(${-cam.x * cam.s}px, ${-cam.y * cam.s}px) scale(${cam.s})`;
+  let step = 40; while (step * cam.s < 18) step *= 5; while (step * cam.s > 90) step /= 5;
+  const g = step * cam.s; vp.style.backgroundSize = `${g}px ${g}px`; vp.style.backgroundPosition = `${-cam.x * cam.s % g}px ${-cam.y * cam.s % g}px`;
+  dirty = true;
+}
+function zoomAt(sx, sy, f) {
+  const ns = Math.min(MAX_S, Math.max(MIN_S, cam.s * f));
+  const wx = cam.x + sx / cam.s, wy = cam.y + sy / cam.s;
+  cam.s = ns; cam.x = wx - sx / ns; cam.y = wy - sy / ns; apply();
+}
+const view = () => [cam.x + W() / 2 / cam.s, cam.y + H() / 2 / cam.s, W() / cam.s];   // center + world width
+function setView([cx, cy, w]) { cam.s = W() / w; cam.x = cx - w / 2; cam.y = cy - H() / 2 / cam.s; apply(); }
+// van Wijk & Nuij smooth zoom-pan (as in d3.interpolateZoom, rho = sqrt 2)
+function interpZoom(p0, p1) {
+  const rho = Math.SQRT2, rho2 = 2, rho4 = 4;
+  const [ux0, uy0, w0] = p0, [ux1, uy1, w1] = p1, dx = ux1 - ux0, dy = uy1 - uy0, d2 = dx * dx + dy * dy;
+  let i, S;
+  if (d2 < 1e-12) { S = Math.log(w1 / w0) / rho; i = t => [ux0 + t * dx, uy0 + t * dy, w0 * Math.exp(rho * t * S)]; }
+  else { const d1 = Math.sqrt(d2), b0 = (w1 * w1 - w0 * w0 + rho4 * d2) / (2 * w0 * rho2 * d1), b1 = (w1 * w1 - w0 * w0 - rho4 * d2) / (2 * w1 * rho2 * d1),
+    r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0), r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1); S = (r1 - r0) / rho;
+    i = t => { const s = t * S, c0 = Math.cosh(r0), u = w0 / (rho2 * d1) * (c0 * Math.tanh(rho * s + r0) - Math.sinh(r0)); return [ux0 + u * dx, uy0 + u * dy, w0 * c0 / Math.cosh(rho * s + r0)]; }; }
+  i.duration = Math.abs(S) * 1000; return i;
+}
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let anim = null;
+const hist = { back: [], fwd: [] };
+function flyToView(target, record = true) {
+  if (record) { hist.back.push(view()); hist.fwd = []; syncHist(); }
+  const from = view(); if (anim) cancelAnimationFrame(anim.raf);
+  if (reduced) { setView(target); return; }
+  const it = interpZoom(from, target), dur = Math.min(1800, Math.max(450, it.duration * 0.9)), t0 = performance.now();
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => { const t = Math.min(1, (now - t0) / dur); setView(it(ease(t))); if (t < 1) anim = { raf: requestAnimationFrame(step) }; else anim = null; };
+  anim = { raf: requestAnimationFrame(step) };
+}
+function boxOf(id) {
+  const n = nodes[id]; if (!n) return null;
+  if (n.box) return n.box;
+  // nested things (cell notes, builder steps): measure on screen, convert to world
+  let e = n.el; while (e && !e.getClientRects().length) e = e.parentElement;
+  if (!e) return null; const r = e.getBoundingClientRect();
+  return { x: cam.x + r.left / cam.s, y: cam.y + r.top / cam.s, w: r.width / cam.s, h: r.height / cam.s };
+}
+function viewFor(b, pad = 1.18) { const w = Math.max(b.w * pad, b.h * pad * W() / H()); return [b.x + b.w / 2, b.y + b.h / 2, Math.max(w, W() / MAX_S)]; }
+function flyTo(id) {
+  if (id.startsWith('b-') || id.startsWith('builder-')) { flyToBuilder(id); return; }
+  let b = boxOf(id);
+  if (!b) return;
+  // tall things (sheets, the book): fit the width and land on the top, then scroll down
+  const aspect = W() / H();
+  if (b.h > b.w / aspect * 1.25 && b.w > 400) b = { x: b.x, y: b.y, w: b.w, h: b.w / aspect * 0.95 };
+  flash(id);
+  flyToView(viewFor(b));
+}
+// The builder is a narrow region on the sheet: fit its WIDTH at a readable size and land on the
+// step's top, so you then scroll down through the steps. Positions come from layout, not the screen,
+// because the steps are hidden until you are close enough to read them.
+const BSCALE = .25;
+function flyToBuilder(id) {
+  const pcId = id.replace(/^b-|^builder-/, '').replace(/-(name|meta|attr|skills|magic|cyber|gear|veh|deck|circles|life)$/, '');
+  const sb = nodes[pcId].box, bx = sb.x + SW - 16 - 240, by = sb.y + 16;
+  let top = 0;
+  if (id.startsWith('b-')) {
+    const inner = sheetEls[pcId].querySelector('.binner'), off = inner.classList.contains('lodoff');
+    inner.classList.remove('lodoff');
+    const e = sheetEls[pcId].querySelector(`[data-id="${id}"]`); top = e ? e.offsetTop * BSCALE : 0;
+    if (off) inner.classList.add('lodoff');
+  }
+  const screenW = Math.min(720, W() - 40), worldW = 240 * W() / screenW;
+  flash(id);
+  flyToView([bx + 120, by + top - 12 + (H() / 2) / (W() / worldW), worldW]);
+}
+function flash(id) { const e = nodes[id]?.el; if (!e) return; e.classList.add('hl'); setTimeout(() => e.classList.remove('hl'), 1800); }
+function overview() { flyToView(viewFor({ x: bookX - 120, y: bookY - 760, w: colX(nS + 1) - bookX + 140, h: L.lanesH - bookY + 800 }, 1.03)); }
+function syncHist() { $('#bBack').disabled = !hist.back.length; $('#bFwd').disabled = !hist.fwd.length; }
+function goBack() { if (!hist.back.length) return; hist.fwd.push(view()); flyToView(hist.back.pop(), false); syncHist(); }
+function goFwd() { if (!hist.fwd.length) return; hist.back.push(view()); flyToView(hist.fwd.pop(), false); syncHist(); }
+
+// ------------------------------------------------------------------ semantic zoom pass
+function bumpLod() { dirty = true; }
+function lodPass() {
+  for (const n of lodNodes) {
+    if (!n.el.isConnected) { lodNodes.delete(n); continue; }
+    const sw = n.box.w * cam.s, z = sw < n.lod[0] ? 'far' : sw < n.lod[1] ? 'mid' : 'near';
+    if (n._z === z) continue;
+    n._z = z; n.el.dataset.z = z;
+    if (!n.lodEls) n.lodEls = ownLodEls(n.el);
+    for (const e of n.lodEls) {
+      const c = e.classList, show = c.contains('f') ? z === 'far' : c.contains('m') ? z !== 'far' : c.contains('nr') ? z === 'near' : z !== 'near';
+      c.toggle('lodoff', !show);
+    }
+  }
+}
+
+// ------------------------------------------------------------------ rulers, edge arrows, threads
+const rulerT = $('#rulerT'), rulerL = $('#rulerL'), arrowsEl = $('#arrows');
+function rulers() {
+  const items = [];
+  const cols = [...C.sessions.map((s, i) => ({ lab: `S${s.n} · ${s.title}`, x0: colX(i), x1: colX(i) + L.colW })), { lab: `S${C.prep.n} · prep`, x0: colX(nS), x1: colX(nS) + L.colW }];
+  const showTop = cam.y > -80 && cam.s > 0.08 && cam.x + W() / cam.s > L.col0;   // header row scrolled away
+  if (showTop) cols.forEach(c => { const a = (c.x0 - cam.x) * cam.s, b = (c.x1 - cam.x) * cam.s; if (b < 60 || a > W() - 60) return;
+    items.push(`<div class="rl" style="left:${Math.max(a + 70, Math.min((a + b) / 2, b - 70))}px">${esc(c.lab)}</div>`); });
+  const nx = (L.nowX - cam.x) * cam.s; if (showTop && nx > 20 && nx < W() - 20) items.push(`<div class="rl now" style="left:${nx}px;top:40px">Now</div>`);
+  rulerT.innerHTML = items.join('');
+  const li = [];
+  if ((L.headX + SW - cam.x) * cam.s < 30 && cam.s > 0.08 && cam.x < colX(nS + 1)) lanes.forEach(ln => { const a = (ln.y - cam.y) * cam.s, b = (ln.y + ln.h - cam.y) * cam.s; if (b < 80 || a > H() - 80) return;
+    li.push(`<div class="rl" style="top:${Math.max(a + 60, Math.min((a + b) / 2, b - 60))}px">${esc(titleOf(ln.id))}</div>`); });
+  rulerL.innerHTML = li.join('');
+}
+const anchors = [
+  { id: 'z-shelf', label: 'The Shelf', icon: 'assets/genre-modern.png', target: 'book-ssr2' },
+  { id: 'overmap', label: 'Campaign map', icon: 'assets/type-OFC.png', target: 'overmap' },
+  { id: 'z-party', label: 'Party', icon: 'assets/tool-pawns.png', target: 'z-party', box: { x: -40, y: -40, w: SW + 80, h: PCS.length * (pcLaneH + 60) } },
+  { id: 'now', label: 'Now', icon: 'assets/tool-build.png', target: 'now' },
+  { id: 'inbox', label: 'Inbox', icon: 'assets/genres-all.png', target: 'inbox' },
+];
+arrowsEl.innerHTML = anchors.map(a => `<div class="arrow" data-anchor="${a.id}" tabindex="0" role="button" style="opacity:0;pointer-events:none"><img src="${a.icon}" alt=""><span>${a.label}</span><span class="dir">➜</span></div>`).join('');
+function contentCoverage() {
+  // how much of the screen is covered by real things (not bands/zones)
+  let area = 0; const vw = W(), vh = H();
+  for (const id in nodes) { const n = nodes[id]; if (!n.box || n.kind === 'zone' || n.kind === 'now') continue;
+    const x0 = Math.max(0, (n.box.x - cam.x) * cam.s), y0 = Math.max(0, (n.box.y - cam.y) * cam.s);
+    const x1 = Math.min(vw, (n.box.x + n.box.w - cam.x) * cam.s), y1 = Math.min(vh, (n.box.y + n.box.h - cam.y) * cam.s);
+    if (x1 > x0 && y1 > y0) area += (x1 - x0) * (y1 - y0); }
+  return area / (vw * vh);
+}
+function edgeArrows() {
+  const lost = contentCoverage() < 0.1, vw = W(), vh = H(), cx = vw / 2, cy = vh / 2, inset = 54;
+  const pts = [];
+  anchors.forEach(a => {
+    const e = arrowsEl.querySelector(`[data-anchor="${a.id}"]`), b = a.box || nodes[a.target].box;
+    const sx = (b.x + b.w / 2 - cam.x) * cam.s, sy = (b.y + b.h / 2 - cam.y) * cam.s;
+    const onScreen = (b.x + b.w - cam.x) * cam.s > 0 && (b.x - cam.x) * cam.s < vw && (b.y + b.h - cam.y) * cam.s > 0 && (b.y - cam.y) * cam.s < vh;
+    if (!lost || onScreen) { e.style.opacity = 0; e.style.pointerEvents = 'none'; return; }
+    const dx = sx - cx, dy = sy - cy, k = Math.min((vw / 2 - inset - 60) / Math.abs(dx || 1e-6), (vh / 2 - inset) / Math.abs(dy || 1e-6));
+    let px = cx + dx * k, py = cy + dy * k;
+    pts.forEach(p => { if (Math.abs(p[0] - px) < 150 && Math.abs(p[1] - py) < 44) py += py < cy ? 46 : -46; }); pts.push([px, py]);
+    e.style.left = px + 'px'; e.style.top = py + 'px'; e.style.opacity = 1; e.style.pointerEvents = 'auto';
+    e.querySelector('.dir').style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+  });
+}
+arrowsEl.addEventListener('click', ev => { const a = ev.target.closest('[data-anchor]'); if (!a) return; const an = anchors.find(x => x.id === a.dataset.anchor);
+  if (an.box) flyToView(viewFor(an.box, 1.05)); else flyTo(an.target); });
+arrowsEl.addEventListener('keydown', ev => { if (ev.key === 'Enter') ev.target.click(); });
+
+const threadsSvg = $('#threads'), tends = $('#tends');
+let threadSrc = null;       // { pcId, key, pinned }
+function drawThreads() {
+  if (!threadSrc) { threadsSvg.innerHTML = ''; tends.innerHTML = ''; return; }
+  const box = sheetEls[threadSrc.pcId], vEl = box.querySelector(`.main [data-prov="${threadSrc.key}"]`);
+  if (!vEl) return;
+  const r0 = vEl.getBoundingClientRect(), x0 = r0.left + r0.width / 2, y0 = r0.top + r0.height / 2;
+  let paths = '', pills = ''; const placed = [];
+  const vw = W(), vh = H();
+  (box._prov[threadSrc.key] || []).forEach(id => {
+    const n = nodes[id]; if (!n || !n.el) return;
+    let e = n.el; while (e && !e.getClientRects().length) e = e.parentElement;
+    if (!e) return;
+    const r = e.getBoundingClientRect(); let x1 = r.left + r.width / 2, y1 = r.top + r.height / 2;
+    if (id.startsWith('b-') && e !== n.el && e.classList.contains('builder')) {   // folded builder: aim at where that step sits
+      const inner = e.querySelector('.binner'); inner.classList.remove('lodoff'); const top = n.el.offsetTop, hh = n.el.offsetHeight; inner.classList.add('lodoff');
+      y1 = r.top + Math.min(r.height - 6, (top + Math.min(hh, 140) / 2) * BSCALE * cam.s); }
+    const off = x1 < 0 || x1 > vw || y1 < 0 || y1 > vh;
+    if (off) { const dx = x1 - x0, dy = y1 - y0, k = Math.min(Math.abs((dx > 0 ? vw - 70 - x0 : 70 - x0) / (dx || 1e-6)), Math.abs((dy > 0 ? vh - 60 - y0 : 60 - y0) / (dy || 1e-6)));
+      x1 = x0 + dx * k; y1 = y0 + dy * k; }
+    const mx = (x0 + x1) / 2, my = Math.min(y0, y1) - 40 - Math.abs(x1 - x0) * .08;
+    paths += `<path d="M${x0},${y0} Q${mx},${my} ${x1},${y1}"/><circle cx="${x1}" cy="${y1}" r="4"/>`;
+    const lab = id.startsWith('b-') ? 'builder: ' + (STEP_NAME[id.split('-').pop()] || '') : (printIndex[id] ? `${titleOf(id)} · p.${printIndex[id].page}` : titleOf(id));
+    let py = y1 - (off ? 0 : 18);
+    while (placed.some(([qx, qy]) => Math.abs(qx - x1) < 170 && Math.abs(qy - py) < 26)) py += (y1 > vh / 2 ? -28 : 28);
+    placed.push([x1, py]);
+    if (off || !id.startsWith('b-')) pills += `<div class="tend" data-go="${id}" style="left:${x1}px;top:${py}px">${off ? '↗ ' : ''}${esc(lab)}</div>`;
+  });
+  threadsSvg.innerHTML = paths; tends.innerHTML = pills;
+}
+
+// ------------------------------------------------------------------ frame loop
+function frame() {
+  if (dirty) { dirty = false; lodPass(); rulers(); edgeArrows(); drawThreads(); pagesPass(); }
+  requestAnimationFrame(frame);
+}
+
+// ------------------------------------------------------------------ input
+let pan = null, pinch = null; const ptrs = new Map();
+const interactive = t => t.closest('button, input, select, a, [contenteditable], .chip, .tend, .arrow, [data-go], .opt, [data-act]');
+vp.addEventListener('pointerdown', ev => {
+  ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }; pan = null; return; }
+  if (dragNote || interactive(ev.target)) return;
+  pan = { sx: ev.clientX, sy: ev.clientY, cx: cam.x, cy: cam.y, moved: false };
+});
+window.addEventListener('pointermove', ev => {
+  if (ptrs.has(ev.pointerId)) ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (pinch && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+    cam.x -= (cx - pinch.cx) / cam.s; cam.y -= (cy - pinch.cy) / cam.s; zoomAt(cx, cy, d / pinch.d); pinch = { d, cx, cy }; return; }
+  if (dragNote) { const n = dragNote; n.nt.x = n.ox + (ev.clientX - n.sx) / cam.s; n.nt.y = n.oy + (ev.clientY - n.sy) / cam.s; place(n.e, n.nt.x, n.nt.y); nodes[n.nt.id].box = { x: n.nt.x, y: n.nt.y, w: 220, h: 120 }; return; }
+  if (!pan) return;
+  const dx = ev.clientX - pan.sx, dy = ev.clientY - pan.sy;
+  if (!pan.moved && Math.hypot(dx, dy) < 4) return;
+  if (!pan.moved) { pan.moved = true; vp.classList.add('panning'); if (anim) { cancelAnimationFrame(anim.raf); anim = null; } }
+  cam.x = pan.cx - dx / cam.s; cam.y = pan.cy - dy / cam.s; apply();
+});
+const up = ev => { ptrs.delete(ev.pointerId); if (ptrs.size < 2) pinch = null; if (dragNote) { dragNote = null; persist(); } pan = null; vp.classList.remove('panning'); };
+window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+vp.addEventListener('wheel', ev => {
+  ev.preventDefault(); if (anim) { cancelAnimationFrame(anim.raf); anim = null; }
+  const mouseWheel = ev.deltaMode === 1 || (ev.deltaX === 0 && Math.abs(ev.deltaY) >= 50 && Number.isInteger(ev.deltaY));
+  if (ev.ctrlKey || ev.metaKey) zoomAt(ev.clientX, ev.clientY, Math.exp(-ev.deltaY * 0.01));
+  else if (mouseWheel && !ev.shiftKey) zoomAt(ev.clientX, ev.clientY, Math.exp(-ev.deltaY * (ev.deltaMode === 1 ? 0.05 : 0.0018)));
+  else { cam.x += (ev.shiftKey && !ev.deltaX ? ev.deltaY : ev.deltaX) / cam.s; cam.y += (ev.shiftKey && !ev.deltaX ? 0 : ev.deltaY) / cam.s; apply(); }
+}, { passive: false });
+vp.addEventListener('dblclick', ev => {
+  if (interactive(ev.target)) return;
+  const hit = ev.target.closest('[data-id]');
+  const id = hit?.dataset.id;
+  if (id && nodes[id] && !['zone'].includes(nodes[id].kind) && !hit.dataset.band) {
+    // the deepest meaningful thing: a builder region on a sheet, else the node
+    const b = ev.target.closest('.builder'); flyTo(b ? b.dataset.id : id); return;
+  }
+  const wx = cam.x + ev.clientX / cam.s, wy = cam.y + ev.clientY / cam.s;
+  const nt = { id: 'n-' + Date.now().toString(36), x: wx - 110, y: wy - 20, text: '' };
+  state.notes.push(nt); const e = makeNote(nt); persist();
+  if (cam.s < 0.6) { setTimeout(() => e.querySelector('.body').focus(), 900); flyToView(viewFor({ x: nt.x - 200, y: nt.y - 150, w: 620, h: 420 })); }
+  else e.querySelector('.body').focus();
+});
+document.addEventListener('click', ev => {
+  const go = ev.target.closest('[data-go]');
+  if (go && !ev.target.closest('.opt:not(.sel)')) { ev.preventDefault(); ev.stopPropagation(); flyTo(go.dataset.go); return; }
+  const act = ev.target.closest('[data-act]'); if (act && act.tagName === 'BUTTON' && !act.disabled) { doAct(act); return; }
+  const pn = ev.target.closest('[data-pin]'); if (pn) { const id = pn.dataset.pin; state.pins = state.pins.includes(id) ? state.pins.filter(x => x !== id) : [...state.pins, id]; persist(); renderPins(); pn.classList.toggle('on'); return; }
+  const v = ev.target.closest('.main .pv[data-prov]');
+  if (v) { const pcId = v.closest('[data-id]').dataset.id; const same = threadSrc && threadSrc.pinned && threadSrc.pcId === pcId && threadSrc.key === v.dataset.prov;
+    document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned'));
+    threadSrc = same ? null : { pcId, key: v.dataset.prov, pinned: true }; if (threadSrc) v.classList.add('pinned'); dirty = true; return; }
+  if (threadSrc?.pinned && !pan) { threadSrc = null; document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned')); dirty = true; }
+}, true);
+document.addEventListener('pointerover', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v && !threadSrc?.pinned) { threadSrc = { pcId: v.closest('[data-id]').dataset.id, key: v.dataset.prov }; dirty = true; } });
+document.addEventListener('pointerout', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v && threadSrc && !threadSrc.pinned) { threadSrc = null; dirty = true; } });
+document.addEventListener('focusin', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v) { threadSrc = { pcId: v.closest('[data-id]').dataset.id, key: v.dataset.prov }; dirty = true; } });
+// ---- builder and sheet actions: every control writes the choices object, then the sheet is recomputed
+function getPath(o, path) { return path.split('.').reduce((a, k) => a == null ? a : a[k], o); }
+function setPath(o, path, v) { const ks = path.split('.'), last = ks.pop(); const t = ks.reduce((a, k) => (a[k] = a[k] ?? {}), o); if (v === null || v === '' || v === 0 && ks.length) delete t[last]; else t[last] = v; }
+function doAct(a) {
+  const pc = pcById[a.dataset.pc]; if (!pc) return;
+  const ch = choicesOf(pc), act = a.dataset.act, path = a.dataset.path;
+  if (act === 'inc') { const v = (getPath(ch, path) ?? (path.startsWith('skills.') ? 1 : 0)) + +a.dataset.d; setPath(ch, path, Math.max(+a.dataset.min, Math.min(+a.dataset.max, v))); }
+  else if (act === 'set') { const v = a.dataset.v; setPath(ch, path, getPath(ch, path) === v ? null : v); if (path === 'trad' && !ch.trad) { ch.spells = ch.spells || []; } }
+  else if (act === 'flag') { setPath(ch, path, getPath(ch, path) ? null : 1); }
+  else if (act === 'toggle') { const arr = getPath(ch, path) || []; const v = a.dataset.v; const max = +a.dataset.max || 99;
+    setPath(ch, path, arr.includes(v) ? arr.filter(x => x !== v) : (arr.length >= max ? [...arr.slice(1), v] : [...arr, v])); }
+  else if (act === 'asof') { state.asof[pc.id] = +a.dataset.v; renderSheet(pc); return; }
+  else if (act === 'dmg') { const live = state.live[pc.id]; const i = +a.dataset.i; const cur = live.dmg[i]; live.dmg[i] = cur === 'B' ? 'L' : cur === 'L' ? null : 'B'; persist(); renderSheet(pc); return; }
+  else if (act === 'roll') { rollFor(pc, a.dataset.skill, !!a.dataset.soak); return; }
+  persist(); renderSheet(pc);
+}
+function rollFor(pc, skill, soak) {
+  const S = R.compute(choicesOf(pc), pc.karma, state.asof[pc.id] ?? 99);
+  const live = state.live[pc.id], filled = live.dmg.filter(Boolean).length, wound = S.adept ? 0 : filled >= 4 ? 3 : filled >= 1 ? 1 : 0;
+  const r = R.roll(S.skill[skill], S.tn(skill) + wound);
+  r.label = soak ? `Soak (${R.SK_NAME[skill]})` : R.SK_NAME[skill];
+  if (soak && r.succ) r.verdict = `Soak ${1 + r.bonuses} damage`;
+  (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift({ label: r.label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict });
+  state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist();
+  // show the result where the die was tapped, then keep it in the sheet's roll log
+  const t = $('#toast'), src = sheetEls[pc.id].querySelector(soak ? '[data-soak]' : `.main [data-act="roll"][data-skill="${skill}"]`), rr = src?.getBoundingClientRect();
+  t.innerHTML = rollHtml(state.rolls[pc.id][0]); t.style.left = Math.max(180, Math.min(W() - 180, rr ? rr.left + rr.width / 2 : W() / 2)) + 'px'; t.style.top = Math.max(90, rr ? rr.top : H() / 2) + 'px';
+  t.hidden = false; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.hidden = true, 300); }, 2600);
+  renderSheet(pc);
+}
+document.addEventListener('input', ev => { const i = ev.target.closest('input[data-act="name"]'); if (!i) return; const pc = pcById[i.dataset.pc]; const ch = choicesOf(pc); ch.name = i.value; persist();
+  const box = sheetEls[pc.id], nm = ch.name || 'New runner'; box.querySelector('.nm').textContent = nm; box.querySelector('.nm').classList.toggle('empty', !ch.name); box.querySelector('.sh-far .fl').textContent = nm; nodes[pc.id].title = nm; });
+document.addEventListener('change', ev => { const s = ev.target.closest('select[data-act="wire"]'); if (!s) return; const pc = pcById[s.dataset.pc]; choicesOf(pc).wire = s.value || null; persist(); renderSheet(pc); });
+
+// ---- the book's pages: pdf.js draws a page only when you are close enough to read it
+let pdfDoc = null, pdfFailed = false;
+(async () => {
+  try {
+    if (!window.pdfjsLib) throw new Error('pdf.js did not load');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfDoc = await pdfjsLib.getDocument(C.book.file).promise; dirty = true;
+  } catch (e) { pdfFailed = true; console.warn('Book pages unavailable:', e.message);
+    pageFrames.forEach(o => { const ph = o.el.querySelector('.ph'); ph.classList.remove('fm'); ph.innerHTML = `${o.n}<small>The page could not be drawn here. The rule regions still work.</small>`; o.lodEls = null; o._z = null; }); }
+})();
+function pagesPass() {
+  if (!pdfDoc) return;
+  const vw = W(), vh = H(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  pageFrames.forEach(o => {
+    if (o._z !== 'near' || o._busy) return;
+    const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
+    if (x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0) return;
+    const want = sw * dpr > 1500 ? 2400 : 1300;
+    if ((o._res || 0) >= want) return;
+    o._busy = true;
+    pdfDoc.getPage(o.n).then(page => { const v1 = page.getViewport({ scale: 1 }), v = page.getViewport({ scale: want / v1.width });
+      const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height);
+      return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { o.el.querySelector('.cv').replaceChildren(c); o._res = want; });
+    }).catch(e => console.warn('page', o.n, e.message)).finally(() => { o._busy = false; dirty = true; });
+  });
+}
+document.addEventListener('keydown', ev => {
+  const typing = ev.target.closest('input, [contenteditable]');
+  if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); openPal(); return; }
+  if (typing) { if (ev.key === 'Escape') ev.target.blur(); return; }
+  if (ev.key === '/') { ev.preventDefault(); openPal(); }
+  else if (ev.altKey && ev.key === 'ArrowLeft') goBack();
+  else if (ev.altKey && ev.key === 'ArrowRight') goFwd();
+  else if (ev.key === '0') overview();
+  else if (ev.key === '+' || ev.key === '=') zoomAt(W() / 2, H() / 2, 1.4);
+  else if (ev.key === '-') zoomAt(W() / 2, H() / 2, 1 / 1.4);
+  else if (ev.key.startsWith('Arrow')) { const d = 120 / cam.s; if (ev.key === 'ArrowLeft') cam.x -= d; if (ev.key === 'ArrowRight') cam.x += d; if (ev.key === 'ArrowUp') cam.y -= d; if (ev.key === 'ArrowDown') cam.y += d; apply(); }
+});
+$('#bBack').onclick = goBack; $('#bFwd').onclick = goFwd; $('#bAll').onclick = overview; $('#bJump').onclick = openPal;
+function helpShown(on) { $('#help').hidden = !on; $('#helpQ').hidden = on; }
+$('#helpX').onclick = () => { helpShown(false); try { localStorage.setItem('turnip-almanac-help', '0'); } catch {} };
+$('#helpQ').onclick = () => helpShown(true);
+try { if (localStorage.getItem('turnip-almanac-help') === '0') helpShown(false); } catch {}
+if (W() < 640) helpShown(false);
+let moves = 0; const tuck = () => { if (++moves === 40 && !$('#help').hidden) helpShown(false); };
+vp.addEventListener('wheel', tuck, { passive: true }); vp.addEventListener('pointermove', e => { if (pan?.moved) tuck(); });
+window.addEventListener('resize', apply);
+
+// ------------------------------------------------------------------ pins + jump palette
+function renderPins() {
+  $('#pins').innerHTML = state.pins.filter(id => nodes[id]).map(id => { const n = nodes[id]; const ic = n.icon || anchors.find(a => a.target === id)?.icon;
+    return `<button data-go="${id}" title="${esc(n.title)}">${ic ? `<img src="${ic}" alt="">` : '★'}<span class="lbl">${esc(n.title.split(' · ')[0])}</span></button>`; }).join('');
+}
+renderPins();
+const pal = $('#pal'), palIn = $('#palIn'), palList = $('#palList'); let palSel = 0, palRes = [];
+function openPal() { pal.hidden = false; palIn.value = ''; searchPal(); palIn.focus(); }
+function closePal() { pal.hidden = true; }
+function searchPal() {
+  const q = palIn.value.trim().toLowerCase();
+  const all = Object.values(nodes).filter(n => n.title && !['zone', 'step'].includes(n.kind) && n.el);
+  const score = n => { const t = (n.title + ' ' + (n.sub || '') + ' ' + (n.text || '')).toLowerCase(); if (!q) return ['character', 'map', 'now', 'book', 'session', 'thread', 'person'].includes(n.kind) ? 1 : 0;
+    const i = n.title.toLowerCase().indexOf(q); if (i === 0) return 3; if (i > 0) return 2; return q.split(/\s+/).every(w => t.includes(w)) ? 1 : 0; };
+  palRes = all.map(n => [score(n), n]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, 9).map(x => x[1]); palSel = 0;
+  palList.innerHTML = palRes.map((n, i) => `<li class="${i === palSel ? 'on' : ''}" data-i="${i}">${n.icon ? `<img src="${n.icon}" alt="">` : '<span style="width:26px;text-align:center">·</span>'}<span>${esc(n.title)}${n.sub ? ` <small style="color:var(--ink-3)">${esc(n.sub)}</small>` : ''}</span><span class="k">${n.kind}</span></li>`).join('') || '<li>Nothing by that name.</li>';
+}
+palIn.addEventListener('input', searchPal);
+palIn.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') closePal();
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); palSel = (palSel + (ev.key === 'ArrowDown' ? 1 : -1) + palRes.length) % palRes.length; palList.querySelectorAll('li').forEach((l, i) => l.classList.toggle('on', i === palSel)); }
+  if (ev.key === 'Enter' && palRes[palSel]) { const id = palRes[palSel].id; closePal(); flyTo(id); }
+});
+palList.addEventListener('click', ev => { const li = ev.target.closest('[data-i]'); if (!li) return; const id = palRes[+li.dataset.i].id; closePal(); flyTo(id); });
+pal.addEventListener('click', ev => { if (ev.target === pal) closePal(); });
+
+// ------------------------------------------------------------------ start: the whole map
+setView(viewFor({ x: bookX - 120, y: bookY - 760, w: colX(nS + 1) - bookX + 140, h: L.lanesH - bookY + 800 }, 1.03));
+window.almanac = { cam, flyTo, nodes, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
+requestAnimationFrame(frame);
+})();
+</script>

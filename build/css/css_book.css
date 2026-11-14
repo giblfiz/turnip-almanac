@@ -1,0 +1,29 @@
+/* the book on the shelf: an index of rules beside the real pages */
+.bk { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px 22px 22px 12px; box-shadow: var(--shadow); border-left: 18px solid var(--ochre); }
+.bk .cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; padding: 80px; }
+.bk .cover .fl { font-size: 190px; }
+.bk .cover .sub { font-size: 80px; color: var(--ink-2); }
+.bk .cover img { width: 260px; height: 260px; }
+.bk .bhead { position: absolute; left: 30px; top: 26px; right: 30px; display: flex; gap: 16px; align-items: center; }
+.bk .bhead h2 { font-size: 46px; }
+.bk .bhead .t { color: var(--ink-2); font-size: 20px; margin-top: 4px; }
+.chap { position: absolute; font: 700 26px var(--f-display); color: var(--ochre); }
+.entry { padding: 12px 14px; border-radius: 12px; }
+.entry .fm h3 { font-size: 36px; line-height: 1.05; }
+.entry h3 { font-size: 19px; }
+.entry .t { font-size: 13.5px; margin-top: 4px; line-height: 1.4; }
+.entry .pg { margin-top: 6px; font-size: 12px; }
+.entry .backs { margin-top: 4px; font-size: 11px; color: var(--ink-3); }
+.entry .backs .chip { font-size: 11px; }
+.pagef { background: #fff; border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 4px; overflow: hidden; }
+.pagef .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 120px var(--f-display); color: #c9c3b6; background: repeating-linear-gradient(0deg, #f4f2ec 0 22px, #fff 22px 44px); }
+.pagef .ph small { display: block; font: 500 34px var(--f-body); color: #a8a296; text-align: center; }
+.pagef .cv { position: absolute; inset: 0; }
+.pagef .cv canvas { width: 100%; height: 100%; display: block; }
+.pagef .pnum { position: absolute; right: -2px; bottom: -40px; font: 600 22px var(--f-body); color: var(--ink-3); }
+.region { position: absolute; border-radius: 4px; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .3s, background .3s; }
+.region:hover { box-shadow: inset 0 0 0 2px #a8770f88; background: #a8770f10; }
+.region.hl { outline: none; box-shadow: inset 0 0 0 4px #a8770f; background: #a8770f22; }
+.region .rt { position: absolute; left: 0; top: -22px; font: 600 13px var(--f-body); color: #7a5608; background: #fff8e6; border: 1px solid #a8770f66; border-radius: 6px 6px 0 0; padding: 1px 7px; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.region:hover .rt, .region.hl .rt { opacity: 1; }
+

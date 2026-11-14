@@ -1,0 +1,48 @@
+/* builder: a region ON the sheet; zoom in, then scroll down through the steps */
+.builder { position: absolute; right: 16px; top: 16px; width: 240px; border: 2px dashed var(--ochre); border-radius: 14px; overflow: hidden; background: var(--ochre-soft); }
+.builder .bf { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 120px; text-align: center; gap: 14px; color: var(--ochre); }
+.builder .bf .fl { font-size: 46px; }
+.builder .bf .t { font-size: 17px; color: var(--ink-2); padding: 0 16px; }
+.binner { position: absolute; left: 0; top: 0; width: 960px; transform-origin: 0 0; transform: scale(.25); padding: 30px; box-sizing: border-box; font-size: 22px; }
+.bstep { border-radius: 22px; padding: 22px 26px; margin-bottom: 30px; background: var(--paper); border: 1px solid var(--rule); }
+.bstep .q { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.bstep .q .no { font: 700 30px var(--f-display); color: var(--ochre); }
+.bstep .q h3 { font-size: 36px; }
+.bstep .q .sub { margin-left: auto; font-size: 20px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bstep .q .chip { font-size: 18px; }
+.bstep .hint { color: var(--ink-2); font-size: 21px; margin: 8px 0 16px; line-height: 1.4; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opts.three { grid-template-columns: 1fr 1fr 1fr; }
+.opt { border: 2px solid var(--rule); border-radius: 16px; padding: 14px 16px; text-align: left; background: transparent; cursor: pointer; color: var(--ink); }
+.opt b { font: 700 26px var(--f-display); display: flex; justify-content: space-between; gap: 8px; }
+.opt b em { font: 600 20px var(--f-body); font-style: normal; color: var(--ochre); }
+.opt span { font-size: 18px; color: var(--ink-2); display: block; margin-top: 4px; line-height: 1.35; }
+.opt.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.opt:disabled { opacity: .4; cursor: not-allowed; }
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.rows.one { grid-template-columns: 1fr; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border: 1px solid var(--rule); border-radius: 14px; padding: 10px 12px; }
+.row.on { border-color: var(--ochre); background: var(--ochre-soft); }
+.row b { font: 600 22px var(--f-body); display: block; }
+.row span { font-size: 17px; color: var(--ink-2); display: block; line-height: 1.3; }
+.row .cost { font-size: 17px; color: var(--ochre); font-weight: 600; }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--rule); background: var(--paper); font: 700 26px var(--f-body); cursor: pointer; color: var(--ink); padding: 0; }
+.stepper button:hover:not(:disabled) { border-color: var(--ochre); color: var(--ochre); }
+.stepper button:disabled { opacity: .3; cursor: not-allowed; }
+.stepper output { min-width: 40px; text-align: center; font: 700 30px var(--f-display); font-variant-numeric: tabular-nums; }
+.grouph { font: 700 24px var(--f-display); margin: 14px 0 8px; display: flex; justify-content: space-between; color: var(--ink-2); }
+.seg { display: flex; border: 2px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 8px 12px; font: 600 17px var(--f-body); cursor: pointer; color: var(--ink-2); border-left: 1px solid var(--rule); }
+.seg button:first-child { border-left: 0; }
+.seg button.sel { background: var(--ochre); color: var(--paper); }
+.chipgrid { display: grid; grid-template-columns: 150px repeat(4, 1fr); gap: 8px; font-size: 18px; align-items: stretch; }
+.chipgrid .h { font-weight: 600; color: var(--ink-2); align-self: end; }
+.chipgrid button { border: 2px solid var(--rule); border-radius: 12px; background: transparent; padding: 8px; font: 600 18px var(--f-body); cursor: pointer; color: var(--ink); }
+.chipgrid button span { display: block; font-weight: 500; font-size: 15px; color: var(--ochre); }
+.chipgrid button.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.bstep input, .bstep select { width: 100%; box-sizing: border-box; font: 600 30px var(--f-display); padding: 12px 14px; border: 2px solid var(--rule); border-radius: 14px; background: var(--paper); color: var(--ink); }
+.bstep select { font: 500 22px var(--f-body); width: auto; }
+.crease { border-radius: 18px; background: repeating-linear-gradient(135deg, var(--crease) 0 12px, transparent 12px 24px); border: 2px dashed var(--ink-3); display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-2); font-size: 24px; padding: 20px; box-sizing: border-box; }
+.interp { font-size: 18px; color: var(--ink-2); border-left: 4px solid var(--ochre); padding: 6px 12px; margin-top: 10px; line-height: 1.4; }
+.bpts { position: absolute; left: 30px; right: 30px; top: 0; }

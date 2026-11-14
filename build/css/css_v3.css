@@ -1,0 +1,120 @@
+/* v4: golden-ish sheet (2100 × 1300), two bands; builder is a small box in the bottom-left corner */
+.sheet section { position: absolute; display: flex; flex-direction: column; gap: 12px; }
+.sheet .sA { left: 34px; top: 30px; width: 600px; height: 520px; }
+.sheet .sB { left: 664px; top: 30px; width: 1040px; height: 520px; }
+.sheet .sP { left: 1734px; top: 30px; width: 336px; height: 520px; }
+.sheet .sD { left: 34px; top: 580px; width: 1040px; height: 340px; }
+.sheet .sL { left: 500px; top: 950px; width: 574px; height: 320px; overflow: hidden; }
+.sheet .sC { left: 1104px; top: 580px; width: 966px; height: 690px; overflow: hidden; }
+.sheet .nm { font-size: 104px; }
+.sheet .who { font-size: 24px; }
+.sheet .sk .k { font-size: 22px; }
+.sheet .list { font-size: 16px; }
+.portrait { position: relative; width: 336px; height: 400px; border-radius: 20px; overflow: hidden; background: var(--band); border: 2px solid var(--rule); }
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .drophint { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px; font-size: 15px; text-align: center; color: #fff; background: linear-gradient(transparent, #0008); opacity: 0; transition: opacity .2s; }
+.portrait:hover .drophint, .portrait.dropping .drophint { opacity: 1; }
+.portrait.dropping, .pport.dropping { outline: 4px dashed var(--ochre); outline-offset: 4px; }
+.tokens { display: flex; gap: 8px; align-items: center; }
+.tokens button, .tokens .upl { width: 66px; height: 66px; border-radius: 12px; border: 2px solid var(--rule); background: var(--band); padding: 0; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--ink-2); box-sizing: border-box; }
+.tokens button img { width: 100%; height: 100%; object-fit: cover; }
+.tokens button.sel { border-color: var(--ochre); }
+.tokens .upl:hover, .tokens button:hover { border-color: var(--ochre); }
+.builder { border-width: 3px; }
+.builder.todo { border-color: #b3412c; }
+.builder.active { box-shadow: 0 0 0 6px var(--ochre-soft); border-style: solid; }
+.lbl.blbl { line-height: .95; }
+.donebox { border-radius: 16px; padding: 16px 18px; font-size: 20px; line-height: 1.45; margin: 12px 0; border: 2px solid; }
+.donebox b { display: block; font: 700 28px var(--f-display); margin-bottom: 4px; }
+.donebox.ok { border-color: #3f7d3a; background: #3f7d3a14; }
+.donebox.bad { border-color: #b3412c; background: #b3412c12; }
+.donebox .w { color: #b3412c; }
+.donebtn { width: 100%; }
+#threads path.build { stroke-dasharray: 10 6; stroke-width: 3; }
+.tend.build { background: var(--ink); }
+
+/* sessions as compact cards */
+.scard { padding: 30px 34px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; }
+.scard .shead { display: flex; gap: 22px; align-items: center; }
+.scard .snum { font: 700 150px/0.85 var(--f-display); color: var(--ochre); }
+.scard h2 { font-size: 52px; }
+.scard .date { font-size: 24px; color: var(--ink-2); margin-top: 4px; }
+.scard .recap { font-size: 26px; color: var(--ink-2); line-height: 1.4; }
+.scard.prep { background: color-mix(in srgb, var(--ochre) 7%, var(--paper)); border-style: dashed; }
+.scard .nowtag { margin-left: auto; align-self: flex-start; }
+.sgroups { display: flex; flex-direction: column; gap: 14px; }
+.sgroup { border-top: 1px solid var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.sgh { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.sgh img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: var(--band); }
+.sgh b { font: 700 28px var(--f-display); }
+.sgh:hover b { color: var(--ochre); }
+.tdot { width: 52px; height: 52px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ochre-soft); color: var(--ochre); font: 700 28px var(--f-display); flex: none; }
+.tdot.big { width: 130px; height: 130px; font-size: 70px; }
+.snote { font-size: 22px; line-height: 1.45; padding-left: 64px; }
+.snote.idea { font-style: italic; color: var(--ink-2); }
+.snote.karma .kk { font: 700 15px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); border: 2px solid var(--ochre); border-radius: 8px; padding: 1px 8px; }
+.snote.karma b { font-weight: 700; }
+.snote.karma .e { color: var(--ink-2); font-size: 19px; }
+.pcard { padding: 28px 30px; box-sizing: border-box; }
+.pcard .pch { display: flex; gap: 22px; align-items: flex-start; }
+.pport { width: 130px; height: 130px; border-radius: 18px; overflow: hidden; flex: none; background: var(--band); }
+.pport img { width: 100%; height: 100%; object-fit: cover; }
+.pcard .num { font: 600 18px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.pcard h2 { font-size: 54px; }
+.pcard .t { font-size: 24px; color: var(--ink-2); margin-top: 8px; line-height: 1.4; }
+.pcard .backs { margin-top: 14px; font-size: 20px; color: var(--ink-3); }
+.pcard .backs .chip { font-size: 20px; }
+.inbox .ih { font-size: 28px; padding: 30px; }
+.inbox h2 { font-size: 64px; }
+
+/* at the table: on the canvas */
+.tablecard { padding: 34px 38px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; }
+.tablecard h3 { font-size: 56px; display: flex; gap: 14px; align-items: center; }
+.tablecard h3 .chip { font: 600 20px var(--f-body); }
+.tablecard > .t { font-size: 22px; color: var(--ink-2); }
+.tablecard .rmeta { display: flex; gap: 12px; align-items: center; font-size: 24px; color: var(--ink-2); }
+.tb { border: 2px solid var(--ochre); color: var(--ochre); background: transparent; border-radius: 999px; padding: 6px 18px; font: 600 20px var(--f-body); cursor: pointer; }
+.tb:hover { background: var(--ochre-soft); }
+.tablecard .init { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.tablecard .init li { display: grid; grid-template-columns: 64px 1fr auto; grid-template-areas: "p n d" "p m w"; gap: 2px 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 14px; }
+.tablecard .init li.on { border: 3px solid var(--ochre); background: var(--ochre-soft); }
+.tablecard .init img { grid-area: p; width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
+.tablecard .init .who2 { grid-area: n; font: 700 30px var(--f-display); cursor: pointer; }
+.tablecard .init .nums { grid-area: m; font-size: 18px; color: var(--ink-2); }
+.tablecard .init .dots { grid-area: d; display: flex; gap: 4px; }
+.tablecard .init .dots i { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--ink-3); }
+.tablecard .init .dots i.B { background: #c98a1b; border-color: #c98a1b; } .tablecard .init .dots i.L { background: #b3412c; border-color: #b3412c; }
+.tablecard .init .wtn { grid-area: w; color: #b3412c; font-weight: 600; font-size: 18px; justify-self: end; }
+.tablecard .qdice { display: flex; gap: 24px; align-items: center; font-size: 24px; flex-wrap: wrap; }
+.tablecard .qdice label { display: flex; gap: 10px; align-items: center; }
+.tablecard .rolls .roll { font-size: 18px; }
+.helpcard { padding: 34px 38px; box-sizing: border-box; }
+.helpcard h3 { font-size: 56px; }
+.helpcard .t { font-size: 25px; line-height: 1.75; color: var(--ink-2); margin-top: 12px; }
+.helpcard b { color: var(--ink); }
+.artcard { background: var(--paper); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.artcard .grip { height: 26px; cursor: move; display: flex; justify-content: flex-end; background: var(--band); }
+.artcard .grip button { border: 0; background: transparent; cursor: pointer; color: var(--ink-2); }
+.artcard img { display: block; width: 100%; }
+#world img { -webkit-user-drag: none; user-select: none; }
+#world { user-select: none; -webkit-user-select: none; }
+#world input, #world textarea, #world [contenteditable] { user-select: text; -webkit-user-select: text; }
+
+/* the quickbar: one line of text, top centre, like Turnip Works */
+#qbar { position: fixed; z-index: 12; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); display: flex; align-items: flex-start; gap: 8px; min-height: 40px; padding: 0 12px; background: color-mix(in srgb, var(--paper) 92%, transparent); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); backdrop-filter: blur(10px); box-sizing: border-box; transition: width .15s ease; }
+#qbar.open { width: min(680px, calc(100% - 24px)); }
+#qbar .lead { width: 16px; height: 16px; margin-top: 12px; opacity: .55; color: var(--ink); flex: none; }
+#qbar textarea { flex: 1; min-width: 0; height: 20px; margin: 0; padding: 10px 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: 14px/20px var(--f-body); resize: none; overflow: hidden; box-sizing: content-box; }
+#qbar textarea::placeholder { color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#qbar kbd { margin-top: 10px; font: 11px var(--f-body); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+#qbar.open kbd { display: none; }
+#qres { position: fixed; z-index: 12; top: calc(58px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(680px, calc(100% - 24px)); max-height: 60vh; overflow: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); padding: 6px; box-sizing: border-box; }
+.qsec { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding: 8px 10px 4px; }
+.qrow { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.qrow.on { background: var(--ochre-soft); }
+.qrow img { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; }
+.qrow .qdot { width: 24px; height: 24px; border-radius: 6px; background: var(--ochre-soft); flex: none; }
+.qrow small { color: var(--ink-3); }
+#toast { position: fixed; z-index: 15; transform: translate(-50%, calc(-100% - 14px)); pointer-events: none; transition: opacity .25s; width: max-content; max-width: min(560px, calc(100vw - 32px)); }
+#toast .roll { box-shadow: var(--shadow); border-color: var(--ochre); font-size: 15px; }
+@media (max-width: 640px) { #qbar kbd { display: none; } }

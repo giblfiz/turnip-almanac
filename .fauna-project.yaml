@@ -1,0 +1,4 @@
+owner: harry-fauna
+publication: public
+phoenix: required
+remote: https://github.com/giblfiz/turnip-almanac.git

@@ -1,0 +1,181 @@
+/* ---- summons strip: bottom-right of the sheet, under the gear lists ---- */
+.sheet .sC { height: 470px; }
+.sheet .sS { left: 1104px; top: 1070px; width: 966px; height: 200px; gap: 8px; }
+.minisheet { flex: 1; position: relative; overflow: hidden; border-radius: 12px; background: var(--band); }
+.mini-in { position: absolute; left: 0; top: 0; width: 1830px; transform: scale(.5); transform-origin: 0 0; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; }
+.mini-in .mh { display: flex; gap: 18px; align-items: center; }
+.mini-in .mh b { font: 700 40px var(--f-display); }
+.mini-in .kind { font-size: 22px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.mini-in .rbox { margin-left: auto; font-size: 26px; display: flex; gap: 12px; align-items: center; }
+.mini-in .boxes { display: flex; gap: 6px; }
+.mini-in .boxes i { width: 26px; height: 26px; border-radius: 6px; border: 3px solid var(--ochre); }
+.mini-in .boxes i.on { background: var(--ochre); }
+.mini-in .mrow { display: flex; gap: 30px; font-size: 26px; color: var(--ink-2); }
+.mini-in .mbtns { display: flex; gap: 14px; margin-top: 6px; }
+.mini-in .btn { font-size: 24px; padding: 8px 20px; }
+.pickgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.pickgrid .btn { padding: 5px 6px; font-size: 13px; display: flex; flex-direction: column; align-items: flex-start; }
+.pickgrid .btn small { font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+.hint2 { font-size: 13px; color: var(--ink-3); }
+
+/* ---- buttons look like buttons; information looks like paper ----
+   Anything you can press: raised keycap, ochre edge, a ledge underneath, presses down.
+   Anything you read: flat, tinted, no border. */
+:root { --ledge: color-mix(in srgb, var(--ochre) 70%, #000); --btn-face: color-mix(in srgb, var(--ochre) 7%, var(--paper)); }
+.btn, .die, .stepper button, .asof button, .tokens button, .tokens .upl, .opt, .seg button, .chipgrid button, .tb, .track button, .launchbtn, .seatbtn, .donebtn, .qskills button {
+  background: var(--btn-face) !important; border: 2px solid var(--ochre) !important; box-shadow: 0 3px 0 var(--ledge) !important; color: var(--ink) !important;
+  cursor: pointer; border-radius: 10px; transition: transform .06s, box-shadow .06s; }
+.btn { font: 600 15px var(--f-body); padding: 7px 14px; }
+.btn.big { font: 700 22px var(--f-display); padding: 14px 22px; align-self: flex-start; }
+.btn.quiet { --btn-face: var(--paper); }
+.btn:hover, .die:hover, .stepper button:hover, .asof button:hover, .tokens button:hover, .tokens .upl:hover, .opt:hover, .seg button:hover, .chipgrid button:hover, .tb:hover, .track button:hover, .launchbtn:hover, .seatbtn:hover, .donebtn:hover {
+  transform: translateY(-1px); box-shadow: 0 4px 0 var(--ledge) !important; }
+.btn:active, .die:active, .stepper button:active, .asof button:active, .tokens button:active, .opt:active, .seg button:active, .chipgrid button:active, .tb:active, .track button:active, .launchbtn:active, .seatbtn:active, .donebtn:active {
+  transform: translateY(3px); box-shadow: 0 0 0 var(--ledge) !important; }
+.btn:disabled, .stepper button:disabled, .opt:disabled { opacity: .35; transform: none; box-shadow: none !important; cursor: not-allowed; }
+/* chosen states: sunk in and filled */
+.opt.sel, .seg button.sel, .chipgrid button.sel, .asof button.on, .tokens button.sel { background: var(--ochre) !important; color: var(--paper) !important; transform: translateY(3px); box-shadow: 0 0 0 var(--ledge) !important; }
+.opt.sel span, .opt.sel b em, .chipgrid button.sel span { color: color-mix(in srgb, var(--paper) 85%, transparent) !important; }
+.track button.B { background: #c98a1b !important; border-color: #8e5f0f !important; color: #fff !important; }
+.track button.L { background: #b3412c !important; border-color: #7a2a1c !important; color: #fff !important; }
+.seg { border: 0; gap: 6px; overflow: visible; }
+.seg button { border-radius: 10px; padding: 6px 12px; }
+.launchbtn { border-width: 6px !important; box-shadow: 0 14px 0 var(--ledge) !important; border-radius: 48px; border-style: solid !important; }
+.seatbtn { border-width: 4px !important; box-shadow: 0 10px 0 var(--ledge) !important; color: var(--ochre) !important; }
+/* links to elsewhere: ochre text with an arrow, a little raised */
+.chip { border: 1.5px solid var(--ochre); box-shadow: 0 2px 0 var(--ledge); background: var(--btn-face); color: var(--ink); }
+.chip:hover { text-decoration: none; transform: translateY(-1px); }
+/* information: flat, tinted, borderless */
+.budget > div, .der > div, .acol, .roll, .warn, .row, .portrait, .minisheet, .donebox { box-shadow: none; }
+.budget > div, .der > div, .acol { border: 0 !important; background: var(--band); }
+.acol .ahead { background: color-mix(in srgb, var(--ink) 6%, var(--band)); }
+.sk { border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
+.row { border: 0 !important; background: var(--band); }
+.row.on { background: var(--ochre-soft); }
+.roll { border: 0; background: var(--band); }
+.pv { cursor: help; }
+.pv:hover { outline: 2px dotted var(--ochre); background: transparent; }
+/* threads on the canvas: translucent, scale with the world, end dots fly to the far end */
+.wthreads { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; z-index: 40; }
+.wthreads path { fill: none; stroke: var(--ochre); opacity: .45; stroke-linecap: round; }
+.wthreads path.build { stroke-dasharray: 18 12; opacity: .55; }
+.wthreads circle { fill: var(--ochre); opacity: .7; }
+.wthreads circle.far { pointer-events: auto; cursor: pointer; opacity: .85; }
+#threads, #tends { display: none; }
+/* a roll button beside each tool */
+.die.sm { width: auto; height: 24px; padding: 0 8px; font: 600 12px var(--f-body); border-radius: 7px; margin-left: 4px; vertical-align: middle; box-shadow: 0 2px 0 var(--ledge) !important; }
+.list > div { line-height: 1.6; }
+/* the summon's sheet: a little card of its own */
+.minisheet { background: var(--paper) !important; border: 2px solid var(--ink-3); box-shadow: 0 2px 6px #0002 !important; }
+.mini-in .mh { background: var(--band); margin: -18px -24px 6px; padding: 14px 24px; border-bottom: 2px solid var(--ink-3); }
+.mini-in .kind { font-size: 26px; }
+/* fit: each section's contents are zoomed to fill it exactly */
+.sheet section { overflow: hidden; }
+.sheet section > .fit { display: flex; flex-direction: column; gap: 12px; transform-origin: 0 0; }
+.sheet .sC.tall { height: 690px; }
+.sheet .sB .fit { gap: 10px; }
+/* close-up portraits: the token's head and shoulders, cropped as Turnip Works does (x 80–240, y 10–170 of 320) */
+.closeup { overflow: hidden; }
+.closeup img { width: 200% !important; height: auto !important; max-width: none !important; margin-left: -50%; margin-top: -6.25%; object-fit: unset !important; display: block; }
+.portrait { width: 336px; height: 448px; }
+.tokens { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.tokens button, .tokens .upl { width: auto; height: 60px; }
+.rimg { grid-area: p; width: 64px; height: 64px; border-radius: 12px; overflow: hidden; display: block; }
+.rimg img { width: 100%; height: 100%; object-fit: cover; }
+.sgimg { width: 52px; height: 52px; border-radius: 12px; overflow: hidden; display: block; flex: none; background: var(--band); }
+.sgimg img { width: 100%; height: 100%; object-fit: cover; }
+#qback { flex: none; margin: 6px 0 6px -4px; width: 30px; height: 28px; border-radius: 8px; border: 1.5px solid var(--ochre); background: var(--btn-face); box-shadow: 0 2px 0 var(--ledge); color: var(--ink); font: 700 18px/1 var(--f-body); cursor: pointer; padding: 0; }
+#qback:active { transform: translateY(2px); box-shadow: none; }
+/* close-ups are real crops now (assets/tokens/close): show them whole */
+.closeup img { width: 100% !important; height: 100% !important; margin: 0 !important; object-fit: cover !important; }
+/* gear, ware & magic: lists pack into two flowing columns; a list with nothing in it isn't drawn */
+.sheet .cols2 { display: block; columns: 2; column-gap: 26px; }
+.sheet .cols2 > div { break-inside: avoid; margin-bottom: 14px; }
+.sheet .cols2 > div:has(> .list > .none:only-child) { display: none; }
+.ahead { white-space: nowrap; gap: 8px; }
+.ahead .an { white-space: nowrap; }
+.budget .bv { white-space: nowrap; }
+/* editable session text */
+.ed { cursor: text; border-radius: 6px; }
+.ed:hover { box-shadow: inset 0 0 0 2px var(--ochre-soft); }
+.ed.editing { outline: 3px solid var(--ochre); outline-offset: 4px; background: var(--paper); cursor: text; user-select: text; -webkit-user-select: text; }
+.snote.ed:empty::before { content: 'Type a note. @name links a person or place; a new @name makes a new person.'; color: var(--ink-3); font-style: italic; }
+.unlinked { border-bottom: 2px dashed var(--ochre); }
+.btn.addnote { align-self: flex-start; font-size: 18px; padding: 6px 16px; }
+.btn.addnote.sm { font-size: 16px; padding: 0 12px; height: 32px; margin-left: 64px; }
+.pdrop { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px; color: var(--ink-3); text-align: center; border: 3px dashed var(--rule); border-radius: 18px; box-sizing: border-box; }
+.scard > .fit, .tablecard > .fit { display: flex; flex-direction: column; gap: 16px; }
+.lbl { color: var(--ink); }
+/* pockets: a free-paste spot on every major thing */
+.pocket { border: 2px dashed color-mix(in srgb, var(--ochre) 55%, transparent); border-radius: 14px; padding: 10px 12px; background: color-mix(in srgb, var(--ochre) 4%, transparent); cursor: copy; }
+.pocket .ph2 { font: 700 15px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); }
+.pocket .pk { font: 500 12px var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 6px; }
+.pocket .scraps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.scrap.txt { background: var(--note); color: var(--note-ink); border-radius: 6px; padding: 6px 10px; font-size: 16px; line-height: 1.35; max-width: 100%; cursor: text; }
+.scrap.img { position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; background: var(--band); }
+.scrap.img img { width: 100%; height: 100%; object-fit: cover; }
+.scrap .x { position: absolute; top: 2px; right: 2px; border: 0; background: #0008; color: #fff; border-radius: 6px; width: 22px; height: 22px; cursor: pointer; font-size: 12px; }
+.pockettab { display: flex; }
+.pockettab .pocket { flex: 1; display: flex; flex-direction: column; border-radius: 0 22px 22px 0; border-left-style: solid; }
+.pockettab .ph2 { writing-mode: horizontal-tb; }
+.pockettab .scraps { flex-direction: column; flex-wrap: nowrap; overflow: hidden; }
+.pockettab .scrap.img { width: 100%; height: 110px; }
+.pcard .pocket { margin-top: 14px; }
+.scard .pocket { margin-top: 6px; }
+/* ghosts: the next one goes here */
+.ghost { display: flex; }
+.ghostbtn { flex: 1; border: 5px dashed color-mix(in srgb, var(--ochre) 60%, transparent) !important; border-radius: 30px; background: transparent !important; box-shadow: none !important; color: var(--ochre) !important; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 30px; font: 700 110px var(--f-display); text-align: left; }
+.ghostbtn:hover { background: var(--ochre-soft) !important; }
+.ghostbtn .plus { font-size: 180px; }
+.ghostbtn small { display: block; font: 500 26px var(--f-body); color: var(--ink-2); max-width: 520px; margin-top: 10px; }
+.sk { grid-template-columns: max-content auto auto; justify-content: space-between; }
+.sk .k { white-space: nowrap; }
+.loose { width: 330px; min-height: 180px; }
+/* the log: rolls and chat */
+.logcard h3 .sub3 { font: 500 22px var(--f-body); color: var(--ink-3); }
+.loglist { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 6px; scrollbar-width: thin; }
+.lrow { display: flex; gap: 12px; align-items: flex-start; font-size: 20px; line-height: 1.4; }
+.lface { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; flex: none; background: var(--band); display: flex; align-items: center; justify-content: center; font: 700 16px var(--f-display); color: var(--ink-2); }
+.lface img { width: 100%; height: 100%; object-fit: cover; }
+.lface.gm { background: var(--ink); color: var(--paper); }
+.lbody { flex: 1; min-width: 0; }
+.lbody .lt { font-size: 14px; color: var(--ink-3); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.lrow .roll { font-size: 16px; margin-top: 2px; }
+.logsay { display: flex; gap: 8px; align-items: center; }
+.logsay select, .logsay input { font: 500 20px var(--f-body); padding: 8px 10px; border: 2px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.logsay input { flex: 1; min-width: 0; }
+.logsay .btn { font-size: 18px; }
+.logcard { display: flex; flex-direction: column; }
+/* sticky notes: a white drag bar you can spot, and a corner to resize */
+.loose { position: absolute; }
+.loose .grip, .artcard .grip { height: 26px; background: #fffdf6; border-bottom: 1px solid #0002; border-radius: 4px 4px 0 0; display: flex; align-items: center; justify-content: center; position: relative; cursor: grab; }
+.loose .grip .dots { width: 34px; height: 6px; background: radial-gradient(circle, #8a7a4a 1.6px, transparent 2px) 0 0 / 12px 6px repeat-x; opacity: .8; }
+.loose .grip button, .artcard .grip button { position: absolute; right: 4px; top: 2px; color: #6b5a2a; opacity: .7; }
+.rsz { position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 50%, #8a7a4a99 50%, #8a7a4a99 58%, transparent 58%, transparent 70%, #8a7a4a99 70%, #8a7a4a99 78%, transparent 78%); border-radius: 0 0 12px 0; }
+.artcard { position: absolute; }
+
+/* nothing is ever abbreviated: labels keep whole words; the fit shrinks the section instead (Harry, 13 Nov) */
+.sheet .main * { text-overflow: clip !important; }
+.acol { overflow: visible; }
+.loose { width: auto; min-height: 0 !important; overflow: hidden; }
+.loose .grip { position: absolute; left: 0; right: 0; top: 0; box-sizing: border-box; }
+.loose .body { position: absolute; left: 0; right: 0; box-sizing: border-box; overflow: hidden; line-height: 1.15; overflow-wrap: anywhere; min-height: 0 !important; }
+/* the summon's sheet takes real space: zoom instead of a transform (an absolute child collapsed it to 4px) */
+.minisheet { flex: none; overflow: visible; }
+.mini-in { position: relative !important; transform: none !important; zoom: .5; width: auto !important; }
+.sumfail { font-size: 15px; color: #b3412c; }
+/* the summon's card: golden, its own scale (fitted), dice like a runner's */
+.sumrow { display: flex; gap: 16px; height: 172px; }
+.scard2 { flex: none; width: 278px; height: 172px; border-radius: 12px; background: var(--paper); border: 2px solid var(--ink-3); box-shadow: 0 2px 6px #0002; overflow: hidden; position: relative; }
+.sc-in { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; box-sizing: border-box; }
+.sch { display: flex; gap: 10px; align-items: baseline; background: var(--band); margin: 0 0 2px; padding: 6px 10px; border-radius: 8px; }
+.sch b { font: 700 24px var(--f-display); } .sch .kind { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.scr { font-size: 15px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .scr b { font: 700 20px var(--f-display); color: var(--ink); }
+.scr .boxes { display: inline-flex; gap: 3px; } .scr .boxes i { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--ochre); } .scr .boxes i.on { background: var(--ochre); }
+.scs { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.sskill { display: flex; gap: 6px; align-items: center; font-size: 15px; white-space: nowrap; } .sskill b { font: 700 17px var(--f-display); }
+.scsp { display: flex; flex-wrap: wrap; gap: 4px 14px; } .scsp .sp { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+.sca { font-size: 12px; color: var(--ink-3); }
+.sumside { flex: 1; min-width: 0; position: relative; overflow: hidden; }
+.ss-in { display: flex; flex-direction: column; gap: 8px; }
+.ss-in .mbtns { display: flex; gap: 8px; flex-wrap: wrap; }
