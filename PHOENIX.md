@@ -51,6 +51,12 @@ one Claude Code session; commits in this repo.
 | P-41 | H (Android): tapping quickbar results did nothing | taps work | **fixed blind** (emulated taps worked): the page cancelled every one-finger touchmove, and Chrome drops the click of a tap that wiggled | now only multi-finger moves are cancelled (iOS page zoom) |
 | P-42 | H: drop the chapter numbers ("why is 3 below 11?") | the cluster order is free | verified | the numbers fought the golden arrangement's order |
 
+| P-43 | H: voice input on the quickbar, as in Turnip Works | mic in the quickbar | verified (button present; Web Speech API, as TW) | |
+| P-44 | H: a new character goes on top, under the button, and pushes the rest down; and a way to delete one | party order; Remove on the pocket tab | verified (order, slide, ⌘Z restores) | seats were fixed slots; now an ordered list, empty seats after it |
+| P-45 | H: "the whole thing is essentially got to be version controlled", like a document's edit history | deep history card | verified: versions commit when the saved record settles (only changed parts, IndexedDB); go back to any version, which is itself a new version | a restore was at risk of being overwritten by the page's own saves on the way out: writes freeze until the reload |
+| P-46 | H: rolling all stats again and again leaves no trace; count every roll button | roll counts on every dice button; characteristic rolls named in the history and log | verified ("rolled characteristics (3rd time)") | |
+| P-47 | H: pictures in notes, and visibility, from a little icon on the note's bar | note menu: picture; who can see it (everyone, GM, me, some players) | verified; **visibility recorded, not enforced** (one seat) | a drag that moved now stops all click handlers (stopImmediatePropagation): the earlier guard let the document's own handler through |
+
 ## Evaluator note (automation frontier, 2026-11-13; Claude Opus 5.5 builder; Gemini via agy-run as the blind reader)
 Gemini blind reads found real bugs (mojibake, LOD leak, missing toast CSS, Contact duplication, crop framing) and
 made confident false claims (a "clipped" note that measured fine, a "missing" Soak button, a "duplicate" toast).

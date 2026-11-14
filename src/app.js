@@ -8,16 +8,18 @@ const C = window.CAMPAIGN, R = window.RIG;
 const $ = (s, r = document) => r.querySelector(s);
 const vp = $('#vp'), world = $('#world');
 const STORE_KEY = C.id ? `turnip-almanac-2:${C.id}` : 'turnip-almanac-2';   // one saved table per campaign
+let FROZEN = false;   // set while going back in history, so nothing on the way out overwrites the restored record
+const lsSet = (k, v) => { if (!FROZEN) localStorage.setItem(k, v); };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } },
-  set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch {} },
+  set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -187,7 +189,11 @@ C.print.forEach(p => {
 
 // ------------------------------------------------------------------ party: sheets as rows down the map's left edge
 const clone = o => JSON.parse(JSON.stringify(o));
-const PCS = [...C.pcs, ...state.extra];
+const PCS = [...C.pcs, ...state.extra].filter(p => !state.removed.includes(p.id));
+// the party's order, top to bottom (H, 14 Nov: a new one goes on top and pushes the rest down; a removed one closes the gap)
+if (!state.order) state.order = [...PCS].sort((a, b) => (a.slot ?? 99) - (b.slot ?? 99)).map(p => p.id);
+state.order = state.order.filter(id => PCS.some(p => p.id === id)); PCS.forEach(p => { if (!state.order.includes(p.id)) state.order.push(p.id); });
+PCS.forEach(p => p.slot = state.order.indexOf(p.id));
 const pcById = Object.fromEntries(PCS.map(p => [p.id, p]));
 function choicesOf(pc) { return state.choices[pc.id] || (state.choices[pc.id] = clone(pc.choices || R.blank(''))); }
 const sheetEls = {};
@@ -271,30 +277,45 @@ reg('launch', { el: launch, title: `Build a new ${WORDS.char}`, kind: 'action', 
 label(world, 'The party', PX, -1240, 300);
 
 PCS.forEach((pc, i) => placeSheet(pc, pc.slot ?? i));
-function emptySeats() { const used = new Set(PCS.map(p => p.slot)); return [...Array(SLOTS).keys()].filter(i => !used.has(i)); }
+function emptySeats() { const n = state.order.length; return [...Array(Math.max(0, SLOTS - n)).keys()].map(i => n + i); }
 const seatEls = {};
 function renderSeats() {
   Object.values(seatEls).forEach(e => e.remove());
-  emptySeats().forEach(i => { const e = add(world, 'seat', PX, pcRowY(i), SW, SH, `<button class="seatbtn" data-act="newpc" data-slot="${i}"><span class="plus">+</span> Empty seat · build a new ${WORDS.char} here</button>`); seatEls[i] = e; });
+  for (const k in seatEls) delete seatEls[k];
+  emptySeats().forEach(i => { const e = add(world, 'seat', PX, pcRowY(i), SW, SH, `<button class="seatbtn" data-act="newpc" data-slot="end"><span class="plus">+</span> Empty seat · build a new ${WORDS.char} here</button>`); seatEls[i] = e; });
 }
 renderSeats();
-function newRunner(slot) {
-  const free = emptySeats(); if (!free.length) return null;
-  slot = slot != null && free.includes(+slot) ? +slot : free[0];
-  const id = 'pc-x' + Date.now().toString(36);
-  const pc = { id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot };
-  state.extra.push({ id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot });
-  PCS.push(pc); pcById[id] = pc; placeSheet(pc, slot); renderSeats(); persist();
+function newRunner(where) {
+  // the launcher puts a new one on top (just under the button) and pushes the rest down; an empty seat adds it there
+  const id = 'pc-x' + Date.now().toString(36), top = where !== 'end';
+  const pc = { id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [] };
+  state.extra.push({ id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [] });
+  if (top) state.order.unshift(id); else state.order.push(id);
+  PCS.push(pc); pcById[id] = pc; placeSheet(pc, state.order.indexOf(id)); historyNote(`Added a new ${WORDS.char}`); layoutParty(); persist();
   return id;
 }
-
+// put every sheet in its seat (sheets slide: see .sheet in the CSS), then the empty seats after them
+function layoutParty() {
+  state.order.forEach((id, i) => { const pc = pcById[id], e = sheetEls[id]; if (!pc || !e) return; pc.slot = i;
+    e.style.top = pcRowY(i) + 'px'; if (nodes[id]) nodes[id].box = { x: PX, y: pcRowY(i), w: SW, h: SH }; if (typeof renderPocketTab === 'function' && pocketTabs[id]) renderPocketTab(pc); });
+  renderSeats(); dirty = true;
+}
+function removePc(id) {
+  const pc = pcById[id]; if (!pc) return; pushUndo();
+  const nm = choicesOf(pc).name || `the new ${WORDS.char}`;
+  state.order = state.order.filter(x => x !== id); state.removed.push(id); PCS.splice(PCS.indexOf(pc), 1); delete pcById[id];
+  sheetEls[id]?.remove(); delete sheetEls[id]; pocketTabs[id]?.remove(); delete pocketTabs[id]; delete nodes[id];
+  if (state.build?.pc === id) state.build = null;
+  historyNote(`Removed ${nm} from the party`); layoutParty(); persist(); renderTable?.();
+  toast({ msg: `Removed ${nm}`, note: '⌘Z or the History card brings them back.' });
+}
 // (sessions3)
 let persistExtra = () => {};
 
 // ------------------------------------------------------------------ pockets: a free-paste spot on every major thing
 // Paste (⌘V) with the pointer over a pocket, drop an image on it, or click it to type. Scraps are text or pictures.
 state.pockets = saved.pockets || {};
-const persistPockets = () => { persistExtra(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.pockets = state.pockets; o.sessx = state.sessx; o.prepN = state.prepN; o.threadx = state.threadx; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
+const persistPockets = () => { persistExtra(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.pockets = state.pockets; o.sessx = state.sessx; o.prepN = state.prepN; o.threadx = state.threadx; lsSet(STORE_KEY, JSON.stringify(o)); } catch {} };
 function pocketHtml(owner, label = 'Pocket') {
   const items = state.pockets[owner] || [];
   return `<div class="pocket" data-pocket="${owner}"><div class="ph2">${esc(label)} <span class="pk">paste, drop, or click to type</span></div><div class="scraps">${items.map(it => it.kind === 'img'
@@ -311,10 +332,10 @@ const pocketTabs = {};
 function renderPocketTab(pc) {
   const y = pcRowY(pc.slot);
   let t = pocketTabs[pc.id]; if (!t) { t = add(world, 'pockettab', PX + SW + 30, y, 180, SH, ''); pocketTabs[pc.id] = t; }
-  place(t, PX + SW + 30, y, 180, SH); t.innerHTML = pocketHtml(pc.id, 'Pocket');
+  place(t, PX + SW + 30, y, 180, SH); t.innerHTML = pocketHtml(pc.id, 'Pocket') + `<button class="rmpc" data-rmpc="${pc.id}" title="Remove from the party (undo brings them back)">Remove</button>`;
 }
 PCS.forEach(renderPocketTab);
-const _newRunner = newRunner; newRunner = function (slot) { const id = _newRunner(slot); if (id) renderPocketTab(pcById[id]); return id; };
+const _newRunner = newRunner; newRunner = function (slot) { const id = _newRunner(slot); if (id) { renderPocketTab(pcById[id]); layoutParty(); } return id; };
 
 // ------------------------------------------------------------------ sessions: compact, editable cards; the next one waits as a ghost
 const SCW = 1000, SGAP = 60, SCOLS = 3;
@@ -323,7 +344,7 @@ state.sessx = saved.sessx || []; state.prepN = saved.prepN || C.prep.n; state.th
 state.snotes = saved.snotes || null; state.smeta = saved.smeta || {}; state.npcx = saved.npcx || [];
 const allSessions = () => [...C.sessions, ...state.sessx, { ...C.prep, n: state.prepN, title: state.prepN === C.prep.n ? C.prep.title : 'Next session', date: 'planned', prep: true }];
 if (!state.snotes) { state.snotes = {}; allSessions().forEach(s => { state.snotes[s.n] = []; Object.entries(C.cells).forEach(([who, row]) => (row[s.n] || []).forEach((t, j) => state.snotes[s.n].push({ id: `c-${who}-${s.n}-${j}`, who, text: t }))); }); }
-persistExtra = () => { persist(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); Object.assign(o, { snotes: state.snotes, smeta: state.smeta, npcx: state.npcx, pockets: state.pockets, sessx: state.sessx, prepN: state.prepN, threadx: state.threadx }); localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
+persistExtra = () => { persist(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); Object.assign(o, { snotes: state.snotes, smeta: state.smeta, npcx: state.npcx, pockets: state.pockets, sessx: state.sessx, prepN: state.prepN, threadx: state.threadx }); lsSet(STORE_KEY, JSON.stringify(o)); } catch {} };
 state.npcx.forEach(n => { if (!npcIndex[n.id]) { C.npcs.push(n); npcIndex[n.id] = n; } });
 state.threadx.forEach(t => { if (!C.threads.find(x => x.id === t.id)) C.threads.push(t); });
 // ------------------------------------------------------------------ sessions: compact, editable cards; notes grouped by who
@@ -516,16 +537,53 @@ refreshBacks();
 // loose notes
 let dragNote = null;
 function makeNote(nt) {
-  const e = add(world, 'loose', nt.x, nt.y, null, null, `<div class="grip"><span class="dots"></span><button aria-label="Delete note">✕</button></div><div class="body" contenteditable="true" spellcheck="false"></div><div class="rsz" title="Drag to resize"></div>`);
+  const e = add(world, 'loose', nt.x, nt.y, null, null, `<div class="grip"><button class="nmenu" aria-label="Note menu: picture, who can see it" title="Picture · who can see it">⋯</button><span class="dots"></span><span class="nvis"></span><button class="ndel" aria-label="Delete note">✕</button></div><div class="nimg" hidden><img alt=""></div><div class="body" contenteditable="true" spellcheck="false"></div><div class="rsz" title="Drag to resize"></div>`);
   e.querySelector('.body').textContent = nt.text || '';
   e.querySelector('.body').addEventListener('input', ev => { nt.text = ev.target.textContent; nodes[nt.id].title = nt.text.slice(0, 60) || 'Note'; persist(); });
-  e.querySelector('.grip button').addEventListener('click', () => { e.remove(); state.notes = state.notes.filter(n => n !== nt); delete nodes[nt.id]; persist(); });
+  e.querySelector('.grip .ndel').addEventListener('click', () => { e.remove(); state.notes = state.notes.filter(n => n !== nt); delete nodes[nt.id]; historyNote('Deleted a note'); persist(); });
+  e.querySelector('.grip .nmenu').addEventListener('click', ev => { ev.stopPropagation(); openNoteMenu(nt, e); });
+  // drop a picture on a note to put it in the note
+  e.addEventListener('dragover', ev => { if ([...(ev.dataTransfer?.items || [])].some(i => i.type.startsWith('image/'))) { ev.preventDefault(); ev.stopPropagation(); } });
+  e.addEventListener('drop', ev => { const f = [...(ev.dataTransfer?.files || [])].find(f => f.type.startsWith('image/')); if (!f) return; ev.preventDefault(); ev.stopPropagation(); noteImage(nt, e, f); });
+  showNoteExtras(nt, e);
   e.querySelector('.grip').addEventListener('pointerdown', ev => { if (ev.target.closest('button')) return; ev.stopPropagation(); dragNote = { nt, e, sx: ev.clientX, sy: ev.clientY, ox: nt.x, oy: nt.y }; });
   if (!nt.w) { const k = nt.k || 1; nt.w = 330 * k; nt.h = 180 * k; }   // a free rectangle: made at the zoom you were at, then any size and shape
   reg(nt.id, { el: e, title: (nt.text || 'Note').slice(0, 60), kind: 'loose note', box: { x: nt.x, y: nt.y, w: nt.w, h: nt.h } });
   requestAnimationFrame(() => sizeNote(nt, e));
   return e;
 }
+// a note's menu (H, 14 Nov): a picture, and who can see it. Visibility is recorded with the note now; it is enforced once
+// the table has more than one seat (see docs/VISIBILITY.md for the open design: owner / group / table, groups from play).
+function showNoteExtras(nt, e) {
+  const img = e.querySelector('.nimg img'); if (nt.img) img.src = nt.img;
+  const v = nt.vis?.mode || 'all', who = (nt.vis?.who || []).map(id => choicesOf(pcById[id] || {}).name).filter(Boolean);
+  e.querySelector('.nvis').textContent = v === 'gm' ? 'GM only' : v === 'me' ? 'Only me' : v === 'some' ? (who.join(', ') || 'Nobody yet') : '';
+  e.classList.toggle('private', v !== 'all');
+}
+async function noteImage(nt, e, file) {
+  try { const r = await shrinkImage(file); nt.img = r.src; if (!nt.w || nt.h < nt.w * 0.6) nt.h = Math.max(nt.h, nt.w * r.h / r.w + nt.w * 0.25); showNoteExtras(nt, e); sizeNote(nt, e); historyNote('Put a picture in a note'); persist(); }
+  catch { toast({ msg: 'That file is not a picture' }); }
+}
+let noteMenu = null;
+function openNoteMenu(nt, e) {
+  noteMenu?.remove(); const m = noteMenu = document.createElement('div'); m.className = 'notemenu'; m.setAttribute('role', 'menu');
+  const v = nt.vis?.mode || 'all', who = new Set(nt.vis?.who || []);
+  m.innerHTML = `<label class="nmrow keyb">${nt.img ? 'Change the picture' : 'Add a picture'}<input type="file" accept="image/*" hidden></label>${nt.img ? '<button class="nmrow keyb" data-nm="rmimg">Take the picture out</button>' : ''}
+    <div class="nmh">Who can see it</div>
+    <div class="nmseg">${[['all', 'Everyone'], ['gm', 'GM only'], ['me', 'Only me'], ['some', 'Some players']].map(([k, n]) => `<button data-nm="vis" data-v="${k}" class="${v === k ? 'sel' : ''}" aria-pressed="${v === k}">${n}</button>`).join('')}</div>
+    ${v === 'some' ? `<div class="nmseg">${PCS.map(pc => `<button data-nm="who" data-v="${pc.id}" class="${who.has(pc.id) ? 'sel' : ''}">${esc(choicesOf(pc).name || WORDS.Char)}${pc.player ? ` <small>${esc(pc.player)}</small>` : ''}</button>`).join('')}</div>` : ''}
+    <div class="nmfoot">Kept with the note now; enforced once more than one seat joins the table.</div>`;
+  document.body.appendChild(m);
+  const r = e.querySelector('.grip').getBoundingClientRect();
+  m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.left)) + 'px'; m.style.top = Math.min(innerHeight - m.offsetHeight - 12, r.bottom + 6) + 'px';
+  m.querySelector('input[type=file]').addEventListener('change', ev => { const f = ev.target.files?.[0]; if (f) noteImage(nt, e, f); m.remove(); });
+  m.addEventListener('click', ev => { const b = ev.target.closest('[data-nm]'); if (!b) return; ev.stopPropagation();
+    if (b.dataset.nm === 'rmimg') { delete nt.img; historyNote('Took a picture out of a note'); m.remove(); }
+    if (b.dataset.nm === 'vis') { nt.vis = { mode: b.dataset.v, who: nt.vis?.who || [] }; historyNote(`Note visible to: ${b.textContent}`); }
+    if (b.dataset.nm === 'who') { const w = new Set(nt.vis?.who || []); w.has(b.dataset.v) ? w.delete(b.dataset.v) : w.add(b.dataset.v); nt.vis = { mode: 'some', who: [...w] }; historyNote('Changed who can see a note'); }
+    showNoteExtras(nt, e); sizeNote(nt, e); persist(); if (m.isConnected) openNoteMenu(nt, e); });
+}
+document.addEventListener('pointerdown', ev => { if (noteMenu && !ev.target.closest('.notemenu, .nmenu')) { noteMenu.remove(); noteMenu = null; } }, true);
 if (!state.notes) state.notes = [
   { id: 'n-1', x: IBX + 60, y: SY + 300, text: 'Ask Clutch’s player whether Clutch keeps the BigBeatle or trades up to a GunBug.' },
   { id: 'n-2', x: IBX + 440, y: SY + 420, text: 'Grey paid ¥4,000 each. Where did that money come from?' },
@@ -549,14 +607,14 @@ label(world, 'HELP', PX - 1900, -2240 - 1260, 1150);
 reg('help', { el: helpCard, title: 'Getting around', kind: 'help', box: { x: PX - 1900, y: -2240, w: 1800, h: 1180 } });
 let turn = { round: 1, at: 0 };
 function toast(rec, at) {
-  const t = $('#toast'); t.innerHTML = rollHtml(rec);
+  const t = $('#toast'); t.innerHTML = rec.msg ? `<div class="roll"><b>${esc(rec.msg)}</b>${rec.note ? `<span class="tn">${esc(rec.note)}</span>` : ''}</div>` : rollHtml(rec);
   const r = at?.getBoundingClientRect?.(); t.style.left = (r ? Math.max(180, Math.min(W() - 180, r.left + r.width / 2)) : W() / 2) + 'px'; t.style.top = (r ? Math.max(130, r.top) : 150) + 'px';
   t.hidden = false; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.hidden = true, 300); }, 2800);
 }
 var tableReady = false;
 // the log: every roll and every line of chat, in order (Harry, 13 Nov)
 state.log = saved.log || [];
-function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.log = state.log; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} renderLog(true); }
+function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.log = state.log; lsSet(STORE_KEY, JSON.stringify(o)); } catch {} renderLog(true); }
 let logSpeaker = 'gm';
 function speakerOf(id) { if (id === 'gm' || !id) return { name: 'GM', icon: null }; const pc = pcById[id]; return pc ? { name: choicesOf(pc).name || WORDS.Char, icon: portraitOf(pc, sheetOf(pc)).src } : { name: id, icon: null }; }
 function renderLog(stick) {
@@ -634,6 +692,26 @@ qin.addEventListener('keydown', ev => {
   else if (ev.key === 'ArrowUp') { ev.preventDefault(); if (!qin.value && qhist.length) { qin.value = qhist[0]; qrender(); } else { qhi = Math.max(0, qhi - 1); qrender(); } }
   ev.stopPropagation();
 });
+// voice: the browser's own speech recognition (Web Speech API), shown only where the browser has it, as in Turnip Works.
+// What is heard is the query, as if typed, updating as it is heard. The browser asks for the microphone itself, once;
+// its speech service may send the audio to its maker.
+(() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (typeof SR !== 'function') return;
+  const mic = document.createElement('button'); mic.type = 'button'; mic.id = 'qmic'; mic.setAttribute('aria-label', 'Speak'); mic.setAttribute('aria-pressed', 'false'); mic.title = 'Speak';
+  mic.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4"/></svg>';
+  let rec = null; const done = () => { rec = null; mic.classList.remove('on'); mic.setAttribute('aria-pressed', 'false'); };
+  mic.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); });
+  mic.addEventListener('click', ev => {
+    ev.stopPropagation(); if (rec) { try { rec.stop(); } catch {} return; }
+    qin.blur(); qrender();
+    const r = rec = new SR(); r.lang = navigator.language || 'en-US'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+    r.onresult = e => { if (rec !== r) return; qin.value = [...e.results].map(x => x[0]?.transcript || '').join(' ').replace(/[.?!,]+$/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); qhi = 0; fitBar(); qrender(); };
+    r.onerror = e => { if (rec !== r) return; if (e?.error === 'not-allowed' || e?.error === 'service-not-allowed') toast({ msg: 'The microphone is off for this site', note: "Turn it on in the browser's site settings." }); done(); };
+    r.onend = () => { if (rec === r) done(); };
+    mic.classList.add('on'); mic.setAttribute('aria-pressed', 'true'); try { r.start(); } catch { done(); }
+  });
+  qb.insertBefore(mic, qb.querySelector('kbd'));
+})();
 qres.addEventListener('click', ev => { const r = ev.target.closest('[data-qi]'); if (r) qrun(+r.dataset.qi); });
 document.addEventListener('pointerdown', ev => { if (!ev.target.closest('#qbar, #qres') && !qres.hidden) qclose(); });
 
@@ -785,9 +863,11 @@ document.fonts?.ready.then(() => { PCS.forEach(pc => fitSections(sheetEls[pc.id]
 let lastPt = { x: 0, y: 0 }, lastRollAt = 0;
 window.addEventListener('pointermove', ev => { lastPt = { x: ev.clientX, y: ev.clientY }; }, { passive: true });
 const undo = [], redo = [];
-function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof }); }
+function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof, order: state.order, removed: state.removed }); }
 function pushUndo() { undo.push(snap()); if (undo.length > 60) undo.shift(); redo.length = 0; }
-function restore(json) { const o = JSON.parse(json); Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof }); persist(); PCS.forEach(renderSheet); }
+function restore(json) { const o = JSON.parse(json); const party = JSON.stringify([o.order, o.removed]) !== JSON.stringify([state.order, state.removed]);
+  Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof, order: o.order || state.order, removed: o.removed || state.removed }); persist();
+  if (party) { location.reload(); return; } PCS.forEach(renderSheet); }
 function doUndo() { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); }
 function doRedo() { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); }
 const editable = t => t?.closest?.('input, textarea, select, [contenteditable]');
@@ -851,8 +931,11 @@ document.addEventListener('pointerdown', ev => {
 function sizeNote(nt, e) {
   e.style.transform = ''; e.style.width = nt.w + 'px'; e.style.height = nt.h + 'px';
   const gh = Math.max(3, Math.min(nt.h * 0.14, nt.w * 0.14, 90)), grip = e.querySelector('.grip'), body = e.querySelector('.body'), rz = e.querySelector('.rsz');
-  grip.style.height = gh + 'px'; grip.querySelector('button').style.fontSize = (gh * 0.55) + 'px'; grip.querySelector('.dots').style.transform = `scale(${gh / 26})`;
-  body.style.top = gh + 'px'; body.style.height = (nt.h - gh) + 'px'; body.style.padding = (gh * 0.35) + 'px ' + (gh * 0.45) + 'px';
+  grip.style.height = gh + 'px'; grip.querySelector('.ndel').style.fontSize = (gh * 0.55) + 'px'; grip.querySelector('.dots').style.transform = `scale(${gh / 26})`;
+  const pic = e.querySelector('.nimg'), has = !!nt.img, txt = (nt.text || '').trim(), ih = has ? (nt.h - gh) * (txt ? 0.62 : 0.84) : 0;
+  if (pic) { pic.hidden = !has; if (has) { pic.style.top = gh + 'px'; pic.style.height = ih + 'px'; } }
+  e.querySelectorAll('.grip .nmenu, .grip .nvis').forEach(b => b.style.fontSize = (gh * 0.55) + 'px');
+  body.style.top = (gh + ih) + 'px'; body.style.height = (nt.h - gh - ih) + 'px'; body.style.padding = (gh * 0.35) + 'px ' + (gh * 0.45) + 'px';
   if (rz) { rz.style.width = rz.style.height = Math.max(4, gh * 0.85) + 'px'; }
   fitNoteText(e);
 }
@@ -1081,7 +1164,7 @@ const up = ev => {
 };
 window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
 // a drag or pinch that moved must not also press whatever it started on
-document.addEventListener('click', ev => { if (performance.now() < suppressClickUntil) { ev.preventDefault(); ev.stopPropagation(); } }, true);
+document.addEventListener('click', ev => { if (performance.now() < suppressClickUntil) { ev.preventDefault(); ev.stopImmediatePropagation(); } }, true);
 // the page never zooms (iOS Safari gesture events); only the canvas does
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 // only multi-finger moves (iOS would zoom the page); cancelling a one-finger move makes Android drop the tap's click
@@ -1143,6 +1226,7 @@ function doAct(a) {
   if (a.dataset.act === 'finish') { endBuild(true); return; }
   if (a.dataset.act === 'newpc') { const id = newRunner(a.dataset.slot); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); return; }
   const pc = pcById[a.dataset.pc]; if (!pc) return;
+  if (!['roll', 'rollchars', 'croll'].includes(a.dataset.act)) historyNote(`${choicesOf(pc).name || `A new ${WORDS.char}`}: ${(a.getAttribute('aria-label') || a.dataset.label || a.querySelector('b')?.textContent || a.textContent || a.dataset.act).trim().replace(/\s+/g, ' ').slice(0, 60)}`);
   const ch = choicesOf(pc), act = a.dataset.act, path = a.dataset.path;
   if (!RIG_NO_UNDO.has(act)) pushUndo();
   if (rigAct(act, a, pc, ch)) return;
@@ -1218,6 +1302,83 @@ setView(viewFor(BOUNDS, 1.02));
 const qinEl = document.getElementById('qin');
 function qHint() { if (!qinEl) return; const long = WORDS.quickHint || 'Jump or do: a name, a skill, roll, round order…'; qinEl.placeholder = innerWidth < 640 ? 'Jump or do…' : long; }
 qHint(); addEventListener('resize', qHint);
-window.almanac = { cam, flyTo, nodes, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
+// ------------------------------------------------------------------ deep history (H, 14 Nov: "version controlled", like a
+// document's edit history). Everything the table saves lives in one record; when it changes and settles, a version is
+// committed to IndexedDB holding only the parts that changed, with a line saying what happened. Any version can be gone
+// back to (which is itself a new version, so nothing is ever lost).
+let histNotes = [];
+function historyNote(t) { histNotes.push(t); }
+const HIST = { vs: [], db: null, last: null, lastRaw: null, settle: null, settleT: 0 };
+const HKEYS = { choices: 'characters', live: 'damage', rolls: 'rolls', notes: 'notes', log: 'the log', pockets: 'pockets', snotes: 'session notes', smeta: 'sessions', sessx: 'sessions', prepN: 'sessions',
+  portraits: 'portraits', art: 'pictures', order: 'the party', removed: 'the party', rollCount: 'roll counts', extra: 'the party', done: 'builds', summons: 'summons', npcx: 'people', threadx: 'threads', pins: 'pins' };
+function histRebuild(upto = Infinity) { const o = {}; for (const v of HIST.vs) { if (v.id > upto) break; Object.assign(o, v.set); (v.del || []).forEach(k => delete o[k]); } return o; }
+function histTx(mode) { return HIST.db.transaction('versions', mode).objectStore('versions'); }
+(async () => {
+  HIST.db = await new Promise(res => { try { const r = indexedDB.open('turnip-almanac-history', 1); r.onupgradeneeded = () => r.result.createObjectStore('versions', { keyPath: 'id', autoIncrement: true }).createIndex('k', 'k'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch { res(null); } });
+  if (!HIST.db) return;
+  HIST.vs = await new Promise(res => { const q = histTx('readonly').index('k').getAll(STORE_KEY); q.onsuccess = () => res(q.result.sort((a, b) => a.id - b.id)); q.onerror = () => res([]); });
+  HIST.last = histRebuild(); HIST.lastRaw = JSON.stringify(HIST.last);
+  try { const n = sessionStorage.getItem('turnip-almanac-histnote'); if (n) { histNotes.push(n); sessionStorage.removeItem('turnip-almanac-histnote'); } } catch {}
+  renderHistory();
+  if (!HIST.vs.length) { const v = { k: STORE_KEY, t: Date.now(), notes: ['Opened the campaign'], set: {}, del: [] };   // the first version: the campaign as it came
+    await new Promise(res => { const q = histTx('readwrite').add(v); q.onsuccess = () => { v.id = q.result; HIST.vs.push(v); res(); }; q.onerror = res; }); HIST.lastRaw = null; renderHistory(); }
+  setInterval(histTick, 1500); histTick();
+})();
+function histTick() {
+  const raw = localStorage.getItem(STORE_KEY) || '{}', now = performance.now();
+  if (raw === HIST.lastRaw) return;
+  if (raw !== HIST.settle) { HIST.settle = raw; HIST.settleT = now; if (HIST.vs.length) return; }
+  if (HIST.vs.length && now - HIST.settleT < 1800) return;
+  let o; try { o = JSON.parse(raw); } catch { return; }
+  const set = {}, del = [];
+  for (const k in o) if (JSON.stringify(o[k]) !== JSON.stringify(HIST.last[k])) set[k] = o[k];
+  for (const k in HIST.last) if (!(k in o)) del.push(k);
+  HIST.lastRaw = raw; if (!Object.keys(set).length && !del.length) return;
+  const counts = {}; histNotes.splice(0).forEach(n => counts[n] = (counts[n] || 0) + 1);
+  const notes = Object.entries(counts).map(([n, c]) => c > 1 ? `${n} ×${c}` : n);
+  if (!notes.length) notes.push('Changed ' + [...new Set(Object.keys(set).concat(del).map(k => HKEYS[k] || k))].join(', '));
+  const v = { k: STORE_KEY, t: Date.now(), notes, set, del };
+  const q = histTx('readwrite').add(v); q.onsuccess = () => { v.id = q.result; HIST.vs.push(v); HIST.last = o; renderHistory(); };
+}
+function histGoBack(id) {
+  const v = HIST.vs.find(x => x.id === id); if (!v) return;
+  localStorage.setItem(STORE_KEY, JSON.stringify(histRebuild(id))); FROZEN = true;
+  try { sessionStorage.setItem('turnip-almanac-histnote', `Went back to ${new Date(v.t).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}`); } catch {}
+  location.reload();
+}
+const HBX = SX + 3 * (TBW + SGAP);
+const histCard = add(world, 'card tablecard histcard', HBX, TBY, TBW, TBH, '');
+reg('history', { el: histCard, title: 'History · every change, newest first', kind: 'table', box: { x: HBX, y: TBY, w: TBW, h: TBH } });
+function renderHistory() {
+  const vs = HIST.vs.slice(-200).reverse(), day = t => new Date(t).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  let lastDay = '', rows = '';
+  vs.forEach((v, i) => { const d = day(v.t); if (d !== lastDay) { rows += `<div class="hday">${esc(d)}</div>`; lastDay = d; }
+    rows += `<div class="hrow"><span class="ht">${new Date(v.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span><span class="hn">${v.notes.map(esc).join('<br>')}</span>${i ? `<button class="tb" data-hist="${v.id}">Go back to this</button>` : '<span class="now">now</span>'}</div>`; });
+  histCard.innerHTML = `<h3>History <span class="sub3">every change, newest first</span></h3><div class="hlist scrolly">${rows || '<div class="none">Changes appear here as you make them.</div>'}</div>`;
+}
+
+// ------------------------------------------------------------------ roll counts (H, 14 Nov): every dice button keeps a tiny
+// count of how often it was pressed; a build's characteristic rolls also go into the history.
+const ROLLSEL = '[data-act="roll"], [data-act="rollchars"], [data-act="croll"], button.die, [data-troll]';
+const rollKey = b => `${b.dataset.pc || b.closest('[data-id^="pc-"]')?.dataset.id || 'gm'}|${b.dataset.act || 'die'}|${b.dataset.label || b.dataset.skill || b.dataset.troll || b.dataset.target || ''}`;
+function decorateCounts(root = document) {
+  root?.querySelectorAll(ROLLSEL).forEach(b => { const n = state.rollCount[rollKey(b)] || 0; let c = b.querySelector(':scope > .rc');
+    if (!n) { c?.remove(); return; } if (!c) { c = document.createElement('span'); c.className = 'rc'; b.appendChild(c); } c.textContent = n; c.title = `Pressed ${n} time${n === 1 ? '' : 's'}`; });
+}
+const ordinal = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
+document.addEventListener('click', ev => {
+  const b = ev.target.closest?.(ROLLSEL); if (!b || b.disabled) return;
+  const k = rollKey(b), n = state.rollCount[k] = (state.rollCount[k] || 0) + 1, pc = pcById[b.dataset.pc];
+  if (b.dataset.act === 'rollchars') { historyNote(`${choicesOf(pc).name || `A new ${WORDS.char}`} rolled characteristics (${ordinal(n)} time)`); logPush({ kind: 'note', who: pc.id, text: `rolled characteristics (${ordinal(n)} time)` }); }
+  setTimeout(() => { persist(); decorateCounts(b.closest('.sheet, .card') || document); }, 0);
+}, true);
+{ const rs = renderSheet; renderSheet = function (pc) { rs(pc); decorateCounts(sheetEls[pc.id]); }; }
+{ const rt = renderTable; renderTable = function () { rt(); decorateCounts(diceCard); }; }
+decorateCounts();
+document.addEventListener('click', ev => {
+  const rm = ev.target.closest?.('[data-rmpc]'); if (rm) { removePc(rm.dataset.rmpc); return; }
+  const h = ev.target.closest?.('[data-hist]'); if (h) histGoBack(+h.dataset.hist);
+});
+window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
 requestAnimationFrame(frame);
 })();

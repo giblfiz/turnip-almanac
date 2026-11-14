@@ -56,6 +56,10 @@ rejected designs. The implementation is replaceable; these contracts are not.
 - E14b **Every thread end has a quick-follow button**: a small keycap beside the far end when it is on screen, on the
   screen's edge where the line leaves when it is not; never on top of what the thread starts from. Lines and dots are
   sized on screen, so a close view is not covered by them.
+- E14c **Nothing is lost** (H, 14 Nov): a History card holds every change, newest first, each with what happened; any
+  version can be gone back to (a new version itself). Every dice button carries a tiny count of its presses.
+- E4a **Party order** (H, 14 Nov): a new character goes on top, just under the launcher, and the rest slide down; removing
+  one closes the gap (undo or history brings them back).
 - E15 **Build mode**: a live two-ended thread joins the current builder step to its rule and to the part of the
   sheet it writes; an "All done" step says legal/illegal and points left.
 - E16 **Tools roll their skill**: weapons, cyberware weapons, kits, decks, rides, spells, circles and lifestyles
