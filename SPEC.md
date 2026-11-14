@@ -81,6 +81,6 @@ summons, notes, snotes (session notes), smeta, npcx/threadx, pockets, sessx/prep
   claims were false on measurement, so layout claims are settled by the DOM scan, not the vision read.
 
 ## 4. Build
-The page is currently *generated*: `build/assemble3.py` stitches `build/src/*.js` and `build/css/*.css` onto the
-engine from `build/index.v15.html`, after `build/patch_v4/6/7/8/10.py` rewrite the world script. This is a
-patch stack, not a clean source tree; see PHOENIX P-28 and docs/GENERALIZING.md §6 (the rebuild).
+Phase A of the rebuild (2026-11-13): the page is assembled from plain sources by `./build.sh`:
+`src/head.html` + `src/style.css` + `src/body.html` + `src/scripts.html` (the rig, campaign, map and token scripts) +
+`src/app.js`. The old patch stack is archived in `build/legacy/` (it produced the same page; kept as history).
