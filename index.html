@@ -779,26 +779,34 @@ C.places.forEach(p => {
 
 // ------------------------------------------------------------------ the shelf: Harry's book, its index beside its real pages
 const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
-const IDXW = 1300, bookW = 40 + IDXW + 60 + 2 * PW + PG + 40, BX = 0;
+// the index: chapters from the book's list, or from each print entry's chapter
+const chapters = BK.chapters ? BK.chapters.map(ch => ({ title: ch.title, entries: C.print.filter(p => ch.page ? p.page === ch.page : p.chapter === ch.title) }))
+  : [...new Set(C.print.map(p => p.chapter || 'Rules'))].map(t => ({ title: t, entries: C.print.filter(p => (p.chapter || 'Rules') === t) }));
+const ICOLS = 4, ICW = 316, IRH = 150, IDXW = ICOLS * (ICW + 10);
+const idxH = chapters.reduce((h, ch) => h + 50 + Math.ceil(ch.entries.length / ICOLS) * IRH + 24, 0);
+// the pages: a grid whose column count makes the whole book about golden (E2)
+let PCOLS = 1, best = 1e9;
+for (let c = 1; c <= BK.pages; c++) { const rows = Math.ceil(BK.pages / c), w = 100 + IDXW + c * (PW + PG), h = 300 + Math.max(idxH, rows * (PH + PG)), d = Math.abs(w / h - 1.618); if (d < best) { best = d; PCOLS = c; } }
+const PROWS = Math.ceil(BK.pages / PCOLS);
+const bookW = 40 + IDXW + 60 + PCOLS * PW + (PCOLS - 1) * PG + 40, BX = 0;
 const pagesX = 40 + IDXW + 60, pagesY = 260;
-const bookH = pagesY + 2 * PH + PG + 60, BY = -bookH - 260;
-const bk = add(world, 'bk', BX, BY, bookW, bookH, `<div class="bhead"><img src="assets/genre-modern.png" alt=""><div><h2>${esc(BK.title)} 2e</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
-reg(BK.id, { el: bk, title: BK.title + ' 2e', kind: 'book', icon: 'assets/genre-modern.png', box: { x: BX, y: BY, w: bookW, h: bookH } });
+const bookH = pagesY + Math.max(idxH, PROWS * (PH + PG) - PG) + 60, BY = -bookH - 260;
+const bk = add(world, 'bk', BX, BY, bookW, bookH, `<div class="bhead"><img src="${BK.icon || 'assets/genre-modern.png'}" alt=""><div><h2>${esc(BK.fullTitle || BK.title)}</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
+reg(BK.id, { el: bk, title: BK.fullTitle || BK.title, kind: 'book', icon: BK.icon || 'assets/genre-modern.png', box: { x: BX, y: BY, w: bookW, h: bookH } });
 label(world, 'The rulebook', BX, BY - 420, 300);
 let iy = 260;
-BK.chapters.forEach(ch => {
+chapters.forEach(ch => {
   add(bk, 'chap', 40, iy, IDXW, 40, esc(ch.title)); iy += 50;
-  const es = C.print.filter(p => p.page === ch.page);
-  es.forEach((p, i) => {
-    const x = 40 + (i % 4) * 326, y = iy + Math.floor(i / 4) * 150;
-    const ce = add(bk, 'entry card', x, y, 316, 140, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
-    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: { x: BX + x, y: BY + y, w: 316, h: 140 } });
+  ch.entries.forEach((p, i) => {
+    const x = 40 + (i % ICOLS) * (ICW + 10), y = iy + Math.floor(i / ICOLS) * IRH;
+    const ce = add(bk, 'entry card', x, y, ICW, IRH - 10, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: { x: BX + x, y: BY + y, w: ICW, h: IRH - 10 } });
   });
-  iy += Math.ceil(es.length / 4) * 150 + 24;
+  iy += Math.ceil(ch.entries.length / ICOLS) * IRH + 24;
 });
 const pageFrames = [];
 for (let n = 1; n <= BK.pages; n++) {
-  const px = pagesX + ((n - 1) % 2) * (PW + PG), py = pagesY + Math.floor((n - 1) / 2) * (PH + PG);
+  const px = pagesX + ((n - 1) % PCOLS) * (PW + PG), py = pagesY + Math.floor((n - 1) / PCOLS) * (PH + PG);
   const pf = add(bk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
   label(pf, String(n), PW - 170, 20, 200, { cls: 'pnumlbl', over: true });
   pageFrames.push(reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: { x: BX + px, y: BY + py, w: PW, h: PH }, n }));
@@ -1976,21 +1984,31 @@ let pdfDoc = null, pdfFailed = false;
   } catch (e) { pdfFailed = true; console.warn('Book pages unavailable:', e.message);
     pageFrames.forEach(o => { o.el.querySelector('.ph').innerHTML = `${o.n}<small style="display:block;font-size:30px">The page could not be drawn here.</small>`; }); }
 })();
+// every page is always there (E1): a thumbnail first, sharpened only when it is big on screen; a few sharp pages at a time
+let pagesBusy = 0;
+const SHARP_MAX = 14;
+function renderPage(o, width) {
+  pagesBusy++; o._busy = true;
+  return pdfDoc.getPage(o.n).then(page => { const v1 = page.getViewport({ scale: 1 }), v = page.getViewport({ scale: width / v1.width });
+    const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height);
+    return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { if (width <= 240) o._thumb = c; o.el.querySelector('.cv').replaceChildren(c); o._res = width; o._used = performance.now(); });
+  }).catch(e => console.warn('page', o.n, e.message)).finally(() => { pagesBusy--; o._busy = false; dirty = true; });
+}
 function pagesPass() {
   if (!pdfDoc) return;
   const vw = W(), vh = H(), dpr = Math.min(2, window.devicePixelRatio || 1);
-  pageFrames.forEach(o => {
-    if (o._busy) return;
-    const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
-    const onScreen = !(x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0);
-    const want = onScreen && sw * dpr > 1300 ? 2600 : 1300;
-    if ((o._res || 0) >= want) return;
-    o._busy = true;
-    pdfDoc.getPage(o.n).then(page => { const v1 = page.getViewport({ scale: 1 }), v = page.getViewport({ scale: want / v1.width });
-      const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height);
-      return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { o.el.querySelector('.cv').replaceChildren(c); o._res = want; });
-    }).catch(e => console.warn('page', o.n, e.message)).finally(() => { o._busy = false; dirty = true; });
-  });
+  const scored = pageFrames.map(o => { const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
+    return { o, sw, on: !(x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0) }; });
+  for (const { o, sw, on } of scored.sort((a, b) => (b.on - a.on) || (b.sw - a.sw))) {
+    if (pagesBusy >= 2) break;
+    if (o._busy) continue;
+    const want = !o._thumb ? 200 : on && sw * dpr > 1300 ? 2600 : on && sw * dpr > 240 ? 1300 : 0;
+    if (want && (o._res || 0) < want) renderPage(o, want);
+  }
+  if (pagesBusy < 2 && pageFrames.some(o => !o._thumb && !o._busy)) dirty = true;      // keep filling thumbnails in the background
+  const sharp = scored.filter(x => (x.o._res || 0) >= 1300 && !x.on).sort((a, b) => a.o._used - b.o._used);
+  const nSharp = pageFrames.filter(o => (o._res || 0) >= 1300).length;
+  for (let k = 0; k < nSharp - SHARP_MAX && k < sharp.length; k++) { const o = sharp[k].o; if (o._thumb) { o.el.querySelector('.cv').replaceChildren(o._thumb); o._res = 200; } }
 }
 document.addEventListener('keydown', ev => {
   const typing = ev.target.closest('input, [contenteditable]');
