@@ -57,24 +57,29 @@ rejected designs. The implementation is replaceable; these contracts are not.
  CAMPAIGN (per table)       party [{ id, player, choices, karma[], summon }] · sessions · notes {who,text} · people · threads · places(+map) · pockets · log
 ```
 
-**RIG interface** (as implemented by `rigs/ssr2.js`; this is the seam the next system must fill):
+**RIG interface** (two implementations: `rigs/ssr2.js` + `rigs/ssr2-ui.js`, and `rigs/brp.js` + `rigs/brp-ui.js`):
 - `blank()` → empty choices; `compute(choices, karmaLog, asOf)` → sheet `S` with `attr, skill, tn(), derived…,
   spend[{label, pts, src[]}], prov{key: [srcIds]}, warn[]`. `src`/`prov` ids are BOOK print ids or `B:<step>`.
 - `roll(pool, tn)` → `{dice[{chain, ok}], succ, bonuses, verdict}`; `summon(type, S)`; initiative comparator.
 - Tables: `META, CYBER, GEAR, VEH, DECKS, CHIPS, TRAD, SPELLS, SUMMONS, CIRCLES, LIFE`, `TOOL_SKILL`.
 - `interpretations[]` (shown to the user).
-- *Not yet factored out of the app (still SSR-specific code in the page):* the builder step HTML, the sheet
-  section HTML, the initiative comparator, the wound rule. See docs/GENERALIZING.md.
+- The rig's UI half (`rigs/<sys>-ui.js`, spliced in at `/*@RIG-UI@*/`) supplies: `WORDS, ORDER, BCOLS, BINNER, BREG,
+  STEP_RULE, STEP_SHEET, STEP_NAME, stepHtml, renderSheet, rollHtml, portraitOf, initiative, renderTable, freeRoll,
+  trayStep, trayRoll, rigCommands, rigAct, advanceText, RIG_NO_UNDO`. Each table rule and system name the engine
+  needs comes from here; the engine must not name a system's steps, stats or dice.
+- BRP's `compute` returns `char, skill, der{hp, mw, pp, dmg, mov}, croll, spend, warn, prov, pts, left`;
+  `roll(target)` → `{roll, target, level: critical|special|success|failure|fumble, ok}`.
 
-**BOOK print**: `books/ssr2-print.json` (32 entries, generated from the PDF build's own layout audit).
+**BOOK print**: `books/ssr2-print.json` (32 entries, from the PDF build's own layout audit); `books/brp-print.json`
+(200 entries with page rects; the BRP PDF is fetched by `books/get-brp.sh`, never committed).
 
-**State** (localStorage `turnip-almanac-2`): choices, live damage, rolls, extra runners, portraits, art, done,
+**State** (localStorage `turnip-almanac-2`, or `turnip-almanac-2:<campaign id>` when the campaign has an id): choices, live damage, rolls, extra runners, portraits, art, done,
 summons, notes, snotes (session notes), smeta, npcx/threadx, pockets, sessx/prepN, log.
 
 ## 3. Evals (named checks; a change is verified only when these pass)
 - `tests/walk4.py` — the end-to-end walk (flights, quickbar commands, new runner, Tab build, All done, portrait,
   threads, Firefox pan). Zero page errors.
-- `tests/scan_layout.py` — E6/E7: no section overflow, no cut or abbreviated label, no roll button outside its
+- `tests/scan_layout.py [url]` — E6/E7 (run on `index.html` and `brp.html`): no section overflow, no cut or abbreviated label, no roll button outside its
   column, in Chromium and Firefox.
 - `tests/builds.js` — the four 11-06 sample builds cost 99/100/100/100 under 2.1.
 - Perceptual: Gemini blind reads (agy-run, isolated folder). Useful for "does this read as X"; ~half its defect
@@ -83,4 +88,4 @@ summons, notes, snotes (session notes), smeta, npcx/threadx, pockets, sessx/prep
 ## 4. Build
 Phase A of the rebuild (2026-11-13): the page is assembled from plain sources by `./build.sh`:
 `src/head.html` + `src/style.css` + `src/body.html` + `src/scripts.html` (the rig, campaign, map and token scripts) +
-`src/app.js`. The old patch stack is archived in `build/legacy/` (it produced the same page; kept as history).
+`src/app.js`. `./build.sh brp` builds `brp.html` from `src/scripts-brp.html` and `rigs/brp-ui.js`. The old patch stack is archived in `build/legacy/` (it produced the same page; kept as history).

@@ -248,6 +248,8 @@ function initiative() {
     .sort((a, b) => b.S.actions - a.S.actions || b.S.attr.coord - a.S.attr.coord || b.S.skill.palming - a.S.skill.palming);
 }
 const qdice2 = { pool: 6, tn: 4 };
+function trayStep(k, d) { qdice2[k] = Math.max(k === 'tn' ? 0 : 1, Math.min(k === 'tn' ? 18 : 30, qdice2[k] + d)); }
+function trayRoll(el) { freeRoll(qdice2.pool, qdice2.tn, 'Free roll', el); }
 function renderTable() {
   const o = initiative(); if (turn.at >= o.length) turn.at = 0;
   roundCard.innerHTML = `<div class="fit"><h3>Round order <span class="chip" data-go="p-turns">p.3</span></h3><div class="t">Total Actions, then Coordination, then Palming. Each round, everyone with actions left acts once.</div>

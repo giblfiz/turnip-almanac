@@ -7,9 +7,10 @@
 const C = window.CAMPAIGN, R = window.RIG;
 const $ = (s, r = document) => r.querySelector(s);
 const vp = $('#vp'), world = $('#world');
+const STORE_KEY = C.id ? `turnip-almanac-2:${C.id}` : 'turnip-almanac-2';   // one saved table per campaign
 const store = {
-  get() { try { return JSON.parse(localStorage.getItem('turnip-almanac-2') || '{}'); } catch { return {}; } },
-  set(v) { try { localStorage.setItem('turnip-almanac-2', JSON.stringify(v)); } catch {} },
+  get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } },
+  set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
 const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, summonPick: {}, asof: {}, build: null };
@@ -68,7 +69,7 @@ C.places.forEach(p => {
   reg(p.id, { el: e, title: p.name, kind: 'place', icon: p.icon, box: { x: x - 220, y: y - 220, w: 440, h: 640 } });
 });
 
-// ------------------------------------------------------------------ the shelf: Harry's book, its index beside its real pages
+// ------------------------------------------------------------------ the shelf: the book, its index beside its real pages
 const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
 // the index: chapters from the book's list, or from each print entry's chapter
 const chapters = BK.chapters ? BK.chapters.map(ch => ({ title: ch.title, entries: C.print.filter(p => ch.page ? p.page === ch.page : p.chapter === ch.title) }))
@@ -185,7 +186,7 @@ let persistExtra = () => {};
 // ------------------------------------------------------------------ pockets: a free-paste spot on every major thing
 // Paste (⌘V) with the pointer over a pocket, drop an image on it, or click it to type. Scraps are text or pictures.
 state.pockets = saved.pockets || {};
-const persistPockets = () => { persistExtra(); try { const o = JSON.parse(localStorage.getItem('turnip-almanac-2') || '{}'); o.pockets = state.pockets; o.sessx = state.sessx; o.prepN = state.prepN; o.threadx = state.threadx; localStorage.setItem('turnip-almanac-2', JSON.stringify(o)); } catch {} };
+const persistPockets = () => { persistExtra(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.pockets = state.pockets; o.sessx = state.sessx; o.prepN = state.prepN; o.threadx = state.threadx; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
 function pocketHtml(owner, label = 'Pocket') {
   const items = state.pockets[owner] || [];
   return `<div class="pocket" data-pocket="${owner}"><div class="ph2">${esc(label)} <span class="pk">paste, drop, or click to type</span></div><div class="scraps">${items.map(it => it.kind === 'img'
@@ -214,7 +215,7 @@ state.sessx = saved.sessx || []; state.prepN = saved.prepN || C.prep.n; state.th
 state.snotes = saved.snotes || null; state.smeta = saved.smeta || {}; state.npcx = saved.npcx || [];
 const allSessions = () => [...C.sessions, ...state.sessx, { ...C.prep, n: state.prepN, title: state.prepN === C.prep.n ? C.prep.title : 'Next session', date: 'planned', prep: true }];
 if (!state.snotes) { state.snotes = {}; allSessions().forEach(s => { state.snotes[s.n] = []; Object.entries(C.cells).forEach(([who, row]) => (row[s.n] || []).forEach((t, j) => state.snotes[s.n].push({ id: `c-${who}-${s.n}-${j}`, who, text: t }))); }); }
-persistExtra = () => { persist(); try { const o = JSON.parse(localStorage.getItem('turnip-almanac-2') || '{}'); Object.assign(o, { snotes: state.snotes, smeta: state.smeta, npcx: state.npcx, pockets: state.pockets, sessx: state.sessx, prepN: state.prepN, threadx: state.threadx }); localStorage.setItem('turnip-almanac-2', JSON.stringify(o)); } catch {} };
+persistExtra = () => { persist(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); Object.assign(o, { snotes: state.snotes, smeta: state.smeta, npcx: state.npcx, pockets: state.pockets, sessx: state.sessx, prepN: state.prepN, threadx: state.threadx }); localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
 state.npcx.forEach(n => { if (!npcIndex[n.id]) { C.npcs.push(n); npcIndex[n.id] = n; } });
 state.threadx.forEach(t => { if (!C.threads.find(x => x.id === t.id)) C.threads.push(t); });
 // ------------------------------------------------------------------ sessions: compact, editable cards; notes grouped by who
@@ -447,7 +448,7 @@ function toast(rec, at) {
 var tableReady = false;
 // the log: every roll and every line of chat, in order (Harry, 13 Nov)
 state.log = saved.log || [];
-function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem('turnip-almanac-2') || '{}'); o.log = state.log; localStorage.setItem('turnip-almanac-2', JSON.stringify(o)); } catch {} renderLog(true); }
+function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.log = state.log; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} renderLog(true); }
 let logSpeaker = 'gm';
 function speakerOf(id) { if (id === 'gm' || !id) return { name: 'GM', icon: null }; const pc = pcById[id]; return pc ? { name: choicesOf(pc).name || WORDS.Char, icon: portraitOf(pc, sheetOf(pc)).src } : { name: id, icon: null }; }
 function renderLog(stick) {
@@ -469,8 +470,8 @@ document.addEventListener('change', ev => { if (ev.target.closest?.('.logwho')) 
 document.addEventListener('keydown', ev => { if (ev.target.closest?.('.loginput') && ev.key === 'Enter') { ev.preventDefault(); say(ev.target.value); logCard.querySelector('.loginput')?.focus({ preventScroll: true }); } });
 function renderQuick() { if (tableReady) renderTable(); }
 document.addEventListener('click', ev => {
-  const ts = ev.target.closest('[data-ts]'); if (ts) { const k = ts.dataset.ts; qdice2[k] = Math.max(k === 'tn' ? 0 : 1, Math.min(k === 'tn' ? 18 : 30, qdice2[k] + +ts.dataset.d)); renderTable(); return; }
-  const tr = ev.target.closest('[data-troll]'); if (tr) { freeRoll(qdice2.pool, qdice2.tn, 'Free roll', tr); return; }
+  const ts = ev.target.closest('[data-ts]'); if (ts) { trayStep(ts.dataset.ts, +ts.dataset.d); renderTable(); return; }
+  const tr = ev.target.closest('[data-troll]'); if (tr) { trayRoll(tr); return; }
   const tn = ev.target.closest('[data-turn]'); if (tn) { const n = initiative().length; if (tn.dataset.turn === 'next') { turn.at++; if (turn.at >= n) { turn.at = 0; turn.round++; } } else turn = { round: turn.round + 1, at: 0 }; renderTable(); }
 });
 tableReady = true; renderTable(); renderLog(true);
@@ -787,7 +788,7 @@ function flyTo(id) {
 }
 const BSCALE = BK_K;
 function flyToBuilder(id) {
-  const pcId = id.replace(/^b-|^builder-/, '').replace(/-(name|meta|attr|skills|magic|cyber|gear|veh|deck|circles|life|done)$/, '');
+  const pcId = id.replace(/^b-|^builder-/, '').replace(new RegExp('-(' + ORDER.join('|') + ')$'), '');
   const sb = nodes[pcId].box, bx = sb.x + BREG.x, by = sb.y + BREG.y;
   if (id.startsWith('builder-')) { flash(id); flyToView(viewFor({ x: bx, y: by, w: BREG.w, h: BREG.h }, 1.06)); return; }
   const e = sheetEls[pcId].querySelector(`[data-id="${id}"]`); if (!e) return;
@@ -822,7 +823,7 @@ function lodPass() {
 const rulerT = $('#rulerT'), rulerL = $('#rulerL'), arrowsEl = $('#arrows');
 function rulers() {}
 const anchors = [
-  { id: 'a-book', label: 'Rulebook', icon: 'assets/genre-modern.png', target: 'book-ssr2' },
+  { id: 'a-book', label: 'Rulebook', icon: 'assets/genre-modern.png', target: BK.id },
   { id: 'a-map', label: 'Map', icon: 'assets/type-OFC.png', target: 'map' },
   { id: 'a-party', label: 'Party', icon: 'assets/tool-pawns.png', target: 'party', box: { x: PX, y: -900, w: SW, h: SLOTS * RH + 900 } },
   { id: 'a-sessions', label: 'Sessions', icon: 'assets/tool-build.png', target: 's1', box: { x: SX, y: SY, w: SBW, h: py - SY } },

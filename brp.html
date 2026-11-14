@@ -1,0 +1,1953 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Turnip Almanac</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one infinite canvas. x = time (shelf → campaign → sessions → now), zoom = abstraction. HUD floats over it. */
+:root {
+  --paper: #fcfbf8;      /* cards, sheets */
+  --ground: #efece5;     /* the canvas itself */
+  --ink: #1a1917;
+  --ink-2: #5f5c55;
+  --ink-3: #8e8a80;
+  --rule: #ddd8cd;
+  --ochre: #a8770f;      /* Turnip Works' accent: links, now line, threads */
+  --ochre-soft: #a8770f22;
+  --band: #e6e2d8;
+  --note: #f6e7a8;
+  --note-ink: #3d3420;
+  --crease: #e4dfd3;
+  --shadow: 0 1px 2px #1a191714, 0 6px 18px #1a19170f;
+  --f-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #24231f; --ground: #181715; --ink: #ece9e2; --ink-2: #b4afa4; --ink-3: #7f7a70; --rule: #3a3833;
+  --ochre: #e0aa45; --ochre-soft: #e0aa4526; --band: #1f1e1b; --note: #4a4226; --note-ink: #f1e6c0; --crease: #2e2c27;
+  --shadow: 0 1px 2px #0006, 0 6px 18px #0005; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #24231f; --ground: #181715; --ink: #ece9e2; --ink-2: #b4afa4; --ink-3: #7f7a70; --rule: #3a3833;
+  --ochre: #e0aa45; --ochre-soft: #e0aa4526; --band: #1f1e1b; --note: #4a4226; --note-ink: #f1e6c0; --crease: #2e2c27;
+  --shadow: 0 1px 2px #0006, 0 6px 18px #0005; color-scheme: dark }
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--f-body); overflow: hidden; }
+#vp { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px); }
+#vp.panning { cursor: grabbing; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.n { position: absolute; box-sizing: border-box; }
+h1, h2, h3, .disp { font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+button { font: inherit; color: inherit; }
+img { max-width: none; }
+
+/* --- semantic zoom: every node is far / mid / near by its size ON SCREEN --- */
+/* f = far only, m = mid and near, nr = near only, fm = far and mid. Set per element by JS, so nested zoomable things never inherit their parent's level. */
+.lodoff { display: none !important; }
+
+/* zones: big quiet labels you read from far away */
+.zone { border-radius: 28px; }
+.zone > .zl { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--f-display); font-weight: 700; color: var(--ink-3); opacity: .55; pointer-events: none; }
+
+/* bands: lanes and session columns */
+.lane { background: var(--band); border-radius: 18px; }
+.lane.alt { background: transparent; }
+.col { border-left: 1px dashed var(--rule); }
+.colhead { padding: 18px 20px; }
+.colhead .num { font: 600 15px var(--f-body); color: var(--ochre); letter-spacing: .08em; text-transform: uppercase; }
+.colhead h2 { font-size: 34px; margin-top: 4px; }
+.colhead .date { color: var(--ink-2); font-size: 15px; margin-top: 4px; }
+.colhead .recap { color: var(--ink-2); font-size: 16px; line-height: 1.45; margin-top: 10px; }
+.colhead.prep h2 { font-style: italic; }
+.nowline { background: var(--ochre); width: 4px; border-radius: 2px; }
+.nowtag { background: var(--ochre); color: var(--paper); font: 700 22px var(--f-display); padding: 6px 14px; border-radius: 999px; white-space: nowrap; }
+.prepwash { background: linear-gradient(180deg, var(--ochre-soft), transparent 60%); border-radius: 18px; }
+
+/* cards */
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); padding: 16px 18px; overflow: hidden; }
+.card h3 { font-size: 22px; }
+.card .t { color: var(--ink-2); font-size: 15px; line-height: 1.45; margin-top: 6px; }
+.fl { font-family: var(--f-display); font-weight: 700; line-height: 1.05; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 6px; background: var(--ochre-soft); color: var(--ochre); font-weight: 600; cursor: pointer; white-space: nowrap; }
+.chip:hover { text-decoration: underline; }
+.chip img { width: 1.2em; height: 1.2em; }
+.chip::after { content: "↗"; font-size: .8em; opacity: .75; }
+
+/* books */
+.book { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px 18px 18px 10px; box-shadow: var(--shadow); border-left: 14px solid var(--ochre); }
+.book .cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; text-align: center; padding: 40px; }
+.book .cover img { width: 160px; height: 160px; }
+.book .cover .fl { font-size: 54px; overflow-wrap: normal; }
+.book .cover .sub { font-size: 30px; color: var(--ink-2); }
+.book .bhead { padding: 20px 24px 6px; display: flex; gap: 14px; align-items: center; }
+.book .bhead img { width: 44px; height: 44px; }
+.book .bhead h2 { font-size: 30px; }
+.chap { position: absolute; font: 700 22px var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.entry { padding: 10px 12px; border-radius: 10px; }
+.entry .fm h3 { font-size: 34px; line-height: 1.05; }
+.entry h3 { font-size: 17px; display: flex; align-items: center; gap: 6px; }
+.entry h3 img { width: 22px; height: 22px; }
+.entry .t { font-size: 12.5px; margin-top: 4px; }
+.entry .fl { font-size: 26px; }
+.entry .backs { margin-top: 6px; font-size: 11px; color: var(--ink-3); }
+.entry .backs .chip { font-size: 11px; }
+.hl { outline: 3px solid var(--ochre); outline-offset: 3px; }
+
+/* overmap */
+.overmap { background: var(--paper); border: 1px solid var(--rule); border-radius: 22px; box-shadow: var(--shadow);
+  background-image: radial-gradient(circle at 70% 30%, var(--ochre-soft), transparent 45%), radial-gradient(circle at 20% 80%, var(--ochre-soft), transparent 40%); background-color: var(--paper); }
+.overmap .omh { position: absolute; left: 32px; top: 24px; }
+.overmap .omh h2 { font-size: 40px; }
+.overmap .omh .t { color: var(--ink-2); font-size: 17px; margin-top: 4px; }
+.overmap svg { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.overmap .road { stroke: var(--ink-3); stroke-width: 3; stroke-dasharray: 2 10; stroke-linecap: round; fill: none; }
+.place { width: 200px; height: 150px; margin: -75px 0 0 -100px; text-align: center; border-radius: 16px; padding: 8px; }
+.place:hover { background: var(--ochre-soft); }
+.place img.pi { width: 72px; height: 72px; }
+.place .pn { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.place .fl { font-size: 40px; }
+.place .pnote { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+.place .tw { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 600; color: var(--ochre); text-decoration: none; border: 1px solid var(--ochre); border-radius: 999px; padding: 1px 6px; }
+.place .backs { font-size: 9px; color: var(--ink-3); margin-top: 3px; }
+.place .backs .chip { font-size: 9px; }
+
+/* the book on the shelf: an index of rules beside the real pages */
+.bk { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px 22px 22px 12px; box-shadow: var(--shadow); border-left: 18px solid var(--ochre); }
+.bk .cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; padding: 80px; }
+.bk .cover .fl { font-size: 190px; }
+.bk .cover .sub { font-size: 80px; color: var(--ink-2); }
+.bk .cover img { width: 260px; height: 260px; }
+.bk .bhead { position: absolute; left: 30px; top: 26px; right: 30px; display: flex; gap: 16px; align-items: center; }
+.bk .bhead h2 { font-size: 46px; }
+.bk .bhead .t { color: var(--ink-2); font-size: 20px; margin-top: 4px; }
+.chap { position: absolute; font: 700 26px var(--f-display); color: var(--ochre); }
+.entry { padding: 12px 14px; border-radius: 12px; }
+.entry .fm h3 { font-size: 36px; line-height: 1.05; }
+.entry h3 { font-size: 19px; }
+.entry .t { font-size: 13.5px; margin-top: 4px; line-height: 1.4; }
+.entry .pg { margin-top: 6px; font-size: 12px; }
+.entry .backs { margin-top: 4px; font-size: 11px; color: var(--ink-3); }
+.entry .backs .chip { font-size: 11px; }
+.pagef { background: #fff; border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 4px; overflow: hidden; }
+.pagef .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 120px var(--f-display); color: #c9c3b6; background: repeating-linear-gradient(0deg, #f4f2ec 0 22px, #fff 22px 44px); }
+.pagef .ph small { display: block; font: 500 34px var(--f-body); color: #a8a296; text-align: center; }
+.pagef .cv { position: absolute; inset: 0; }
+.pagef .cv canvas { width: 100%; height: 100%; display: block; }
+.pagef .pnum { position: absolute; right: -2px; bottom: -40px; font: 600 22px var(--f-body); color: var(--ink-3); }
+.region { position: absolute; border-radius: 4px; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .3s, background .3s; }
+.region:hover { box-shadow: inset 0 0 0 2px #a8770f88; background: #a8770f10; }
+.region.hl { outline: none; box-shadow: inset 0 0 0 4px #a8770f; background: #a8770f22; }
+.region .rt { position: absolute; left: 0; top: -22px; font: 600 13px var(--f-body); color: #7a5608; background: #fff8e6; border: 1px solid #a8770f66; border-radius: 6px 6px 0 0; padding: 1px 7px; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.region:hover .rt, .region.hl .rt { opacity: 1; }
+
+/* builder: a region ON the sheet; zoom in, then scroll down through the steps */
+.builder { position: absolute; right: 16px; top: 16px; width: 240px; border: 2px dashed var(--ochre); border-radius: 14px; overflow: hidden; background: var(--ochre-soft); }
+.builder .bf { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 120px; text-align: center; gap: 14px; color: var(--ochre); }
+.builder .bf .fl { font-size: 46px; }
+.builder .bf .t { font-size: 17px; color: var(--ink-2); padding: 0 16px; }
+.binner { position: absolute; left: 0; top: 0; width: 960px; transform-origin: 0 0; transform: scale(.25); padding: 30px; box-sizing: border-box; font-size: 22px; }
+.bstep { border-radius: 22px; padding: 22px 26px; margin-bottom: 30px; background: var(--paper); border: 1px solid var(--rule); }
+.bstep .q { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.bstep .q .no { font: 700 30px var(--f-display); color: var(--ochre); }
+.bstep .q h3 { font-size: 36px; }
+.bstep .q .sub { margin-left: auto; font-size: 20px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bstep .q .chip { font-size: 18px; }
+.bstep .hint { color: var(--ink-2); font-size: 21px; margin: 8px 0 16px; line-height: 1.4; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opts.three { grid-template-columns: 1fr 1fr 1fr; }
+.opt { border: 2px solid var(--rule); border-radius: 16px; padding: 14px 16px; text-align: left; background: transparent; cursor: pointer; color: var(--ink); }
+.opt b { font: 700 26px var(--f-display); display: flex; justify-content: space-between; gap: 8px; }
+.opt b em { font: 600 20px var(--f-body); font-style: normal; color: var(--ochre); }
+.opt span { font-size: 18px; color: var(--ink-2); display: block; margin-top: 4px; line-height: 1.35; }
+.opt.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.opt:disabled { opacity: .4; cursor: not-allowed; }
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.rows.one { grid-template-columns: 1fr; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border: 1px solid var(--rule); border-radius: 14px; padding: 10px 12px; }
+.row.on { border-color: var(--ochre); background: var(--ochre-soft); }
+.row b { font: 600 22px var(--f-body); display: block; }
+.row span { font-size: 17px; color: var(--ink-2); display: block; line-height: 1.3; }
+.row .cost { font-size: 17px; color: var(--ochre); font-weight: 600; }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--rule); background: var(--paper); font: 700 26px var(--f-body); cursor: pointer; color: var(--ink); padding: 0; }
+.stepper button:hover:not(:disabled) { border-color: var(--ochre); color: var(--ochre); }
+.stepper button:disabled { opacity: .3; cursor: not-allowed; }
+.stepper output { min-width: 40px; text-align: center; font: 700 30px var(--f-display); font-variant-numeric: tabular-nums; }
+.grouph { font: 700 24px var(--f-display); margin: 14px 0 8px; display: flex; justify-content: space-between; color: var(--ink-2); }
+.seg { display: flex; border: 2px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 8px 12px; font: 600 17px var(--f-body); cursor: pointer; color: var(--ink-2); border-left: 1px solid var(--rule); }
+.seg button:first-child { border-left: 0; }
+.seg button.sel { background: var(--ochre); color: var(--paper); }
+.chipgrid { display: grid; grid-template-columns: 150px repeat(4, 1fr); gap: 8px; font-size: 18px; align-items: stretch; }
+.chipgrid .h { font-weight: 600; color: var(--ink-2); align-self: end; }
+.chipgrid button { border: 2px solid var(--rule); border-radius: 12px; background: transparent; padding: 8px; font: 600 18px var(--f-body); cursor: pointer; color: var(--ink); }
+.chipgrid button span { display: block; font-weight: 500; font-size: 15px; color: var(--ochre); }
+.chipgrid button.sel { border-color: var(--ochre); background: var(--ochre-soft); }
+.bstep input, .bstep select { width: 100%; box-sizing: border-box; font: 600 30px var(--f-display); padding: 12px 14px; border: 2px solid var(--rule); border-radius: 14px; background: var(--paper); color: var(--ink); }
+.bstep select { font: 500 22px var(--f-body); width: auto; }
+.crease { border-radius: 18px; background: repeating-linear-gradient(135deg, var(--crease) 0 12px, transparent 12px 24px); border: 2px dashed var(--ink-3); display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-2); font-size: 24px; padding: 20px; box-sizing: border-box; }
+.interp { font-size: 18px; color: var(--ink-2); border-left: 4px solid var(--ochre); padding: 6px 12px; margin-top: 10px; line-height: 1.4; }
+.bpts { position: absolute; left: 30px; right: 30px; top: 0; }
+/* headline labels: big text laid over a region; JS fades them once they outgrow the screen */
+.lbl { position: absolute; font-family: var(--f-display); font-weight: 700; line-height: 1; color: var(--ink); white-space: nowrap; pointer-events: none; letter-spacing: -0.01em; z-index: 3; }
+.lbl.onmap { color: #2b2a26; text-shadow: 0 0 30px #f3efe6, 0 0 12px #f3efe6; }
+.lbl.pnumlbl { color: #a8770f; }
+.lbl.blbl { left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; color: var(--ochre); }
+
+/* the map */
+.map { background: #e9e4d8; border-radius: 30px; overflow: hidden; box-shadow: var(--shadow); }
+.mapimg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .attrib { font: 500 44px var(--f-body); color: #5f5c55; text-align: right; background: #f3efe6cc; border-radius: 10px; padding: 14px 18px; box-sizing: border-box; }
+.place { text-align: center; border-radius: 28px; padding: 14px; box-sizing: border-box; margin: 0; width: 340px; height: auto; z-index: 2; }
+.place:hover { background: #a8770f1f; }
+.place img.pi { width: 200px; height: 200px; filter: drop-shadow(0 6px 10px #0004); }
+.place .pn { font: 700 58px var(--f-display); line-height: 1.02; color: #1a1917; background: #fcfbf8ee; border-radius: 14px; padding: 4px 12px; display: inline-block; margin-top: 4px; }
+.place .pnote { font-size: 28px; color: #3d3b36; margin-top: 8px; background: #fcfbf8dd; border-radius: 10px; padding: 4px 10px; }
+.place .tw { display: inline-block; margin-top: 10px; font-size: 24px; font-weight: 600; color: #7a5608; text-decoration: none; border: 2px solid #a8770f; border-radius: 999px; padding: 4px 14px; background: #fcfbf8; }
+.place .backs { font-size: 24px; color: #5f5c55; margin-top: 6px; }
+.place .backs .chip { font-size: 24px; }
+
+/* the book: no cover swap; a header, an index, the pages */
+.bk .bhead { position: absolute; left: 40px; top: 40px; right: 40px; display: flex; gap: 24px; align-items: center; }
+.bk .bhead img { width: 130px; height: 130px; }
+.bk .bhead h2 { font-size: 96px; }
+.bk .bhead .t { font-size: 34px; }
+.chap { font-size: 32px; }
+.entry h3 { font-size: 23px; line-height: 1.1; }
+.entry .t { font-size: 14px; }
+.entry .pg { margin-top: 6px; font-size: 13px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.pagef .ph { font-size: 200px; }
+.interpcard h3 { font-size: 40px; }
+.interpcard .t { font-size: 24px; line-height: 1.5; }
+
+/* launcher and empty seats */
+.launch { display: flex; }
+.launchbtn { flex: 1; display: flex; align-items: center; gap: 60px; padding: 0 90px; border: 6px dashed var(--ochre); border-radius: 48px; background: var(--ochre-soft); color: var(--ink); cursor: pointer; text-align: left; }
+.launchbtn:hover { background: color-mix(in srgb, var(--ochre) 22%, transparent); }
+.launchbtn .plus { font: 700 300px/1 var(--f-display); color: var(--ochre); }
+.launchbtn b { display: block; font: 700 190px/1 var(--f-display); }
+.launchbtn small { display: block; font-size: 52px; color: var(--ink-2); margin-top: 24px; }
+.seat { display: flex; }
+.seatbtn { flex: 1; border: 4px dashed var(--rule); border-radius: 30px; background: transparent; color: var(--ink-3); font: 600 90px var(--f-display); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 30px; }
+.seatbtn:hover { border-color: var(--ochre); color: var(--ochre); }
+.seatbtn .plus { font-size: 160px; }
+
+/* session headers */
+.colhead { padding: 30px 34px; }
+.colhead .snum { font: 700 200px/0.9 var(--f-display); color: var(--ochre); }
+.colhead h2 { font-size: 60px; margin-top: 12px; }
+.colhead .date { font-size: 28px; color: var(--ink-2); margin-top: 8px; }
+.colhead .recap { font-size: 26px; color: var(--ink-2); line-height: 1.4; margin-top: 14px; }
+.colhead.prep h2 { font-style: italic; }
+.nowtag { font-size: 44px; padding: 10px 26px; }
+.cnote { font-size: 24px; padding: 18px 22px; }
+.adv .lvl { font-size: 18px; } .adv .what { font-size: 30px; } .adv .why { font-size: 20px; }
+.lanehead { padding: 30px 36px; }
+.lanehead img { width: 150px; height: 150px; float: right; }
+.lanehead .num { font: 600 22px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.lanehead h2 { font-size: 90px; margin-top: 6px; }
+.lanehead .t { font-size: 30px; color: var(--ink-2); margin-top: 12px; line-height: 1.4; }
+.inbox .ih { padding: 30px; font-size: 28px; }
+.inbox h2 { font-size: 70px; }
+.loose { width: 330px; min-height: 180px; }
+.loose .body { font-size: 22px; }
+
+/* sheets: wide rows, everything always drawn */
+.sheet { background: var(--paper); border: 1px solid var(--rule); border-radius: 28px; box-shadow: var(--shadow); }
+.sheet .main { position: absolute; inset: 0; }
+.sheet section { position: absolute; top: 30px; bottom: 30px; display: flex; flex-direction: column; gap: 14px; }
+.sheet .sA { left: 34px; width: 640px; }
+.sheet .sB { left: 710px; width: 1040px; }
+.sheet .sC { left: 1786px; width: 620px; }
+.sheet h4 { font: 700 40px var(--f-display); margin: 0; display: flex; gap: 12px; align-items: center; }
+.sheet h4 .chip { font: 600 16px var(--f-body); }
+.sheet .nm { font-size: 130px; line-height: .95; }
+.sheet .nm.empty { color: var(--ink-3); font-style: italic; }
+.sheet .who { color: var(--ink-2); font-size: 26px; }
+.budget { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.budget > div { border: 1px solid var(--rule); border-radius: 14px; padding: 8px 12px; }
+.budget .k, .sk .k, .der .k, .track .k { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.budget .bv { font: 700 30px var(--f-display); font-variant-numeric: tabular-nums; }
+.budget .bar { height: 6px; border-radius: 3px; background: var(--rule); margin-top: 6px; overflow: hidden; }
+.budget .bar i { display: block; height: 100%; background: var(--ochre); }
+.budget .over .bar i { background: #b3412c; }
+.asof { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 14px; color: var(--ink-3); }
+.asof button { border: 1px solid var(--rule); background: transparent; border-radius: 999px; padding: 2px 10px; font-size: 14px; cursor: pointer; color: var(--ink-2); }
+.asof button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.asof button.has { border-color: var(--ochre); }
+.warn { border: 1px solid #b3412c; color: #b3412c; border-radius: 12px; padding: 8px 12px; font-size: 15px; line-height: 1.45; }
+.sec { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-bottom: 4px; display: flex; gap: 8px; align-items: center; }
+.sec .chip { font-size: 12px; letter-spacing: 0; text-transform: none; }
+.ledger { font-size: 14px; columns: 2; column-gap: 22px; }
+.ledger div { display: flex; justify-content: space-between; gap: 8px; break-inside: avoid; padding: 1px 0; border-bottom: 1px dotted var(--rule); }
+.ledger span:last-child { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.pinbtn { position: absolute; right: 0; top: 0; border: 0; background: transparent; cursor: pointer; font-size: 30px; color: var(--ink-3); }
+.pinbtn.on { color: var(--ochre); }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.acol { border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
+.ahead { background: var(--band); padding: 10px 14px; display: flex; justify-content: space-between; align-items: baseline; }
+.ahead .an { font: 700 24px var(--f-display); }
+.pv { font: 700 44px var(--f-display); line-height: 1; font-variant-numeric: tabular-nums; cursor: help; border-radius: 6px; padding: 0 4px; }
+.pv.mid { font-size: 38px; }
+.pv:hover, .pv.pinned { background: var(--ochre-soft); color: var(--ochre); }
+.pv.changed { animation: bump .6s ease-out; }
+@keyframes bump { 0% { color: var(--ochre); transform: scale(1.25); } 100% { transform: none; } }
+.tn { font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.sk { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--rule); }
+.sk .k { text-transform: none; letter-spacing: 0; font-size: 21px; color: var(--ink); }
+.sk.zero .k, .sk.zero .pv { color: var(--ink-3); }
+.die { border: 1px solid var(--rule); background: transparent; border-radius: 10px; width: 40px; height: 40px; cursor: pointer; font-size: 20px; padding: 0; color: var(--ink-2); }
+.die.wide { width: auto; padding: 0 14px; font-size: 16px; margin-left: auto; }
+.die:hover { border-color: var(--ochre); color: var(--ochre); }
+.der { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.der > div { border: 1px solid var(--rule); border-radius: 14px; padding: 8px 10px; text-align: center; }
+.der small { display: block; font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+.track { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.track .k { margin-right: 8px; display: flex; gap: 6px; align-items: center; }
+.track button { width: 38px; height: 38px; border-radius: 9px; border: 2px solid var(--ink-2); background: transparent; cursor: pointer; font: 700 15px var(--f-body); color: #fff; padding: 0; }
+.track button.B { background: #c98a1b; border-color: #c98a1b; }
+.track button.L { background: #b3412c; border-color: #b3412c; }
+.track .wound { font-size: 15px; color: #b3412c; font-weight: 600; margin-left: 6px; }
+.rolls { display: flex; flex-direction: column; gap: 6px; }
+.rolls .none, .list .none { color: var(--ink-3); font-size: 15px; }
+.roll { border: 1px solid var(--rule); border-radius: 10px; padding: 7px 10px; font-size: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--paper); }
+.roll b { font-weight: 600; }
+.roll .dd { display: flex; gap: 3px; flex-wrap: wrap; }
+.roll .dd i { font-style: normal; min-width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--rule); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-variant-numeric: tabular-nums; padding: 0 3px; }
+.roll .dd i.ok { background: var(--ochre); color: var(--paper); border-color: var(--ochre); }
+.roll .verdict { margin-left: auto; font-weight: 600; color: var(--ochre); }
+.roll .verdict.fail { color: var(--ink-3); }
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+.list { display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.3; }
+.list b { font-weight: 600; }
+.list .e { color: var(--ink-2); }
+
+/* builder: fixed columns of steps on the sheet, under one big heading */
+.builder { position: absolute; border: 3px dashed var(--ochre); border-radius: 22px; overflow: hidden; background: color-mix(in srgb, var(--ochre) 6%, var(--paper)); }
+.binner { position: absolute; left: 0; top: 0; width: 4600px; height: 3400px; transform-origin: 0 0; font-size: 22px; }
+.bcol { position: absolute; top: 30px; }
+/* notes in cells, advancement cards, loose notes */
+.cellnotes { display: flex; flex-direction: column; gap: 14px; }
+.cnote { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; font-size: 17px; line-height: 1.45; box-shadow: var(--shadow); }
+.cnote.idea { background: transparent; border-style: dashed; font-style: italic; color: var(--ink-2); box-shadow: none; }
+.adv { border: 2px solid var(--ochre); }
+.adv .lvl { font: 700 13px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.adv .what { font: 700 22px var(--f-display); margin-top: 2px; }
+.adv .why { color: var(--ink-2); font-size: 15px; }
+.lanehead { padding: 22px; }
+.lanehead h2 { font-size: 34px; }
+.lanehead .t { color: var(--ink-2); font-size: 16px; margin-top: 6px; line-height: 1.4; }
+.lanehead img { width: 64px; height: 64px; float: right; }
+.lanehead .fl { font-size: 54px; }
+.loose { background: var(--note); color: var(--note-ink); border-radius: 4px 4px 12px 4px; box-shadow: var(--shadow); width: 220px; min-height: 120px; }
+.loose .grip { height: 22px; cursor: move; border-bottom: 1px solid #0001; display: flex; justify-content: flex-end; }
+.loose .grip button { border: 0; background: transparent; cursor: pointer; color: inherit; opacity: .5; font-size: 14px; }
+.loose .body { padding: 10px 12px; font-size: 16px; line-height: 1.4; outline: none; min-height: 80px; }
+.inbox { background: transparent; border: 2px dashed var(--ink-3); border-radius: 18px; }
+.inbox .ih { padding: 16px 20px; color: var(--ink-2); }
+.inbox h2 { font-size: 28px; color: var(--ink); }
+
+/* --- HUD --- */
+#threads { position: fixed; inset: 0; pointer-events: none; overflow: visible; z-index: 5; }
+#threads path { fill: none; stroke: var(--ochre); stroke-width: 2.2; }
+#threads circle { fill: var(--ochre); }
+.tend { position: fixed; z-index: 6; transform: translate(-50%, -50%); background: var(--ochre); color: var(--paper); font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow); }
+#rulerT { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 0; z-index: 4; pointer-events: none; }
+#rulerL { position: fixed; top: 0; bottom: 0; left: 0; width: 0; z-index: 4; pointer-events: none; }
+.rl { position: absolute; white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--ink-2); background: color-mix(in srgb, var(--paper) 88%, transparent); border: 1px solid var(--rule); border-radius: 999px; padding: 3px 9px; transform: translateX(-50%); top: 10px; }
+.rl.now { color: var(--paper); background: var(--ochre); border-color: var(--ochre); }
+#rulerL .rl { transform: translateY(-50%); left: max(10px, env(safe-area-inset-left, 0px)); top: auto; writing-mode: vertical-rl; rotate: 180deg; padding: 9px 3px; }
+.arrow { position: fixed; z-index: 7; display: flex; align-items: center; gap: 8px; transform: translate(-50%, -50%); background: var(--paper); border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; font-weight: 600; font-size: 13px; transition: opacity .25s; white-space: nowrap; }
+.arrow img { width: 30px; height: 30px; }
+.arrow .dir { color: var(--ochre); font-size: 18px; display: inline-block; }
+.arrow:hover { border-color: var(--ochre); }
+#bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 8; display: flex; gap: 4px; align-items: center; background: var(--paper); border: 1px solid var(--rule); border-radius: 16px; box-shadow: var(--shadow); padding: 5px; max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
+#bar button { border: 0; background: transparent; border-radius: 11px; padding: 7px 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--ink); }
+#bar button:hover { background: var(--ochre-soft); }
+#bar button:focus-visible, .arrow:focus-visible, .opt:focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
+#bar button:disabled { opacity: .35; }
+#bar img { width: 20px; height: 20px; }
+#bar .sep { width: 1px; align-self: stretch; background: var(--rule); margin: 4px 2px; }
+#bar kbd { font: 11px var(--f-body); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+#title { position: fixed; z-index: 8; left: max(16px, env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 8px 14px; box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
+#title .disp { font-size: 20px; }
+#title .disp span { color: var(--ochre); }
+#title .sub { font-size: 12px; color: var(--ink-2); }
+#help { position: fixed; z-index: 8; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 10px 14px; box-shadow: var(--shadow); font-size: 12.5px; line-height: 1.6; color: var(--ink-2); max-width: 270px; }
+#help b { color: var(--ink); font-weight: 600; }
+#help button { border: 0; background: transparent; cursor: pointer; float: right; color: var(--ink-3); }
+#helpQ { position: fixed; z-index: 8; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); cursor: pointer; font: 600 16px var(--f-body); color: var(--ink-2); }
+#pal { position: fixed; inset: 0; z-index: 20; background: #0003; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 0; }
+#pal .box { width: min(560px, 100%); background: var(--paper); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--rule); overflow: hidden; }
+#pal input { width: 100%; box-sizing: border-box; border: 0; border-bottom: 1px solid var(--rule); padding: 16px 18px; font: 500 18px var(--f-body); background: transparent; color: var(--ink); outline: none; }
+#pal ul { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow: auto; }
+#pal li { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+#pal li.on { background: var(--ochre-soft); }
+#pal li img { width: 26px; height: 26px; }
+#pal li .k { margin-left: auto; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+@media (max-width: 640px) { #help { display: none; } #bar .lbl { display: none; } }
+@media (prefers-reduced-motion: reduce) { .v.changed { animation: none; } .arrow { transition: none; } }
+/* v4: golden-ish sheet (2100 × 1300), two bands; builder is a small box in the bottom-left corner */
+.sheet section { position: absolute; display: flex; flex-direction: column; gap: 12px; }
+.sheet .sA { left: 34px; top: 30px; width: 600px; height: 520px; }
+.sheet .sB { left: 664px; top: 30px; width: 1040px; height: 520px; }
+.sheet .sP { left: 1734px; top: 30px; width: 336px; height: 520px; }
+.sheet .sD { left: 34px; top: 580px; width: 1040px; height: 340px; }
+.sheet .sL { left: 500px; top: 950px; width: 574px; height: 320px; overflow: hidden; }
+.sheet .sC { left: 1104px; top: 580px; width: 966px; height: 690px; overflow: hidden; }
+.sheet .nm { font-size: 104px; }
+.sheet .who { font-size: 24px; }
+.sheet .sk .k { font-size: 22px; }
+.sheet .list { font-size: 16px; }
+.portrait { position: relative; width: 336px; height: 400px; border-radius: 20px; overflow: hidden; background: var(--band); border: 2px solid var(--rule); }
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .drophint { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px; font-size: 15px; text-align: center; color: #fff; background: linear-gradient(transparent, #0008); opacity: 0; transition: opacity .2s; }
+.portrait:hover .drophint, .portrait.dropping .drophint { opacity: 1; }
+.portrait.dropping, .pport.dropping { outline: 4px dashed var(--ochre); outline-offset: 4px; }
+.tokens { display: flex; gap: 8px; align-items: center; }
+.tokens button, .tokens .upl { width: 66px; height: 66px; border-radius: 12px; border: 2px solid var(--rule); background: var(--band); padding: 0; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--ink-2); box-sizing: border-box; }
+.tokens button img { width: 100%; height: 100%; object-fit: cover; }
+.tokens button.sel { border-color: var(--ochre); }
+.tokens .upl:hover, .tokens button:hover { border-color: var(--ochre); }
+.builder { border-width: 3px; }
+.builder.todo { border-color: #b3412c; }
+.builder.active { box-shadow: 0 0 0 6px var(--ochre-soft); border-style: solid; }
+.lbl.blbl { line-height: .95; }
+.donebox { border-radius: 16px; padding: 16px 18px; font-size: 20px; line-height: 1.45; margin: 12px 0; border: 2px solid; }
+.donebox b { display: block; font: 700 28px var(--f-display); margin-bottom: 4px; }
+.donebox.ok { border-color: #3f7d3a; background: #3f7d3a14; }
+.donebox.bad { border-color: #b3412c; background: #b3412c12; }
+.donebox .w { color: #b3412c; }
+.donebtn { width: 100%; }
+#threads path.build { stroke-dasharray: 10 6; stroke-width: 3; }
+.tend.build { background: var(--ink); }
+
+/* sessions as compact cards */
+.scard { padding: 30px 34px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; }
+.scard .shead { display: flex; gap: 22px; align-items: center; }
+.scard .snum { font: 700 150px/0.85 var(--f-display); color: var(--ochre); }
+.scard h2 { font-size: 52px; }
+.scard .date { font-size: 24px; color: var(--ink-2); margin-top: 4px; }
+.scard .recap { font-size: 26px; color: var(--ink-2); line-height: 1.4; }
+.scard.prep { background: color-mix(in srgb, var(--ochre) 7%, var(--paper)); border-style: dashed; }
+.scard .nowtag { margin-left: auto; align-self: flex-start; }
+.sgroups { display: flex; flex-direction: column; gap: 14px; }
+.sgroup { border-top: 1px solid var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.sgh { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.sgh img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: var(--band); }
+.sgh b { font: 700 28px var(--f-display); }
+.sgh:hover b { color: var(--ochre); }
+.tdot { width: 52px; height: 52px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ochre-soft); color: var(--ochre); font: 700 28px var(--f-display); flex: none; }
+.tdot.big { width: 130px; height: 130px; font-size: 70px; }
+.snote { font-size: 22px; line-height: 1.45; padding-left: 64px; }
+.snote.idea { font-style: italic; color: var(--ink-2); }
+.snote.karma .kk { font: 700 15px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); border: 2px solid var(--ochre); border-radius: 8px; padding: 1px 8px; }
+.snote.karma b { font-weight: 700; }
+.snote.karma .e { color: var(--ink-2); font-size: 19px; }
+.pcard { padding: 28px 30px; box-sizing: border-box; }
+.pcard .pch { display: flex; gap: 22px; align-items: flex-start; }
+.pport { width: 130px; height: 130px; border-radius: 18px; overflow: hidden; flex: none; background: var(--band); }
+.pport img { width: 100%; height: 100%; object-fit: cover; }
+.pcard .num { font: 600 18px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ochre); }
+.pcard h2 { font-size: 54px; }
+.pcard .t { font-size: 24px; color: var(--ink-2); margin-top: 8px; line-height: 1.4; }
+.pcard .backs { margin-top: 14px; font-size: 20px; color: var(--ink-3); }
+.pcard .backs .chip { font-size: 20px; }
+.inbox .ih { font-size: 28px; padding: 30px; }
+.inbox h2 { font-size: 64px; }
+
+/* at the table: on the canvas */
+.tablecard { padding: 34px 38px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; }
+.tablecard h3 { font-size: 56px; display: flex; gap: 14px; align-items: center; }
+.tablecard h3 .chip { font: 600 20px var(--f-body); }
+.tablecard > .t { font-size: 22px; color: var(--ink-2); }
+.tablecard .rmeta { display: flex; gap: 12px; align-items: center; font-size: 24px; color: var(--ink-2); }
+.tb { border: 2px solid var(--ochre); color: var(--ochre); background: transparent; border-radius: 999px; padding: 6px 18px; font: 600 20px var(--f-body); cursor: pointer; }
+.tb:hover { background: var(--ochre-soft); }
+.tablecard .init { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.tablecard .init li { display: grid; grid-template-columns: 64px 1fr auto; grid-template-areas: "p n d" "p m w"; gap: 2px 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 14px; }
+.tablecard .init li.on { border: 3px solid var(--ochre); background: var(--ochre-soft); }
+.tablecard .init img { grid-area: p; width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
+.tablecard .init .who2 { grid-area: n; font: 700 30px var(--f-display); cursor: pointer; }
+.tablecard .init .nums { grid-area: m; font-size: 18px; color: var(--ink-2); }
+.tablecard .init .dots { grid-area: d; display: flex; gap: 4px; }
+.tablecard .init .dots i { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--ink-3); }
+.tablecard .init .dots i.B { background: #c98a1b; border-color: #c98a1b; } .tablecard .init .dots i.L { background: #b3412c; border-color: #b3412c; }
+.tablecard .init .wtn { grid-area: w; color: #b3412c; font-weight: 600; font-size: 18px; justify-self: end; }
+.tablecard .qdice { display: flex; gap: 24px; align-items: center; font-size: 24px; flex-wrap: wrap; }
+.tablecard .qdice label { display: flex; gap: 10px; align-items: center; }
+.tablecard .rolls .roll { font-size: 18px; }
+.helpcard { padding: 34px 38px; box-sizing: border-box; }
+.helpcard h3 { font-size: 56px; }
+.helpcard .t { font-size: 25px; line-height: 1.75; color: var(--ink-2); margin-top: 12px; }
+.helpcard b { color: var(--ink); }
+.artcard { background: var(--paper); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.artcard .grip { height: 26px; cursor: move; display: flex; justify-content: flex-end; background: var(--band); }
+.artcard .grip button { border: 0; background: transparent; cursor: pointer; color: var(--ink-2); }
+.artcard img { display: block; width: 100%; }
+#world img { -webkit-user-drag: none; user-select: none; }
+#world { user-select: none; -webkit-user-select: none; }
+#world input, #world textarea, #world [contenteditable] { user-select: text; -webkit-user-select: text; }
+
+/* the quickbar: one line of text, top centre, like Turnip Works */
+#qbar { position: fixed; z-index: 12; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); display: flex; align-items: flex-start; gap: 8px; min-height: 40px; padding: 0 12px; background: color-mix(in srgb, var(--paper) 92%, transparent); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); backdrop-filter: blur(10px); box-sizing: border-box; transition: width .15s ease; }
+#qbar.open { width: min(680px, calc(100% - 24px)); }
+#qbar .lead { width: 16px; height: 16px; margin-top: 12px; opacity: .55; color: var(--ink); flex: none; }
+#qbar textarea { flex: 1; min-width: 0; height: 20px; margin: 0; padding: 10px 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: 14px/20px var(--f-body); resize: none; overflow: hidden; box-sizing: content-box; }
+#qbar textarea::placeholder { color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#qbar kbd { margin-top: 10px; font: 11px var(--f-body); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+#qbar.open kbd { display: none; }
+#qres { position: fixed; z-index: 12; top: calc(58px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(680px, calc(100% - 24px)); max-height: 60vh; overflow: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); padding: 6px; box-sizing: border-box; }
+.qsec { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding: 8px 10px 4px; }
+.qrow { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.qrow.on { background: var(--ochre-soft); }
+.qrow img { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; }
+.qrow .qdot { width: 24px; height: 24px; border-radius: 6px; background: var(--ochre-soft); flex: none; }
+.qrow small { color: var(--ink-3); }
+#toast { position: fixed; z-index: 15; transform: translate(-50%, calc(-100% - 14px)); pointer-events: none; transition: opacity .25s; width: max-content; max-width: min(560px, calc(100vw - 32px)); }
+#toast .roll { box-shadow: var(--shadow); border-color: var(--ochre); font-size: 15px; }
+@media (max-width: 640px) { #qbar kbd { display: none; } }
+/* ---- summons strip: bottom-right of the sheet, under the gear lists ---- */
+.sheet .sC { height: 470px; }
+.sheet .sS { left: 1104px; top: 1070px; width: 966px; height: 200px; gap: 8px; }
+.minisheet { flex: 1; position: relative; overflow: hidden; border-radius: 12px; background: var(--band); }
+.mini-in { position: absolute; left: 0; top: 0; width: 1830px; transform: scale(.5); transform-origin: 0 0; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; }
+.mini-in .mh { display: flex; gap: 18px; align-items: center; }
+.mini-in .mh b { font: 700 40px var(--f-display); }
+.mini-in .kind { font-size: 22px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.mini-in .rbox { margin-left: auto; font-size: 26px; display: flex; gap: 12px; align-items: center; }
+.mini-in .boxes { display: flex; gap: 6px; }
+.mini-in .boxes i { width: 26px; height: 26px; border-radius: 6px; border: 3px solid var(--ochre); }
+.mini-in .boxes i.on { background: var(--ochre); }
+.mini-in .mrow { display: flex; gap: 30px; font-size: 26px; color: var(--ink-2); }
+.mini-in .mbtns { display: flex; gap: 14px; margin-top: 6px; }
+.mini-in .btn { font-size: 24px; padding: 8px 20px; }
+.pickgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.pickgrid .btn { padding: 5px 6px; font-size: 13px; display: flex; flex-direction: column; align-items: flex-start; }
+.pickgrid .btn small { font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+.hint2 { font-size: 13px; color: var(--ink-3); }
+
+/* ---- buttons look like buttons; information looks like paper ----
+   Anything you can press: raised keycap, ochre edge, a ledge underneath, presses down.
+   Anything you read: flat, tinted, no border. */
+:root { --ledge: color-mix(in srgb, var(--ochre) 70%, #000); --btn-face: color-mix(in srgb, var(--ochre) 7%, var(--paper)); }
+.btn, .die, .stepper button, .asof button, .tokens button, .tokens .upl, .opt, .seg button, .chipgrid button, .tb, .track button, .launchbtn, .seatbtn, .donebtn, .qskills button {
+  background: var(--btn-face) !important; border: 2px solid var(--ochre) !important; box-shadow: 0 3px 0 var(--ledge) !important; color: var(--ink) !important;
+  cursor: pointer; border-radius: 10px; transition: transform .06s, box-shadow .06s; }
+.btn { font: 600 15px var(--f-body); padding: 7px 14px; }
+.btn.big { font: 700 22px var(--f-display); padding: 14px 22px; align-self: flex-start; }
+.btn.quiet { --btn-face: var(--paper); }
+.btn:hover, .die:hover, .stepper button:hover, .asof button:hover, .tokens button:hover, .tokens .upl:hover, .opt:hover, .seg button:hover, .chipgrid button:hover, .tb:hover, .track button:hover, .launchbtn:hover, .seatbtn:hover, .donebtn:hover {
+  transform: translateY(-1px); box-shadow: 0 4px 0 var(--ledge) !important; }
+.btn:active, .die:active, .stepper button:active, .asof button:active, .tokens button:active, .opt:active, .seg button:active, .chipgrid button:active, .tb:active, .track button:active, .launchbtn:active, .seatbtn:active, .donebtn:active {
+  transform: translateY(3px); box-shadow: 0 0 0 var(--ledge) !important; }
+.btn:disabled, .stepper button:disabled, .opt:disabled { opacity: .35; transform: none; box-shadow: none !important; cursor: not-allowed; }
+/* chosen states: sunk in and filled */
+.opt.sel, .seg button.sel, .chipgrid button.sel, .asof button.on, .tokens button.sel { background: var(--ochre) !important; color: var(--paper) !important; transform: translateY(3px); box-shadow: 0 0 0 var(--ledge) !important; }
+.opt.sel span, .opt.sel b em, .chipgrid button.sel span { color: color-mix(in srgb, var(--paper) 85%, transparent) !important; }
+.track button.B { background: #c98a1b !important; border-color: #8e5f0f !important; color: #fff !important; }
+.track button.L { background: #b3412c !important; border-color: #7a2a1c !important; color: #fff !important; }
+.seg { border: 0; gap: 6px; overflow: visible; }
+.seg button { border-radius: 10px; padding: 6px 12px; }
+.launchbtn { border-width: 6px !important; box-shadow: 0 14px 0 var(--ledge) !important; border-radius: 48px; border-style: solid !important; }
+.seatbtn { border-width: 4px !important; box-shadow: 0 10px 0 var(--ledge) !important; color: var(--ochre) !important; }
+/* links to elsewhere: ochre text with an arrow, a little raised */
+.chip { border: 1.5px solid var(--ochre); box-shadow: 0 2px 0 var(--ledge); background: var(--btn-face); color: var(--ink); }
+.chip:hover { text-decoration: none; transform: translateY(-1px); }
+/* information: flat, tinted, borderless */
+.budget > div, .der > div, .acol, .roll, .warn, .row, .portrait, .minisheet, .donebox { box-shadow: none; }
+.budget > div, .der > div, .acol { border: 0 !important; background: var(--band); }
+.acol .ahead { background: color-mix(in srgb, var(--ink) 6%, var(--band)); }
+.sk { border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
+.row { border: 0 !important; background: var(--band); }
+.row.on { background: var(--ochre-soft); }
+.roll { border: 0; background: var(--band); }
+.pv { cursor: help; }
+.pv:hover { outline: 2px dotted var(--ochre); background: transparent; }
+/* threads on the canvas: translucent, scale with the world, end dots fly to the far end */
+.wthreads { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; z-index: 40; }
+.wthreads path { fill: none; stroke: var(--ochre); opacity: .45; stroke-linecap: round; }
+.wthreads path.build { stroke-dasharray: 18 12; opacity: .55; }
+.wthreads circle { fill: var(--ochre); opacity: .7; }
+.wthreads circle.far { pointer-events: auto; cursor: pointer; opacity: .85; }
+#threads, #tends { display: none; }
+/* a roll button beside each tool */
+.die.sm { width: auto; height: 24px; padding: 0 8px; font: 600 12px var(--f-body); border-radius: 7px; margin-left: 4px; vertical-align: middle; box-shadow: 0 2px 0 var(--ledge) !important; }
+.list > div { line-height: 1.6; }
+/* the summon's sheet: a little card of its own */
+.minisheet { background: var(--paper) !important; border: 2px solid var(--ink-3); box-shadow: 0 2px 6px #0002 !important; }
+.mini-in .mh { background: var(--band); margin: -18px -24px 6px; padding: 14px 24px; border-bottom: 2px solid var(--ink-3); }
+.mini-in .kind { font-size: 26px; }
+/* fit: each section's contents are zoomed to fill it exactly */
+.sheet section { overflow: hidden; }
+.sheet section > .fit { display: flex; flex-direction: column; gap: 12px; transform-origin: 0 0; }
+.sheet .sC.tall { height: 690px; }
+.sheet .sB .fit { gap: 10px; }
+/* close-up portraits: the token's head and shoulders, cropped as Turnip Works does (x 80–240, y 10–170 of 320) */
+.closeup { overflow: hidden; }
+.closeup img { width: 200% !important; height: auto !important; max-width: none !important; margin-left: -50%; margin-top: -6.25%; object-fit: unset !important; display: block; }
+.portrait { width: 336px; height: 448px; }
+.tokens { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.tokens button, .tokens .upl { width: auto; height: 60px; }
+.rimg { grid-area: p; width: 64px; height: 64px; border-radius: 12px; overflow: hidden; display: block; }
+.rimg img { width: 100%; height: 100%; object-fit: cover; }
+.sgimg { width: 52px; height: 52px; border-radius: 12px; overflow: hidden; display: block; flex: none; background: var(--band); }
+.sgimg img { width: 100%; height: 100%; object-fit: cover; }
+#qback { flex: none; margin: 6px 0 6px -4px; width: 30px; height: 28px; border-radius: 8px; border: 1.5px solid var(--ochre); background: var(--btn-face); box-shadow: 0 2px 0 var(--ledge); color: var(--ink); font: 700 18px/1 var(--f-body); cursor: pointer; padding: 0; }
+#qback:active { transform: translateY(2px); box-shadow: none; }
+/* close-ups are real crops now (assets/tokens/close): show them whole */
+.closeup img { width: 100% !important; height: 100% !important; margin: 0 !important; object-fit: cover !important; }
+/* gear, ware & magic: lists pack into two flowing columns; a list with nothing in it isn't drawn */
+.sheet .cols2 { display: block; columns: 2; column-gap: 26px; }
+.sheet .cols2 > div { break-inside: avoid; margin-bottom: 14px; }
+.sheet .cols2 > div:has(> .list > .none:only-child) { display: none; }
+.ahead { white-space: nowrap; gap: 8px; }
+.ahead .an { white-space: nowrap; }
+.budget .bv { white-space: nowrap; }
+/* editable session text */
+.ed { cursor: text; border-radius: 6px; }
+.ed:hover { box-shadow: inset 0 0 0 2px var(--ochre-soft); }
+.ed.editing { outline: 3px solid var(--ochre); outline-offset: 4px; background: var(--paper); cursor: text; user-select: text; -webkit-user-select: text; }
+.snote.ed:empty::before { content: 'Type a note. @name links a person or place; a new @name makes a new person.'; color: var(--ink-3); font-style: italic; }
+.unlinked { border-bottom: 2px dashed var(--ochre); }
+.btn.addnote { align-self: flex-start; font-size: 18px; padding: 6px 16px; }
+.btn.addnote.sm { font-size: 16px; padding: 0 12px; height: 32px; margin-left: 64px; }
+.pdrop { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px; color: var(--ink-3); text-align: center; border: 3px dashed var(--rule); border-radius: 18px; box-sizing: border-box; }
+.scard > .fit, .tablecard > .fit { display: flex; flex-direction: column; gap: 16px; }
+.lbl { color: var(--ink); }
+/* pockets: a free-paste spot on every major thing */
+.pocket { border: 2px dashed color-mix(in srgb, var(--ochre) 55%, transparent); border-radius: 14px; padding: 10px 12px; background: color-mix(in srgb, var(--ochre) 4%, transparent); cursor: copy; }
+.pocket .ph2 { font: 700 15px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); }
+.pocket .pk { font: 500 12px var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 6px; }
+.pocket .scraps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.scrap.txt { background: var(--note); color: var(--note-ink); border-radius: 6px; padding: 6px 10px; font-size: 16px; line-height: 1.35; max-width: 100%; cursor: text; }
+.scrap.img { position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; background: var(--band); }
+.scrap.img img { width: 100%; height: 100%; object-fit: cover; }
+.scrap .x { position: absolute; top: 2px; right: 2px; border: 0; background: #0008; color: #fff; border-radius: 6px; width: 22px; height: 22px; cursor: pointer; font-size: 12px; }
+.pockettab { display: flex; }
+.pockettab .pocket { flex: 1; display: flex; flex-direction: column; border-radius: 0 22px 22px 0; border-left-style: solid; }
+.pockettab .ph2 { writing-mode: horizontal-tb; }
+.pockettab .scraps { flex-direction: column; flex-wrap: nowrap; overflow: hidden; }
+.pockettab .scrap.img { width: 100%; height: 110px; }
+.pcard .pocket { margin-top: 14px; }
+.scard .pocket { margin-top: 6px; }
+/* ghosts: the next one goes here */
+.ghost { display: flex; }
+.ghostbtn { flex: 1; border: 5px dashed color-mix(in srgb, var(--ochre) 60%, transparent) !important; border-radius: 30px; background: transparent !important; box-shadow: none !important; color: var(--ochre) !important; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 30px; font: 700 110px var(--f-display); text-align: left; }
+.ghostbtn:hover { background: var(--ochre-soft) !important; }
+.ghostbtn .plus { font-size: 180px; }
+.ghostbtn small { display: block; font: 500 26px var(--f-body); color: var(--ink-2); max-width: 520px; margin-top: 10px; }
+.sk { grid-template-columns: max-content auto auto; justify-content: space-between; }
+.sk .k { white-space: nowrap; }
+.loose { width: 330px; min-height: 180px; }
+/* the log: rolls and chat */
+.logcard h3 .sub3 { font: 500 22px var(--f-body); color: var(--ink-3); }
+.loglist { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 6px; scrollbar-width: thin; }
+.lrow { display: flex; gap: 12px; align-items: flex-start; font-size: 20px; line-height: 1.4; }
+.lface { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; flex: none; background: var(--band); display: flex; align-items: center; justify-content: center; font: 700 16px var(--f-display); color: var(--ink-2); }
+.lface img { width: 100%; height: 100%; object-fit: cover; }
+.lface.gm { background: var(--ink); color: var(--paper); }
+.lbody { flex: 1; min-width: 0; }
+.lbody .lt { font-size: 14px; color: var(--ink-3); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.lrow .roll { font-size: 16px; margin-top: 2px; }
+.logsay { display: flex; gap: 8px; align-items: center; }
+.logsay select, .logsay input { font: 500 20px var(--f-body); padding: 8px 10px; border: 2px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.logsay input { flex: 1; min-width: 0; }
+.logsay .btn { font-size: 18px; }
+.logcard { display: flex; flex-direction: column; }
+/* sticky notes: a white drag bar you can spot, and a corner to resize */
+.loose { position: absolute; }
+.loose .grip, .artcard .grip { height: 26px; background: #fffdf6; border-bottom: 1px solid #0002; border-radius: 4px 4px 0 0; display: flex; align-items: center; justify-content: center; position: relative; cursor: grab; }
+.loose .grip .dots { width: 34px; height: 6px; background: radial-gradient(circle, #8a7a4a 1.6px, transparent 2px) 0 0 / 12px 6px repeat-x; opacity: .8; }
+.loose .grip button, .artcard .grip button { position: absolute; right: 4px; top: 2px; color: #6b5a2a; opacity: .7; }
+.rsz { position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 50%, #8a7a4a99 50%, #8a7a4a99 58%, transparent 58%, transparent 70%, #8a7a4a99 70%, #8a7a4a99 78%, transparent 78%); border-radius: 0 0 12px 0; }
+.artcard { position: absolute; }
+
+/* nothing is ever abbreviated: labels keep whole words; the fit shrinks the section instead (Harry, 13 Nov) */
+.sheet .main * { text-overflow: clip !important; }
+.acol { overflow: visible; }
+.loose { width: auto; min-height: 0 !important; overflow: hidden; }
+.loose .grip { position: absolute; left: 0; right: 0; top: 0; box-sizing: border-box; }
+.loose .body { position: absolute; left: 0; right: 0; box-sizing: border-box; overflow: hidden; line-height: 1.15; overflow-wrap: anywhere; min-height: 0 !important; }
+/* the summon's sheet takes real space: zoom instead of a transform (an absolute child collapsed it to 4px) */
+.minisheet { flex: none; overflow: visible; }
+.mini-in { position: relative !important; transform: none !important; zoom: .5; width: auto !important; }
+.sumfail { font-size: 15px; color: #b3412c; }
+/* the summon's card: golden, its own scale (fitted), dice like a runner's */
+.sumrow { display: flex; gap: 16px; height: 172px; }
+.scard2 { flex: none; width: 278px; height: 172px; border-radius: 12px; background: var(--paper); border: 2px solid var(--ink-3); box-shadow: 0 2px 6px #0002; overflow: hidden; position: relative; }
+.sc-in { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; box-sizing: border-box; }
+.sch { display: flex; gap: 10px; align-items: baseline; background: var(--band); margin: 0 0 2px; padding: 6px 10px; border-radius: 8px; }
+.sch b { font: 700 24px var(--f-display); } .sch .kind { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.scr { font-size: 15px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .scr b { font: 700 20px var(--f-display); color: var(--ink); }
+.scr .boxes { display: inline-flex; gap: 3px; } .scr .boxes i { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--ochre); } .scr .boxes i.on { background: var(--ochre); }
+.scs { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.sskill { display: flex; gap: 6px; align-items: center; font-size: 15px; white-space: nowrap; } .sskill b { font: 700 17px var(--f-display); }
+.scsp { display: flex; flex-wrap: wrap; gap: 4px 14px; } .scsp .sp { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+.sca { font-size: 12px; color: var(--ink-3); }
+.sumside { flex: 1; min-width: 0; position: relative; overflow: hidden; }
+.ss-in { display: flex; flex-direction: column; gap: 8px; }
+.ss-in .mbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+/* BRP sheet: characteristics grid and skill categories */
+.chgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.chbox { background: var(--band); border-radius: 14px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.chbox .k { font-size: 13px; letter-spacing: .1em; color: var(--ink-2); font-weight: 600; }
+.chbox .crl { font-size: 14px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.chbox .crl .die { width: 30px; height: 30px; font-size: 15px; }
+.skgrid { columns: 3; column-gap: 18px; }
+.skcat { break-inside: avoid; margin-bottom: 12px; background: var(--band); border-radius: 14px; overflow: hidden; }
+.skcat .sk { grid-template-columns: max-content auto auto; justify-content: space-between; }
+.rollall { width: 100%; }
+.roll .dd i.big { font-weight: 800; }
+.roll .dd i.bad { background: #b3412c; color: #fff; border-color: #b3412c; }
+</style>
+<div id="vp" aria-label="Campaign canvas"><div id="world"></div></div>
+<svg id="threads"></svg>
+<div id="tends"></div>
+<div id="arrows"></div>
+<div id="toast" hidden></div>
+<div id="qbar" role="search"><button id="qback" hidden title="Back (⌘[)" aria-label="Back">‹</button><svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><textarea id="qin" rows="1" spellcheck="false" placeholder="Jump or do: tusk guns, roll 6 tn 4, new runner, round order…" aria-label="Quickbar"></textarea><kbd>/</kbd></div>
+<div id="qres" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="rigs/brp-data.js"></script>
+<script src="rigs/brp.js"></script>
+<script src="campaign-brp.js"></script>
+<script src="assets/map/map.js"></script>
+<script src="assets/tokens/tokens.js"></script>
+<script>
+
+(() => {
+'use strict';
+// Turnip Almanac. One tight cluster: book | party | the map (the anchor) | sessions.
+// Nothing changes what it shows when you zoom. Big headline labels sit over regions and fade only once
+// they are bigger than the detail under them.
+const C = window.CAMPAIGN, R = window.RIG;
+const $ = (s, r = document) => r.querySelector(s);
+const vp = $('#vp'), world = $('#world');
+const STORE_KEY = C.id ? `turnip-almanac-2:${C.id}` : 'turnip-almanac-2';   // one saved table per campaign
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } },
+  set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch {} },
+};
+const saved = store.get();
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, summonPick: {}, asof: {}, build: null };
+let dirty = true;
+let openPop = null;
+const qdice = { pool: 4, tn: 4 };
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons });
+
+const nodes = {};
+const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function place(e, x, y, w, h) { e.style.left = x + 'px'; e.style.top = y + 'px'; if (w != null) e.style.width = w + 'px'; if (h != null) e.style.height = h + 'px'; }
+function reg(id, o) { o.id = id; nodes[id] = o; if (o.el) o.el.dataset.id = id; return o; }
+function add(parent, cls, x, y, w, h, html) { const e = el('div', 'n ' + cls, html); place(e, x, y, w, h); parent.appendChild(e); return e; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+// headline label: big readable text laid over a region; fades as it grows past readable
+const labels = [];
+function label(parent, text, x, y, size, opts = {}) {
+  const e = add(parent, 'lbl' + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
+  e.style.fontSize = size + 'px'; if (opts.align) e.style.textAlign = opts.align;
+  labels.push({ e, size, over: !!opts.over }); return e;
+}
+
+const printIndex = Object.fromEntries(C.print.map(p => [p.id, p]));
+const placeIndex = Object.fromEntries(C.places.map(p => [p.id, p]));
+const npcIndex = Object.fromEntries(C.npcs.map(p => [p.id, p]));
+function titleOf(id) { return printIndex[id]?.title || placeIndex[id]?.name || npcIndex[id]?.name || nodes[id]?.title || id; }
+const backlinks = {};
+function linkify(text, fromId) {
+  return esc(text).replace(/\{\{([\w-]+)\}\}/g, (_, id) => {
+    (backlinks[id] = backlinks[id] || []).push(fromId);
+    const g = placeIndex[id]?.icon; const pg = printIndex[id] ? ` <small>p.${printIndex[id].page}</small>` : '';
+    return `<span class="chip" data-go="${id}">${g ? `<img src="${g}" alt="">` : ''}${esc(titleOf(id))}${pg}</span>`;
+  });
+}
+
+// ------------------------------------------------------------------ geometry (world units)
+// Tight clusters at every scale, about the golden ratio: the whole canvas, each sheet (2100 × 1300), the builder block.
+const MAP = window.MAPMETA || { width: 9000, height: 8000 };
+const SW = 2100, SH = 1300, RH = SH + 60, SLOTS = 6;       // party: six seats down the map's right edge
+const rowsTop = 40;
+const pcRowY = i => rowsTop + i * RH;
+const MH = rowsTop + SLOTS * RH;
+const MW = Math.round(MH * (MAP.width / MAP.height));
+const PX = MW + 160;                                        // party column x, on the map's right edge
+
+// ------------------------------------------------------------------ the map: the anchor
+const mapEl = add(world, 'map', 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="Street map of central Seattle" draggable="false" ${MAP.src ? '' : 'hidden'}>`);
+reg('map', { el: mapEl, title: 'Campaign map · Seattle', kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
+label(mapEl, 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
+add(mapEl, 'attrib', MW - 1500, MH - 110, 1440, 80, esc(MAP.attribution || 'Map data © OpenStreetMap contributors, ODbL'));
+C.places.forEach(p => {
+  const pt = (MAP.points || {})[p.key] || { fx: p.x / 1400, fy: p.y / 1000 };
+  const x = pt.fx * MW, y = pt.fy * MH;
+  const e = add(mapEl, 'place', x - 220, y - 220, 440, null, `<img class="pi" src="${p.icon}" alt=""><div class="pn">${esc(p.name)}</div><div class="pnote">${esc(p.note)}</div><a class="tw" href="https://turnipworks.net/" target="_blank" rel="noopener">Open table in Turnip Works ↗</a><div class="backs"></div>`);
+  reg(p.id, { el: e, title: p.name, kind: 'place', icon: p.icon, box: { x: x - 220, y: y - 220, w: 440, h: 640 } });
+});
+
+// ------------------------------------------------------------------ the shelf: the book, its index beside its real pages
+const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
+// the index: chapters from the book's list, or from each print entry's chapter
+const chapters = BK.chapters ? BK.chapters.map(ch => ({ title: ch.title, entries: C.print.filter(p => ch.page ? p.page === ch.page : p.chapter === ch.title) }))
+  : [...new Set(C.print.map(p => p.chapter || 'Rules'))].map(t => ({ title: t, entries: C.print.filter(p => (p.chapter || 'Rules') === t) }));
+const ICOLS = 4, ICW = 316, IRH = 150, IDXW = ICOLS * (ICW + 10);
+const idxH = chapters.reduce((h, ch) => h + 50 + Math.ceil(ch.entries.length / ICOLS) * IRH + 24, 0);
+// the pages: a grid whose column count makes the whole book about golden (E2)
+let PCOLS = 1, best = 1e9;
+for (let c = 1; c <= BK.pages; c++) { const rows = Math.ceil(BK.pages / c), w = 100 + IDXW + c * (PW + PG), h = 300 + Math.max(idxH, rows * (PH + PG)), d = Math.abs(w / h - 1.618); if (d < best) { best = d; PCOLS = c; } }
+const PROWS = Math.ceil(BK.pages / PCOLS);
+const bookW = 40 + IDXW + 60 + PCOLS * PW + (PCOLS - 1) * PG + 40, BX = 0;
+const pagesX = 40 + IDXW + 60, pagesY = 260;
+const bookH = pagesY + Math.max(idxH, PROWS * (PH + PG) - PG) + 60, BY = -bookH - 260;
+const bk = add(world, 'bk', BX, BY, bookW, bookH, `<div class="bhead"><img src="${BK.icon || 'assets/genre-modern.png'}" alt=""><div><h2>${esc(BK.fullTitle || BK.title)}</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
+reg(BK.id, { el: bk, title: BK.fullTitle || BK.title, kind: 'book', icon: BK.icon || 'assets/genre-modern.png', box: { x: BX, y: BY, w: bookW, h: bookH } });
+label(world, 'The rulebook', BX, BY - 420, 300);
+let iy = 260;
+chapters.forEach(ch => {
+  add(bk, 'chap', 40, iy, IDXW, 40, esc(ch.title)); iy += 50;
+  ch.entries.forEach((p, i) => {
+    const x = 40 + (i % ICOLS) * (ICW + 10), y = iy + Math.floor(i / ICOLS) * IRH;
+    const ce = add(bk, 'entry card', x, y, ICW, IRH - 10, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: { x: BX + x, y: BY + y, w: ICW, h: IRH - 10 } });
+  });
+  iy += Math.ceil(ch.entries.length / ICOLS) * IRH + 24;
+});
+const pageFrames = [];
+for (let n = 1; n <= BK.pages; n++) {
+  const px = pagesX + ((n - 1) % PCOLS) * (PW + PG), py = pagesY + Math.floor((n - 1) / PCOLS) * (PH + PG);
+  const pf = add(bk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
+  label(pf, String(n), PW - 170, 20, 200, { cls: 'pnumlbl', over: true });
+  pageFrames.push(reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: { x: BX + px, y: BY + py, w: PW, h: PH }, n }));
+}
+C.print.forEach(p => {
+  const k = PW / BK.pw, [x, y, w, h] = p.rect, pf = nodes['page-' + p.page];
+  const re = add(pf.el, 'region', x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}</span>`);
+  reg(p.id, { el: re, title: p.title, kind: 'rule', sub: `p.${p.page}`, text: p.text, box: { x: pf.box.x + x * k - 6, y: pf.box.y + y * k - 6, w: w * k + 12, h: h * k + 12 } });
+});
+add(world, 'card interpcard', BX + bookW + 120, BY + bookH - 520, 1700, 520, `<h3>Where this book is open, the Almanac decides</h3><div class="t">${R.interpretations.map(esc).join('<br>')}</div>`);
+
+// ------------------------------------------------------------------ party: sheets as rows down the map's left edge
+const clone = o => JSON.parse(JSON.stringify(o));
+const PCS = [...C.pcs, ...state.extra];
+const pcById = Object.fromEntries(PCS.map(p => [p.id, p]));
+function choicesOf(pc) { return state.choices[pc.id] || (state.choices[pc.id] = clone(pc.choices || R.blank(''))); }
+const sheetEls = {};
+// Basic Roleplaying: the rule-specific half of the app. Inserted by build.sh at /*@RIG-UI@*/ inside the app's scope.
+// Contract (what the engine calls): WORDS, RIG_NO_UNDO, advanceText, STEP_NAME, BCOLS, ORDER, STEP_RULE, STEP_SHEET,
+// BIW, BINNER, BREG, BK_K, stepHtml, renderSheet, rollHtml, portraitOf, initiative, renderTable, freeRoll, qdice2,
+// trayStep, trayRoll, rigCommands, rigAct, box_who.
+const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
+const RIG_NO_UNDO = new Set(['roll', 'croll']);
+const P = R.P;
+function advanceText(k) { return (k.gain || []).map(g => `${R.SK[g.skill]?.name || g.skill} +${g.n}`).join(', '); }
+const STEP_NAME = { name: 'name', power: 'power level', chars: 'characteristics', prof: 'profession', profskills: 'professional skills', personal: 'personal skills', powers: 'powers', weapons: 'weapons', armor: 'armour', done: 'all done' };
+const ORDER = ['name', 'power', 'chars', 'prof', 'profskills', 'personal', 'powers', 'weapons', 'armor', 'done'];
+const BCOLS = [['name', 'power', 'chars', 'prof'], ['profskills', 'armor', 'done'], ['personal'], ['powers', 'weapons']];
+const STEP_RULE = { name: 'brp-step-1', power: 'brp-power-level', chars: 'brp-step-1', prof: 'brp-professions', profskills: 'brp-step-7', personal: 'brp-step-7', powers: 'brp-how-do-characters-get-powers', weapons: 'brp-weapons', armor: 'brp-armor', done: 'brp-step-7' };
+const STEP_SHEET = { name: '.nm', power: '.who', chars: '.chgrid', prof: '.who', profskills: '.skgrid', personal: '.skgrid', powers: '.l-powers', weapons: '.l-weapons', armor: '.l-armor', done: '.budget' };
+const BIW = 880, BGAP = 40, BINNER = { w: 30 + 4 * BIW + 3 * BGAP + 30, h: 5200 }, BREG = { x: 30, y: 950, w: 440, h: 320 };
+const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
+
+function stepHead(S, key, no, title, rule) {
+  const pools = key === 'profskills' ? `${S.profLeft} of ${S.profPool} professional left` : key === 'personal' ? `${S.persLeft} of ${S.persPool} personal left` : `${S.profLeft} + ${S.persLeft} points left`;
+  return `<div class="q"><span class="no">${no}</span><h3>${title}</h3>${rule && printIndex[rule] ? `<span class="chip" data-go="${rule}">p.${printIndex[rule].page}</span>` : ''}<span class="sub">${pools}</span></div>`;
+}
+function stepHtml(pc, S, key) {
+  const ch = choicesOf(pc);
+  const opt = (path, v, cur, title, eff, cost) => `<button class="opt${cur === v ? ' sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="${path}" data-v="${v}" aria-pressed="${cur === v}"><b>${esc(title)}${cost != null ? `<em>${esc(cost)}</em>` : ''}</b><span>${esc(eff || '')}</span></button>`;
+  const row = (on, title, eff, cost, ctl) => `<div class="row${on ? ' on' : ''}"><div><b>${title}</b><span>${eff}</span><span class="cost">${cost}</span></div>${ctl}</div>`;
+  const step5 = (path, v, min, max, lab) => `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-5" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${lab}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="5" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${lab}">+</button></div>`;
+  let h = `<div class="bstep" data-id="b-${pc.id}-${key}">`;
+  if (key === 'name') h += `${stepHead(S, 'name', '0', 'Name', STEP_RULE.name)}<div class="hint">Who are they?</div><input data-act="name" data-pc="${pc.id}" value="${esc(ch.name || '')}" placeholder="Name" aria-label="Name"><input data-act="player" data-pc="${pc.id}" value="${esc(pc.player || '')}" placeholder="Player" aria-label="Player name" style="margin-top:12px;font-size:24px">`;
+  if (key === 'power') {
+    h += `${stepHead(S, 'power', '1', 'Power level', STEP_RULE.power)}<div class="hint">Sets skill points, the creation cap and powers. Normal suits horror and modern games.</div><div class="opts">`;
+    R.D.powerLevels.forEach(l => h += opt('power', l.id, ch.power || 'normal', l.id[0].toUpperCase() + l.id.slice(1), `${l.profPoints} professional points · skills to ${l.skillCap}%`));
+    h += `</div>`;
+  }
+  if (key === 'chars') {
+    h += `${stepHead(S, 'chars', '2', 'Characteristics', STEP_RULE.chars)}<div class="hint">Roll them all, then adjust. SIZ and INT must be at least 8.</div>
+      <button class="opt sel rollall" data-act="rollchars" data-pc="${pc.id}"><b>⚄ Roll all eight</b><span>${R.D.characteristics.map(c => c.id.toUpperCase() + ' ' + c.roll).join(' · ')}</span></button><div class="rows" style="margin-top:14px">`;
+    R.D.characteristics.forEach(c => { const v = ch.char[c.id] || 0; h += row(!!v, `${c.name}`, `${c.roll} · ${esc(c.notes || '')}`, v ? `${v}` : 'not rolled', `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="char.${c.id}" data-d="-1" data-min="3" data-max="21" ${v <= 3 ? 'disabled' : ''}>−</button><output>${v || '—'}</output><button data-act="inc" data-pc="${pc.id}" data-path="char.${c.id}" data-d="1" data-min="3" data-max="21" ${v >= 21 ? 'disabled' : ''}>+</button></div>`); });
+    h += `</div>`;
+  }
+  if (key === 'prof') {
+    h += `${stepHead(S, 'prof', '3', 'Profession', STEP_RULE.prof)}<div class="hint">Your profession decides where your professional points may go.</div><div class="opts three">`;
+    R.D.professions.list.forEach(p => h += opt('prof', p.id, ch.prof, p.name, p.skills.filter(x => x.skill).slice(0, 4).map(x => R.SK[x.skill]?.name).filter(Boolean).join(', ') + (p.skills.length > 4 ? '…' : '')));
+    h += `</div>`;
+  }
+  if (key === 'profskills') {
+    h += `${stepHead(S, 'profskills', '4', 'Professional skills', STEP_RULE.profskills)}<div class="hint">Spend ${S.profPool} points on your profession's skills, 5 at a time. No skill above ${S.cap}% at creation.</div>`;
+    const prof = S.prof;
+    if (!prof) h += `<div class="crease" style="height:600px">Choose a profession first</div>`;
+    else { h += `<div class="rows one">`; const seen = new Set();
+      prof.skills.forEach(x => { if (!x.skill || seen.has(x.skill)) return; seen.add(x.skill); const s = R.SK[x.skill]; if (!s) return; const v = ch.profAlloc[x.skill] || 0, base = R.baseOf(s, S.char, ch);
+        h += row(v > 0, `${esc(x.text || s.name)} → ${S.skill[s.id]}%`, `base ${base}%`, `+${v}`, step5('profAlloc.' + s.id, v, 0, Math.max(0, S.cap - base - (ch.persAlloc[s.id] || 0)), s.name)); });
+      h += `</div>${prof.skills.filter(x => !x.skill).map(x => `<div class="hint">Also: ${esc(x.text)} (spend personal points on these)</div>`).join('')}`; }
+  }
+  if (key === 'personal') {
+    h += `${stepHead(S, 'personal', '5', 'Personal skills', STEP_RULE.personal)}<div class="hint">INT × 10 = ${S.persPool} points for any skill, 5 at a time.</div><div class="rows">`;
+    R.SKILLS.forEach(s => { const v = ch.persAlloc[s.id] || 0, base = R.baseOf(s, S.char, ch); h += row(v > 0, `${esc(s.name)} ${S.skill[s.id]}%`, `${esc(s.category || '')} · base ${base}%`, v ? `+${v}` : '', step5('persAlloc.' + s.id, v, 0, Math.max(0, S.cap - base - (ch.profAlloc[s.id] || 0)), s.name)); });
+    h += `</div>`;
+  }
+  if (key === 'powers') {
+    h += `${stepHead(S, 'powers', '6', 'Powers', STEP_RULE.powers)}<div class="hint">Most Normal-level games have none. Choose a system to open its list.</div><div class="opts three">`;
+    h += opt('psys', '', ch.psys || '', 'None', 'No powers'); R.POWERS.forEach(k => h += opt('psys', k, ch.psys || '', R.D.powers[k].name || k, ''));
+    h += `</div><div style="height:1500px;margin-top:14px">`;
+    if (ch.psys) { h += `<div class="grouph"><span>${esc(R.D.powers[ch.psys].name || ch.psys)}${S.powerNote ? ' · ' + S.powerNote : ''}</span></div><div class="opts three">`;
+      R.powerList(ch.psys).forEach(pw => { const on = (ch.powers || []).includes(pw.name); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="powers" data-v="${esc(pw.name)}" aria-pressed="${on}"><b style="font-size:19px">${esc(pw.name)}</b><span style="font-size:15px">${esc(pw.cost || '')} · ${esc((pw.effect || '').slice(0, 70))}</span></button>`; });
+      h += `</div>`; }
+    else h += `<div class="crease" style="height:1500px">A power system's list opens here</div>`;
+    h += `</div>`;
+  }
+  if (key === 'weapons') {
+    h += `${stepHead(S, 'weapons', '7', 'Weapons', STEP_RULE.weapons)}<div class="hint">Pick what they carry. Each weapon rolls its own skill.</div>`;
+    const cats = [...new Set(R.WEAPONS.map(w => w.category))];
+    cats.forEach(cat => { h += `<div class="grouph"><span>${esc(cat)}</span></div><div class="opts four">`;
+      R.WEAPONS.filter(w => w.category === cat).forEach(w => { const on = (ch.weapons || []).includes(w.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:6px 8px" data-act="toggle" data-pc="${pc.id}" data-path="weapons" data-v="${w.id}" aria-pressed="${on}"><b style="font-size:17px">${esc(w.name)}</b><span style="font-size:14px">${esc(w.damage || '')}</span></button>`; });
+      h += `</div>`; });
+  }
+  if (key === 'armor') {
+    h += `${stepHead(S, 'armor', '8', 'Armour', STEP_RULE.armor)}<div class="hint">One suit. Modern and future armour stops the most.</div><div class="opts three">`;
+    R.ARMOR.forEach(a => h += opt('armor', a.id, ch.armor, a.name, `AP ${a.ap} · ${a.era || ''}`));
+    h += `</div>`;
+  }
+  if (key === 'done') {
+    const legal = !S.warn.length;
+    h += `<div class="q"><span class="no">✓</span><h3>All done?</h3></div>
+      <div class="donebox ${legal ? 'ok' : 'bad'}"><b>${legal ? (S.profLeft + S.persLeft > 0 ? `Legal, with ${S.profLeft + S.persLeft} points unspent` : 'Legal and fully spent') : 'Not legal yet'}</b>
+      <div>Professional ${S.profUsed}/${S.profPool} · Personal ${S.persUsed}/${S.persPool} · HP ${S.der.hp}</div>${S.warn.map(w => `<div class="w">${esc(w)}</div>`).join('')}</div>
+      <button class="opt sel donebtn" data-act="finish" data-pc="${pc.id}"><b>All done · back to the sheet</b><span>Tab and Shift+Tab move between steps; Esc also leaves.</span></button>`;
+  }
+  return h + '</div>';
+}
+
+// rolls: d100 under the target; critical / special / success / failure / fumble
+function rollHtml(r) {
+  const cls = r.level === 'critical' || r.level === 'special' ? 'ok big' : r.ok ? 'ok' : r.level === 'fumble' ? 'bad' : '';
+  return `<div class="roll"><b>${esc(r.label)}</b><span class="tn">d100 vs ${r.target}%</span><span class="dd"><i class="${cls}">${String(r.roll).padStart(2, '0')}</i></span><span class="verdict${r.ok ? '' : ' fail'}">${esc(r.level[0].toUpperCase() + r.level.slice(1))}</span></div>`;
+}
+function recFor(label, target) { const r = R.roll(target); return { label, roll: r.roll, target: r.target, level: r.level, ok: r.ok }; }
+function pushRoll(pc, rec, at) { const k = pc ? pc.id : '_free'; (state.rolls[k] = state.rolls[k] || []).unshift(rec); state.rolls[k] = state.rolls[k].slice(0, 8); persist(); toast(rec, at); logPush({ kind: 'roll', who: pc ? pc.id : 'gm', rec }); }
+function rollFor(pc, target, label, at) { pushRoll(pc, recFor(`${choicesOf(pc).name || WORDS.Char} · ${label}`, target), at); renderSheet(pc); }
+
+// portraits: TW's modern townsfolk, picked by profession
+const TOKEN_FILES = window.TOKEN_FILES || {};
+const PROF_TOKEN = [[/police|detective|soldier|military|security|agent|spy/i, ['modern-police-f', 'modern-police-m', 'modern-security-f', 'modern-tactical-m']], [/journal|reporter|writer|artist|entertain/i, ['modern-journalist-f', 'modern-civilian-m']],
+  [/doctor|physician|nurse|medic|scien|scholar|professor|researcher|occult/i, ['modern-streetdoc-m', 'modern-civilian-f', 'modern-exec-f']], [/business|merchant|lawyer|executive|noble|politic|manager/i, ['modern-exec-m', 'modern-exec-f']],
+  [/criminal|thief|beggar|gang|smuggl|hunter|thug/i, ['modern-ganger-f', 'modern-ganger-m', 'modern-fixer-m']], [/./, ['modern-civilian-f', 'modern-civilian-m', 'modern-bartender-m', 'modern-vendor-f']]];
+function portraitOf(pc, S) {
+  const ch = choicesOf(pc), name = (S?.prof?.name || pc.archetype || '');
+  const pick = (PROF_TOKEN.find(([re]) => re.test(name)) || PROF_TOKEN.at(-1))[1];
+  const close = u => (u && /assets\/tokens\/(?!close\/)/.test(u)) ? u.replace('assets/tokens/', 'assets/tokens/close/') : u;
+  const options = [...pick, ...Object.keys(TOKEN_FILES).filter(k => k.startsWith('modern-') && !pick.includes(k))].slice(0, 4).map(k => close(TOKEN_FILES[k])).filter(Boolean);
+  return { src: close(state.portraits[pc.id] || options[0] || ''), options };
+}
+function liveOf(pc) { return state.live[pc.id] || (state.live[pc.id] = { dmg: [] }); }
+
+function renderSheet(pc) {
+  const box = sheetEls[pc.id], ch = choicesOf(pc), S = sheetOf(pc), asOf = state.asof[pc.id] ?? 99, live = liveOf(pc);
+  const nm = ch.name || `New ${WORDS.char}`, who = [S.prof?.name, (ch.power || 'normal') !== 'normal' ? ch.power : null].filter(Boolean).join(' · ') || 'Not built yet';
+  const prev = box._prev || {};
+  const pv = (key, v, cls = '', suffix = '') => `<span class="pv ${cls}${prev[key] != null && prev[key] !== v ? ' changed' : ''}" data-prov="${key}" tabindex="0">${v}${suffix}</span>`;
+  const chip = (id, lab) => printIndex[id] ? `<span class="chip" data-go="${id}">${lab || 'p.' + printIndex[id].page}</span>` : '';
+  const has = new Set((pc.karma || []).map(k => k.s));
+  const asofBtns = ['Start', ...C.sessions.map(s => 'S' + s.n), 'Now'].map((lab, i) => { const val = lab === 'Now' ? 99 : i; const on = asOf === val; return `<button data-act="asof" data-pc="${pc.id}" data-v="${val}" class="${on ? 'on' : ''}${has.has(i) ? ' has' : ''}" aria-pressed="${on}">${lab}</button>`; }).join('');
+  const die = (target, label) => `<button class="die" data-act="roll" data-pc="${pc.id}" data-target="${target}" data-label="${esc(label)}" title="Roll ${esc(label)}: d100 vs ${target}%" aria-label="Roll ${esc(label)}">⚄</button>`;
+  const chars = R.D.characteristics.map(c => { const r = Object.values(S.croll).find(x => x.src === c.src); return `<div class="chbox"><div class="k">${c.id.toUpperCase()}</div>${pv('c:' + c.id, S.char[c.id] || '—', 'mid')}${r ? `<div class="crl">${esc(r.name.replace(' roll', ''))} ${r.v}% ${die(r.v, r.name)}</div>` : ''}</div>`; }).join('');
+  const hpBoxes = Array.from({ length: S.der.hp }, (_, i) => `<button class="${live.dmg[i] ? 'L' : ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Hit point ${i + 1}">${live.dmg[i] ? '×' : ''}</button>`).join('');
+  const hurt = live.dmg.filter(Boolean).length;
+  const cats = [...new Set(R.SKILLS.map(s => s.category || 'Other'))];
+  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
+  const weaponRows = S.weapons.map(w => { const sk = R.skillOfWeapon(w), v = sk ? S.skill[sk] : 0; return `<div><b>${esc(w.name)}</b> <span class="e">${esc(w.damage || '')}${w.range ? ' · ' + esc(w.range) : ''}</span> <button class="die sm" data-act="roll" data-pc="${pc.id}" data-target="${v}" data-label="${esc(w.name)}">⚄ ${esc(R.SK[sk]?.name || 'skill')} ${v}%</button></div>`; }).join('');
+  const tok = portraitOf(pc, S);
+  box.innerHTML = `
+    <div class="main">
+    <section class="sA">
+      <div class="nm disp${ch.name ? '' : ' empty'}">${esc(nm)}</div>
+      <div class="who">${esc(who)} · played by ${esc(pc.player || '—')}</div>
+      <div class="budget">
+        <div class="${S.profLeft < 0 ? 'over' : ''}"><div class="k">Professional ${chip(P.profPts)}</div><div class="bv">${S.profUsed} <span class="tn">/ ${S.profPool}</span></div><div class="bar"><i style="width:${Math.min(100, S.profUsed / Math.max(1, S.profPool) * 100)}%"></i></div></div>
+        <div class="${S.persLeft < 0 ? 'over' : ''}"><div class="k">Personal</div><div class="bv">${S.persUsed} <span class="tn">/ ${S.persPool}</span></div><div class="bar"><i style="width:${Math.min(100, S.persUsed / Math.max(1, S.persPool) * 100)}%"></i></div></div>
+        <div><div class="k">Experience ${chip(P.xp)}</div><div class="bv">+${S.xp.gained} <span class="tn">${S.xp.checks} checks</span></div><div class="bar"><i style="width:${Math.min(100, S.xp.checks * 10)}%"></i></div></div>
+      </div>
+      <div class="asof">As of ${asofBtns}</div>
+      ${S.warn.length ? `<div class="warn">${S.warn.map(esc).join('<br>')}</div>` : ''}
+    </section>
+    <section class="sB">
+      <h4>Characteristics ${chip('brp-characteristics')}</h4>
+      <div class="chgrid">${chars}</div>
+      <div class="der">
+        <div><div class="k">Hit points</div>${pv('hp', S.der.hp, 'mid')}<small>major wound ${S.der.mw}</small></div>
+        <div><div class="k">Power points</div>${pv('pp', S.der.pp, 'mid')}<small>= POW</small></div>
+        <div><div class="k">Damage mod</div>${pv('dmg', S.der.dmg, 'mid')}<small>STR + SIZ</small></div>
+        <div><div class="k">Move</div><span class="pv mid">${S.der.mov}</span><small>metres</small></div>
+        <div><div class="k">XP bonus</div><span class="pv mid">${S.der.xpBonus}%</span><small>INT ÷ 2</small></div>
+      </div>
+    </section>
+    <section class="sP">
+      <div class="portrait closeup" data-portrait="${pc.id}" title="Drop an image here, or pick a figure below"><img src="${tok.src}" alt="${esc(nm)} portrait" draggable="false"><span class="drophint">Drop an image</span></div>
+      <div class="tokens">${tok.options.map(o => `<button class="closeup ${o === tok.src ? 'sel' : ''}" data-tok="${o}" data-pc="${pc.id}" aria-label="Use this figure"><img src="${o}" alt="" draggable="false"></button>`).join('')}<label class="upl" title="Upload an image">⇪<input type="file" accept="image/*" data-upload="${pc.id}" hidden></label></div>
+    </section>
+    <section class="sD">
+      <h4>Combat ${chip(P.combat, 'DEX rank p.' + (printIndex[P.combat]?.page || ''))}</h4>
+      <div class="track"><span class="k">Hit points ${chip(P.hp)}</span>${hpBoxes}<span class="wound">${hurt ? `${S.der.hp - hurt} left${hurt >= S.der.mw ? ' · major wound!' : ''}` : ''}</span></div>
+      <div class="list l-weapons">${weaponRows || '<div class="none">No weapons</div>'}</div>
+      <div class="list l-armor">${S.armor ? `<div><b>${esc(S.armor.name)}</b> <span class="e">AP ${esc(S.armor.ap)} · ${esc(S.armor.locations || '')}</span></div>` : '<div class="none">No armour</div>'}</div>
+      <div class="list l-powers">${S.psys ? `<div><b>${esc(R.D.powers[S.psys].name || S.psys)}</b> <span class="e">${S.powers.map(esc).join(', ') || 'none chosen'}</span></div>` : ''}</div>
+      <div class="rolls">${(state.rolls[pc.id] || []).slice(0, 2).map(rollHtml).join('') || '<div class="none">Tap ⚄ beside a skill to roll it.</div>'}</div>
+    </section>
+    <section class="sL">
+      <div class="sec">Where the points went</div><div class="ledger">${R.SKILLS.filter(s => (ch.profAlloc[s.id] || 0) + (ch.persAlloc[s.id] || 0)).map(s => `<div><span>${esc(s.name)}</span><span>${(ch.profAlloc[s.id] || 0) ? 'prof ' + ch.profAlloc[s.id] : ''}${(ch.persAlloc[s.id] || 0) ? ' pers ' + ch.persAlloc[s.id] : ''}</span></div>`).join('') || '<div><span>Nothing spent yet</span><span>0</span></div>'}</div>
+    </section>
+    <section class="sC tall">
+      <h4>Skills ${chip('brp-alphabetical-skill-list')} ${chip(P.rolls, 'results p.' + (printIndex[P.rolls]?.page || ''))}</h4>
+      <div class="skgrid">${skillCols}</div>
+    </section>
+    </div>
+    <div class="builder${state.build?.pc === pc.id ? ' active' : ''}" data-id="builder-${pc.id}" style="left:${BREG.x}px;top:${BREG.y}px;width:${BREG.w}px;height:${BREG.h}px">
+      <div class="binner" style="width:${BINNER.w}px;height:${BINNER.h}px;transform:scale(${BK_K})">${builderInner(pc, S)}</div>
+    </div>`;
+  const bl = el('div', 'lbl blbl'); bl.innerHTML = 'CHARACTER<br>BUILDER'; bl.style.fontSize = '64px'; box.querySelector('.builder').appendChild(bl); labels.push({ e: bl, size: 64, over: true });
+  if (!ch.prof && !state.done[pc.id]) box.querySelector('.builder').classList.add('todo');
+  box._prev = Object.fromEntries([...R.CH.map(k => ['c:' + k, S.char[k]]), ...R.SKILLS.map(s => ['s:' + s.id, S.skill[s.id]]), ['hp', S.der.hp], ['pp', S.der.pp], ['dmg', S.der.dmg]]);
+  const prov = {}; Object.entries(S.prov).forEach(([k, ids]) => prov[k] = [...new Set(ids.flatMap(id => S.prov[id] && id !== k ? S.prov[id] : [id]).map(id => resolveSrc(pc, id)))]);
+  box._prov = prov;
+  if (nodes[pc.id]) { nodes[pc.id].title = nm; nodes[pc.id].sub = who; }
+  box.querySelectorAll('.bstep[data-id]').forEach(e => { const id = e.dataset.id; nodes[id] = Object.assign(nodes[id] || {}, { id, title: `${nm} · builder: ${STEP_NAME[id.split('-').pop()] || ''}`, kind: 'step', el: e }); });
+  for (let i = labels.length - 1; i >= 0; i--) if (!labels[i].e.isConnected) labels.splice(i, 1);
+  fitSections(box);
+  renderQuick(); dirty = true;
+}
+function box_who(pc) { const S = sheetOf(pc); sheetEls[pc.id].querySelector('.who').textContent = `${S.prof?.name || 'Not built yet'} · played by ${pc.player || '—'}`; }
+
+// round order: DEX rank, highest first; ties by the better Dodge (INTERP: the book says "the relevant skill")
+function initiative() { return PCS.filter(pc => choicesOf(pc).name).map(pc => ({ pc, S: sheetOf(pc) })).sort((a, b) => (b.S.char.dex || 0) - (a.S.char.dex || 0) || (b.S.skill['skill-dodge'] || 0) - (a.S.skill['skill-dodge'] || 0)); }
+const qdice2 = { pool: 50, tn: 0, active: 12, passive: 10 };
+function trayStep(k, d) { if (k === 'pool') qdice2.pool = Math.max(0, Math.min(200, qdice2.pool + d * 5)); else qdice2[k] = Math.max(1, Math.min(30, qdice2[k] + d)); }
+function trayRoll(el) { if (el.dataset.troll === 'resist') { const t = R.resistance(qdice2.active, qdice2.passive); return freeRoll(t, `Resistance ${qdice2.active} vs ${qdice2.passive}`, el); } freeRoll(qdice2.pool, 'Free roll', el); }
+function freeRoll(target, label = 'Free roll', at) { pushRoll(null, recFor(label, target), at); renderTable(); }
+function tstep2(k, lab) { return `<span class="stepper"><button data-ts="${k}" data-d="-1">−</button><output>${qdice2[k]}${k === 'pool' ? '%' : ''}</output><button data-ts="${k}" data-d="1">+</button></span>`; }
+function renderTable() {
+  const o = initiative(); if (turn.at >= o.length) turn.at = 0;
+  roundCard.innerHTML = `<div class="fit"><h3>Round order ${printIndex[P.combat] ? `<span class="chip" data-go="${P.combat}">p.${printIndex[P.combat].page}</span>` : ''}</h3><div class="t">DEX rank, highest first; a tie goes to the better Dodge. Statements, powers, actions, then resolution.</div>
+    <div class="rmeta">Round ${turn.round} <button class="tb" data-turn="next">Next ›</button><button class="tb" data-turn="reset">New round</button></div>
+    <ol class="init">${o.map(({ pc, S }, i) => { const live = liveOf(pc), tok = portraitOf(pc, S).src, hurt = live.dmg.filter(Boolean).length;
+      return `<li class="${i === turn.at ? 'on' : ''}"><span class="closeup rimg"><img src="${tok}" alt="" draggable="false"></span><span class="who2" data-go="${pc.id}">${esc(choicesOf(pc).name)}</span><span class="nums">DEX ${S.char.dex || '—'} · Dodge ${S.skill['skill-dodge']}%</span><span class="dots">${Array.from({ length: S.der.hp }, (_, k) => `<i class="${live.dmg[k] ? 'L' : ''}"></i>`).join('')}</span>${hurt >= S.der.mw && hurt ? '<span class="wtn">major wound</span>' : ''}</li>`; }).join('')}</ol></div>`; fitCard(roundCard);
+  diceCard.innerHTML = `<div class="fit"><h3>Dice tray ${printIndex[P.rolls] ? `<span class="chip" data-go="${P.rolls}">p.${printIndex[P.rolls].page}</span>` : ''}</h3><div class="t">d100 under the chance. Critical ≤ 1/20, special ≤ 1/5, fumble at the top of the failures.</div>
+    <div class="qdice"><label>Chance ${tstep2('pool')}</label><button class="tb go" data-troll="1">Roll d100</button></div>
+    <div class="qdice"><label>Active ${tstep2('active')}</label><label>vs ${tstep2('passive')}</label><button class="tb go" data-troll="resist">Resist (${R.resistance(qdice2.active, qdice2.passive)}%)</button></div>
+    <div class="rolls">${[...(state.rolls._free || [])].slice(0, 5).map(rollHtml).join('') || '<div class="none">No rolls yet.</div>'}</div></div>`; fitCard(diceCard);
+}
+function skillWord(w) { w = w.toLowerCase(); return R.SKILLS.find(s => s.name.toLowerCase() === w) || R.SKILLS.find(s => s.name.toLowerCase().startsWith(w) && w.length >= 3); }
+function rigCommands(q, ws, nums, pcw) {
+  const out = [], sk = ws.map(skillWord).find(Boolean);
+  if (pcw && sk) { const S = sheetOf(pcw); out.push({ k: 'cmd', t: `Roll ${choicesOf(pcw).name}’s ${sk.name} (${S.skill[sk.id]}%)`, run: () => rollFor(pcw, S.skill[sk.id], sk.name) }); }
+  else if ((ws[0] === 'roll' || ws[0] === 'r') && nums.length) out.push({ k: 'cmd', t: `Roll d100 vs ${nums[0]}%`, run: () => freeRoll(nums[0], `Roll vs ${nums[0]}%`, qb) });
+  if (ws[0] === 'resist' && nums.length >= 2) { const t = R.resistance(nums[0], nums[1]); out.push({ k: 'cmd', t: `Resistance ${nums[0]} vs ${nums[1]}: ${t}%`, run: () => freeRoll(t, `Resistance ${nums[0]} vs ${nums[1]}`, qb) }); }
+  if ((ws[0] === 'damage' || ws[0] === 'hurt') && pcw) { const n = nums[0] || 1; out.push({ k: 'cmd', t: `${choicesOf(pcw).name} takes ${n} damage`, run: () => { const S = sheetOf(pcw), d = liveOf(pcw).dmg; let left = n; for (let i = 0; i < S.der.hp && left; i++) if (!d[i]) { d[i] = 1; left--; } persist(); renderSheet(pcw); } }); }
+  if (ws[0] === 'heal' && pcw) out.push({ k: 'cmd', t: `Clear ${choicesOf(pcw).name}’s damage`, run: () => { liveOf(pcw).dmg = []; persist(); renderSheet(pcw); } });
+  return out;
+}
+function rigAct(act, a, pc, ch) {
+  if (act === 'roll') { rollFor(pc, +a.dataset.target, a.dataset.label, a); return true; }
+  if (act === 'rollchars') { ch.char = R.rollChars(); persist(); renderSheet(pc); return true; }
+  if (act === 'dmg') { const d = liveOf(pc).dmg, i = +a.dataset.i; d[i] = d[i] ? 0 : 1; persist(); renderSheet(pc); return true; }
+  return false;
+}
+
+const resolveSrc = (pc, id) => id.startsWith('B:') ? `b-${pc.id}-${id.slice(2)}` : id;
+// builder: fixed columns, so nothing ever moves when a choice opens a step
+function stepper(pc, path, v, min, max, lab) {
+  return `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-1" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${lab}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="1" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${lab}">+</button></div>`;
+}
+function builderInner(pc, S) {
+  return BCOLS.map((col, i) => `<div class="bcol" style="left:${30 + i * (BIW + BGAP)}px;width:${BIW}px">${col.map(k => stepHtml(pc, S, k)).join('')}</div>`).join('');
+}
+// portraits: an uploaded image, else the Turnip Works runner token that best fits the build
+// summons: one at a time; a tiny sheet inside the summoner's sheet (rules p.2)
+function fitInto(box, inner, max = 3) {
+  if (!box || !inner || !box.clientWidth) return; const W = box.clientWidth, H = box.clientHeight; let lo = 0.15, hi = max;
+  for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; inner.style.zoom = m; inner.style.width = (W / m) + 'px';
+    const r = inner.getBoundingClientRect(), b = box.getBoundingClientRect(); if (r.height <= b.height * 0.98 && inner.scrollWidth <= inner.clientWidth + 3) lo = m; else hi = m; }
+  inner.style.zoom = lo; inner.style.width = (W / lo) + 'px';
+}
+const isToken = src => /assets\/tokens\//.test(src || '');
+// fill every section: scale its contents (CSS zoom) until they exactly fill the box, so no sheet carries dead space
+function fitSections(box) {
+  box.querySelectorAll('.main > section:not(.sP):not(.sS)').forEach(sec => {
+    let f = sec.querySelector(':scope > .fit');
+    if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
+    const sr = sec.getBoundingClientRect(); if (!sr.height) return;
+    const W = sec.clientWidth;
+    let lo = 0.45, hi = 2.6;
+    const wide = () => [...f.querySelectorAll('.acol, .sk, .ahead, .budget > div, .der > div, .list > div, .track, .asof, .roll, .grid4, .der, .budget')].some(e => e.scrollWidth > e.clientWidth + 1) || [...f.querySelectorAll('.sk .k, .ahead .an')].some(k => { const r = k.getBoundingClientRect(), p2 = k.closest('.sk, .ahead').getBoundingClientRect(); return r.right > p2.right + 0.5; });
+    for (let i = 0; i < 11; i++) { const mid = (lo + hi) / 2; f.style.zoom = mid; f.style.width = (W / mid) + 'px';
+      if (f.getBoundingClientRect().height <= sr.height * 0.98 && !wide()) lo = mid; else hi = mid; }
+    f.style.zoom = lo; f.style.width = (W / lo) + 'px'; f.dataset.z = lo.toFixed(2);
+  });
+}
+function sheetOf(pc) { return R.compute(choicesOf(pc), pc.karma || [], state.asof[pc.id] ?? 99); }
+
+function placeSheet(pc, slot) {
+  if (sheetEls[pc.id]) { sheetEls[pc.id].remove(); }
+  const e = add(world, 'sheet', PX, pcRowY(slot), SW, SH); sheetEls[pc.id] = e; pc.slot = slot;
+  reg(pc.id, { el: e, title: '', kind: 'character', icon: 'assets/tool-pawns.png', box: { x: PX, y: pcRowY(slot), w: SW, h: SH } });
+  renderSheet(pc);
+}
+
+// the launcher: above the party, straddling the map's top-right corner
+const launch = add(world, 'launch', PX - 1900, -900, SW + 1900, 760, `<button class="launchbtn" data-act="newpc"><span class="plus">+</span><span><b>Build a new ${WORDS.char}</b><small>Opens a blank sheet in the next empty seat and takes you to its builder.</small></span></button>`);
+reg('launch', { el: launch, title: `Build a new ${WORDS.char}`, kind: 'action', icon: 'assets/tool-pawns.png', box: { x: PX - 1900, y: -900, w: SW + 1900, h: 760 } });
+label(world, 'The party', PX, -1240, 300);
+
+PCS.forEach((pc, i) => placeSheet(pc, pc.slot ?? i));
+function emptySeats() { const used = new Set(PCS.map(p => p.slot)); return [...Array(SLOTS).keys()].filter(i => !used.has(i)); }
+const seatEls = {};
+function renderSeats() {
+  Object.values(seatEls).forEach(e => e.remove());
+  emptySeats().forEach(i => { const e = add(world, 'seat', PX, pcRowY(i), SW, SH, `<button class="seatbtn" data-act="newpc" data-slot="${i}"><span class="plus">+</span> Empty seat · build a new ${WORDS.char} here</button>`); seatEls[i] = e; });
+}
+renderSeats();
+function newRunner(slot) {
+  const free = emptySeats(); if (!free.length) return null;
+  slot = slot != null && free.includes(+slot) ? +slot : free[0];
+  const id = 'pc-x' + Date.now().toString(36);
+  const pc = { id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot };
+  state.extra.push({ id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot });
+  PCS.push(pc); pcById[id] = pc; placeSheet(pc, slot); renderSeats(); persist();
+  return id;
+}
+
+// (sessions3)
+let persistExtra = () => {};
+
+// ------------------------------------------------------------------ pockets: a free-paste spot on every major thing
+// Paste (⌘V) with the pointer over a pocket, drop an image on it, or click it to type. Scraps are text or pictures.
+state.pockets = saved.pockets || {};
+const persistPockets = () => { persistExtra(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.pockets = state.pockets; o.sessx = state.sessx; o.prepN = state.prepN; o.threadx = state.threadx; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
+function pocketHtml(owner, label = 'Pocket') {
+  const items = state.pockets[owner] || [];
+  return `<div class="pocket" data-pocket="${owner}"><div class="ph2">${esc(label)} <span class="pk">paste, drop, or click to type</span></div><div class="scraps">${items.map(it => it.kind === 'img'
+    ? `<span class="scrap img" data-scrap="${it.id}"><img src="${it.src}" alt="" draggable="false"><button class="x" data-unscrap="${owner}|${it.id}" aria-label="Remove">✕</button></span>`
+    : `<span class="scrap txt ed" data-scrap="${it.id}" data-owner="${owner}" tabindex="0">${renderNote(it.text, it.id, new Set())}</span>`).join('')}</div></div>`;
+}
+function addScrap(owner, it) { (state.pockets[owner] = state.pockets[owner] || []).push({ id: 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), ...it }); persistPockets(); refreshPocket(owner); }
+function refreshPocket(owner) {
+  if (pcById[owner]) { renderPocketTab(pcById[owner]); return; }
+  if (/^s\d+$/.test(owner)) { const x = sessionEls.find(q => 's' + q.s.n === owner); if (x) { renderSessionCard(x); return; } }
+  if (pEls[owner]) { pEls[owner].querySelector('.pocket')?.replaceWith(el('div', '', pocketHtml(owner)).firstElementChild); layoutPeople(); }
+}
+const pocketTabs = {};
+function renderPocketTab(pc) {
+  const y = pcRowY(pc.slot);
+  let t = pocketTabs[pc.id]; if (!t) { t = add(world, 'pockettab', PX + SW + 30, y, 180, SH, ''); pocketTabs[pc.id] = t; }
+  place(t, PX + SW + 30, y, 180, SH); t.innerHTML = pocketHtml(pc.id, 'Pocket');
+}
+PCS.forEach(renderPocketTab);
+const _newRunner = newRunner; newRunner = function (slot) { const id = _newRunner(slot); if (id) renderPocketTab(pcById[id]); return id; };
+
+// ------------------------------------------------------------------ sessions: compact, editable cards; the next one waits as a ghost
+const SCW = 1000, SGAP = 60, SCOLS = 3;
+const SX = PX + SW + 240, SY = 40;
+state.sessx = saved.sessx || []; state.prepN = saved.prepN || C.prep.n; state.threadx = saved.threadx || [];
+state.snotes = saved.snotes || null; state.smeta = saved.smeta || {}; state.npcx = saved.npcx || [];
+const allSessions = () => [...C.sessions, ...state.sessx, { ...C.prep, n: state.prepN, title: state.prepN === C.prep.n ? C.prep.title : 'Next session', date: 'planned', prep: true }];
+if (!state.snotes) { state.snotes = {}; allSessions().forEach(s => { state.snotes[s.n] = []; Object.entries(C.cells).forEach(([who, row]) => (row[s.n] || []).forEach((t, j) => state.snotes[s.n].push({ id: `c-${who}-${s.n}-${j}`, who, text: t }))); }); }
+persistExtra = () => { persist(); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); Object.assign(o, { snotes: state.snotes, smeta: state.smeta, npcx: state.npcx, pockets: state.pockets, sessx: state.sessx, prepN: state.prepN, threadx: state.threadx }); localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} };
+state.npcx.forEach(n => { if (!npcIndex[n.id]) { C.npcs.push(n); npcIndex[n.id] = n; } });
+state.threadx.forEach(t => { if (!C.threads.find(x => x.id === t.id)) C.threads.push(t); });
+// ------------------------------------------------------------------ sessions: compact, editable cards; notes grouped by who
+// Notes are plain text with two marks: @name links a runner, person or place (and makes a new person if nobody matches),
+// [[Title]] links anything by its title (a rule, a place). The seed text's {{id}} marks still render.
+function knownNames() {
+  return [...PCS.map(pc => ({ id: pc.id, name: choicesOf(pc).name })), ...C.npcs.map(n => ({ id: n.id, name: n.name })), ...C.places.map(p => ({ id: p.id, name: p.name }))].filter(x => x.name);
+}
+function matchMention(words) {
+  // the longest run of words after @ that starts a known name; else nothing
+  const names = knownNames().map(x => ({ ...x, l: x.name.toLowerCase() }));
+  for (let n = Math.min(4, words.length); n >= 1; n--) {
+    const ph = words.slice(0, n).join(' ').toLowerCase().replace(/_/g, ' ');
+    const hit = names.filter(x => x.l === ph || x.l.startsWith(ph + ' ') || (n === 1 && x.l.startsWith(ph) && ph.length >= 3)).sort((a, b) => a.l.length - b.l.length)[0];
+    if (hit) return { ...hit, used: n };
+  }
+  return null;
+}
+function titleMatch(t) { t = t.toLowerCase(); const n = Object.values(nodes).find(n => n.title && n.title.toLowerCase() === t && ['rule', 'place', 'person', 'character', 'thread', 'session'].includes(n.kind)); return n?.id || C.print.find(p => p.title.toLowerCase() === t)?.id || null; }
+function chipFor(id, label) { const g = placeIndex[id]?.icon; const pg = printIndex[id] ? ` <small>p.${printIndex[id].page}</small>` : ''; return `<span class="chip" data-go="${id}" data-mark="${esc(label)}">${g ? `<img src="${g}" alt="">` : ''}${esc(label)}${pg}</span>`; }
+function renderNote(text, fromId, mentions) {
+  let h = esc(text);
+  h = h.replace(/\{\{([\w-]+)\}\}/g, (_, id) => { mentions.add(id); return chipFor(id, titleOf(id)); });
+  h = h.replace(/\[\[([^\]]+)\]\]/g, (m, t) => { const id = titleMatch(t.replace(/&amp;/g, '&')); if (!id) return `<span class="unlinked">${t}</span>`; mentions.add(id); return chipFor(id, titleOf(id)); });
+  h = h.replace(/@([A-Za-z][\w'’-]*(?:[ _][A-Za-z][\w'’-]*){0,3})/g, (m, run) => {
+    const words = run.split(/[ _]/), hit = matchMention(words);
+    if (!hit) return `<span class="unlinked">@${words[0]}</span>${words.length > 1 ? ' ' + words.slice(1).join(' ') : ''}`;
+    mentions.add(hit.id); const rest = words.slice(hit.used).join(' ');
+    return chipFor(hit.id, hit.name) + (rest ? ' ' + rest : '');
+  });
+  return h;
+}
+// leaving an edit: chips back to marks, unknown @names become new people
+function textOf(el) {
+  const c = el.cloneNode(true);
+  c.querySelectorAll('.chip[data-go]').forEach(ch => { const id = ch.dataset.go, n = nodes[id]; const isName = pcById[id] || npcIndex[id] || placeIndex[id];
+    ch.replaceWith(isName ? '@' + (titleOf(id)) : `[[${titleOf(id)}]]`); });
+  return c.innerText.replace(/ /g, ' ').trim();
+}
+function adoptMentions(text) {
+  let made = false;
+  (text.match(/@([A-Za-z][\w'’-]*(?:[ _][A-Za-z][\w'’-]*){0,3})/g) || []).forEach(m => {
+    const words = m.slice(1).split(/[ _]/); if (matchMention(words)) return;
+    const name = words[0][0].toUpperCase() + words[0].slice(1);
+    const n = { id: 'npc-x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, text: 'Met in play. Click to add who they are.', icon: null };
+    C.npcs.push(n); npcIndex[n.id] = n; state.npcx.push(n); made = true;
+  });
+  return made;
+}
+const subjOf = id => pcById[id] ? { name: choicesOf(pcById[id]).name || `New ${WORDS.char}`, icon: portraitOf(pcById[id], sheetOf(pcById[id])).src, go: id } : npcIndex[id] ? { name: npcIndex[id].name, icon: state.portraits[id] || npcIndex[id].icon, go: id } : C.threads.find(t => t.id === id) ? { name: C.threads.find(t => t.id === id).name, icon: null, go: id, thread: true } : { name: 'Table notes', icon: null, go: null, general: true };
+const mentionsBy = {};                                   // subject id -> Set of note ids that mention it
+function renderSessionCard(x, measuring) {
+  const s = x.s, card = x.card, meta = state.smeta[s.n] || {};
+  const groups = [];
+  (state.snotes[s.n] || []).forEach(n => { let g = groups.find(q => q.who === n.who); if (!g) groups.push(g = { who: n.who, notes: [] }); g.notes.push(n); });
+  C.pcs.forEach(pc => { const ks = (pc.karma || []).filter(k => k.s === s.n); if (!ks.length) return; let g = groups.find(q => q.who === pc.id); if (!g) groups.push(g = { who: pc.id, notes: [] }); g.karma = ks; });
+  const order = id => pcById[id] ? 0 : npcIndex[id] ? 1 : C.threads.find(t => t.id === id) ? 2 : 3;
+  groups.sort((a, b) => order(a.who) - order(b.who));
+  const title = meta.title ?? s.title, recap = meta.recap ?? (s.recap || 'Ideas sit here, unsettled, until the table makes them true.');
+  card.innerHTML = `<div class="fit">
+    <div class="shead"><div class="snum">S${s.n}${s.prep ? '?' : ''}</div><div><h2 class="ed" data-sedit="title" data-s="${s.n}" tabindex="0">${esc(title)}</h2><div class="date">${esc(s.date)}</div></div>${s.prep ? '<span class="nowtag">Now</span>' : ''}</div>
+    <div class="recap ed" data-sedit="recap" data-s="${s.n}" tabindex="0">${esc(recap)}</div>
+    <div class="sgroups"></div>
+    <button class="btn addnote" data-addnote="${s.n}" data-who="">+ Note</button>${pocketHtml('s' + s.n)}</div>`;
+  const gEl = card.querySelector('.sgroups');
+  groups.forEach(g => {
+    const sj = subjOf(g.who);
+    const ge = el('div', 'sgroup' + (sj.thread ? ' thread' : ''), `<div class="sgh" ${sj.go ? `data-go="${sj.go}"` : ''}>${sj.icon ? `<span class="sgimg"><img src="${sj.icon}" alt="" draggable="false"></span>` : `<span class="tdot">${sj.general ? '✎' : '?'}</span>`}<b>${esc(sj.name)}</b></div>`);
+    (g.karma || []).forEach(k => {
+      const buys = advanceText(k);
+      const e = el('div', 'snote karma', `<span class="kk">Karma +${k.award || 0}</span>${buys ? ` <b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
+      ge.appendChild(e); reg(k.id, { el: e, title: `${sj.name} · karma S${s.n}${buys ? ': ' + buys : ''}`, kind: 'karma', sub: `S${s.n}` });
+    });
+    g.notes.forEach(n => { const ms = new Set(); const e = el('div', 'snote ed' + (s.prep ? ' idea' : ''), renderNote(n.text, n.id, ms)); e.dataset.note = n.id; e.dataset.s = s.n; e.tabIndex = 0; ge.appendChild(e);
+      ms.add(g.who); ms.forEach(id => (mentionsBy[id] = mentionsBy[id] || new Set()).add(n.id));
+      reg(n.id, { el: e, title: e.textContent.slice(0, 70), kind: s.prep ? 'idea' : 'note', sub: `S${s.n} · ${sj.name}` }); });
+    if (g.who) { const add = el('button', 'btn addnote sm', '+'); add.dataset.addnote = s.n; add.dataset.who = g.who; add.title = `Add a note about ${sj.name}`; ge.appendChild(add); }
+    gEl.appendChild(ge);
+  });
+  if (measuring) { const f = card.querySelector('.fit'); f.style.zoom = 1; f.style.width = (SCW - 68) + 'px'; } else fitCard(card);
+}
+function fitCard(card) {
+  const f = card.querySelector(':scope > .fit'); if (!f || !card.offsetHeight) return;
+  const W = card.clientWidth - 68, Hh = card.clientHeight - 60; let lo = 0.5, hi = 2.2;
+  const cr = card.getBoundingClientRect(), k = cr.height / card.offsetHeight || 1;
+  for (let i = 0; i < 10; i++) { const mid = (lo + hi) / 2; f.style.zoom = mid; f.style.width = (W / mid) + 'px'; if (f.getBoundingClientRect().height / k <= Hh) lo = mid; else hi = mid; }
+  f.style.zoom = lo; f.style.width = (W / lo) + 'px';
+}
+let sessionEls = [], ghostS = null, sy = SY;
+function layoutSessions() {
+  sessionEls.forEach(x => x.card.remove()); ghostS?.remove(); sessionEls = [];
+  const list = allSessions();
+  list.forEach(s => { if (!state.snotes[s.n]) state.snotes[s.n] = []; const card = add(world, 'card scard' + (s.prep ? ' prep' : ''), 0, 0, SCW, null, ''); sessionEls.push({ s, card }); });
+  sessionEls.forEach(x => { renderSessionCard(x, true); });
+  sy = SY;
+  const slots = [...sessionEls, { ghost: true }];
+  for (let r = 0; r * SCOLS < slots.length; r++) {
+    const row = slots.slice(r * SCOLS, r * SCOLS + SCOLS);
+    const h = Math.max(700, ...row.filter(x => !x.ghost).map(x => x.card.offsetHeight)) + 160;
+    row.forEach((x, c) => { const bx = SX + c * (SCW + SGAP);
+      if (x.ghost) { ghostS = add(world, 'ghost', bx, sy, SCW, Math.min(h, 900), `<button class="ghostbtn" data-newsession="1"><span class="plus">+</span><span>S${state.prepN + 1}<small>Play S${state.prepN}: its prep card becomes the record, and a fresh prep card opens here.</small></span></button>`); return; }
+      place(x.card, bx, sy, SCW, h); x.box = { x: bx, y: sy, w: SCW, h };
+      reg('s' + x.s.n, { el: x.card, title: `S${x.s.n} · ${x.s.title}`, kind: 'session', box: x.box }); renderSessionCard(x); });
+    sy += h + SGAP;
+  }
+  const last = sessionEls[sessionEls.length - 1];
+  nodes.now = { id: 'now', el: last.card, title: 'Now · next session', kind: 'now', icon: 'assets/tool-build.png', box: last.box };
+  updateBounds();
+}
+label(world, 'Sessions', SX, SY - 330, 260);
+
+// editing in place: click a note, a title or a recap. Enter saves, Shift+Enter breaks a line, Esc cancels.
+let editing = null;
+function startEdit(e) {
+  if (editing?.el === e) return; if (editing) endEdit(true);
+  const raw = e.dataset.note ? (state.snotes[e.dataset.s].find(n => n.id === e.dataset.note)?.text ?? '') : e.dataset.scrap ? ((state.pockets[e.dataset.owner] || []).find(q => q.id === e.dataset.scrap)?.text ?? '') : null;
+  editing = { el: e, before: e.innerHTML };
+  if (raw != null) { const tmp = el('div', '', renderNote(raw, '', new Set())); e.textContent = textOf(tmp); }
+  e.contentEditable = 'true'; e.classList.add('editing'); e.focus();
+  const r = document.createRange(); r.selectNodeContents(e); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+}
+function endEdit(save) {
+  const ed = editing; if (!ed) return; editing = null; const e = ed.el; e.contentEditable = 'false'; e.classList.remove('editing');
+  const s = +e.dataset.s, x = sessionEls.find(q => q.s.n === s);
+  if (e.dataset.scrap) { const list = state.pockets[e.dataset.owner] || [], it = list.find(q => q.id === e.dataset.scrap); const t2 = e.innerText.replace(/\u00a0/g, ' ').trim(); if (it) { if (t2) it.text = t2; else list.splice(list.indexOf(it), 1); } adoptMentions(t2); persistPockets(); refreshPocket(e.dataset.owner); return; }
+  if (!save) { e.innerHTML = ed.before; return; }
+  const text = e.innerText.replace(/ /g, ' ').trim();
+  if (e.dataset.pedit) { const id = e.dataset.pid, o = npcIndex[id] || C.threads.find(t => t.id === id); if (o) { o[e.dataset.pedit] = text || o[e.dataset.pedit]; const x2 = state.npcx.find(q => q.id === id) || state.threadx.find(q => q.id === id); if (x2) x2[e.dataset.pedit] = o[e.dataset.pedit]; }
+    persistExtra(); layoutPeople(); sessionEls.forEach(q => renderSessionCard(q)); return; }
+  if (e.dataset.sedit) { state.smeta[s] = { ...(state.smeta[s] || {}), [e.dataset.sedit]: text }; }
+  else { const list = state.snotes[s], n = list.find(q => q.id === e.dataset.note); if (n) { if (text) n.text = text; else list.splice(list.indexOf(n), 1); } }
+  const made = adoptMentions(text);
+  persistExtra(); renderSessionCard(x); if (made) layoutPeople(); }
+document.addEventListener('click', ev => {
+  if (ev.target.closest('[data-newsession]')) { const n = state.prepN, meta = state.smeta[n] || {};
+    state.sessx.push({ n, title: meta.title || (n === C.prep.n ? C.prep.title : `Session ${n}`), date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), recap: meta.recap || '' });
+    state.prepN = n + 1; state.snotes[n + 1] = state.snotes[n + 1] || []; persistExtra(); layoutSessions(); layoutPeople(); flyTo('s' + (n + 1)); return; }
+  const un = ev.target.closest('[data-unscrap]'); if (un) { const [o, id] = un.dataset.unscrap.split('|'); state.pockets[o] = (state.pockets[o] || []).filter(q => q.id !== id); persistPockets(); refreshPocket(o); return; }
+  const gp = ev.target.closest('[data-newperson], [data-newthread]');
+  if (gp) { const isP = !!gp.dataset.newperson, o = { id: (isP ? 'npc-x' : 'th-x') + Date.now().toString(36), name: isP ? 'New person' : 'New thread', text: isP ? 'Click to say who they are.' : 'What does the table keep asking?', icon: null };
+    if (isP) { C.npcs.push(o); npcIndex[o.id] = o; state.npcx.push(o); } else { C.threads.push(o); state.threadx.push(o); }
+    persistExtra(); layoutPeople(); const h = pEls[o.id]?.querySelector('h2.ed'); if (h) { flyTo(o.id); setTimeout(() => startEdit(h), 700); } return; }
+  const pk = ev.target.closest('.pocket'); if (pk && !ev.target.closest('.scrap, .chip, button')) { const o = pk.dataset.pocket; addScrap(o, { kind: 'text', text: '' }); const e = [...document.querySelectorAll(`[data-pocket="${o}"] .scrap.txt`)].pop(); if (e) startEdit(e); return; }
+  const add = ev.target.closest('[data-addnote]');
+  if (add) { const s = +add.dataset.addnote, n = { id: `c-x${Date.now().toString(36)}`, who: add.dataset.who || '', text: '' }; state.snotes[s].push(n);
+    const x = sessionEls.find(q => q.s.n === s); renderSessionCard(x); const e = x.card.querySelector(`[data-note="${n.id}"]`); if (e) startEdit(e); return; }
+  const ed = ev.target.closest('.ed'); if (ed && !ev.target.closest('.chip') && !ed.isContentEditable) { startEdit(ed); return; }
+  if (editing && !ev.target.closest('.editing')) endEdit(true);
+});
+document.addEventListener('keydown', ev => { if (!editing || ev.target !== editing.el) return;
+  if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); endEdit(true); } else if (ev.key === 'Escape') { ev.preventDefault(); endEdit(false); }
+  ev.stopPropagation(); }, true);
+
+// people, threads and the inbox: a column of their own beside the sessions, so neither pushes the other
+const SBW = SCOLS * SCW + (SCOLS - 1) * SGAP;
+const PCX = SX + SBW + 140, PCW = 1100;
+const IBX = PCX;
+const ib = add(world, 'inbox', PCX, SY, PCW, 700, `<div class="ih"><h2>Inbox</h2>Loose notes land here. Drag them where they belong, or leave them. Paste text anywhere (⌘V) to make one.</div>`);
+reg('inbox', { el: ib, title: 'Inbox · loose notes', kind: 'inbox', box: { x: PCX, y: SY, w: PCW, h: 700 } });
+label(world, 'People and threads', PCX, SY + 760, 160);
+const pEls = {}; let ghostP = null, ghostT = null, py = SY + 990;
+function personCard(p) {
+  return `<div class="pch">${p.kind === 'npc' ? `<div class="pport" data-portrait="${p.o.id}">${(state.portraits[p.o.id] || p.o.icon) ? `<img src="${state.portraits[p.o.id] || p.o.icon}" alt="" draggable="false">` : '<span class="pdrop">Drop a picture</span>'}</div>` : '<span class="tdot big">?</span>'}<div><div class="num">${p.kind === 'npc' ? 'Person' : 'Thread'}</div><h2 class="ed" data-pedit="name" data-pid="${p.o.id}" tabindex="0">${esc(p.o.name)}</h2><div class="t ed" data-pedit="text" data-pid="${p.o.id}" tabindex="0">${esc(p.o.text || '')}</div></div></div><div class="backs"></div>${pocketHtml(p.o.id)}`;
+}
+function layoutPeople() {
+  const pts = [...C.npcs.map(n => ({ o: n, kind: 'npc' })), ...C.threads.map(t => ({ o: t, kind: 'thread' }))];
+  let y = SY + 990;
+  pts.forEach(p => { let e = pEls[p.o.id];
+    if (!e) { e = add(world, 'card pcard', PCX, 0, PCW, null, ''); reg(p.o.id, { el: e, title: p.o.name, kind: p.kind === 'npc' ? 'person' : 'thread', icon: p.o.icon, box: null }); pEls[p.o.id] = e; }
+    e.style.height = ''; e.innerHTML = personCard(p); nodes[p.o.id].title = p.o.name;
+    const h = e.offsetHeight; place(e, PCX, y, PCW, h); nodes[p.o.id].box = { x: PCX, y, w: PCW, h }; y += h + SGAP; });
+  ghostP?.remove(); ghostT?.remove();
+  ghostP = add(world, 'ghost', PCX, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newperson="1"><span class="plus">+</span><span>Person</span></button>`);
+  ghostT = add(world, 'ghost', PCX + (PCW + SGAP) / 2, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newthread="1"><span class="plus">+</span><span>Thread</span></button>`);
+  py = y + 360; refreshBacks(); updateBounds();
+}
+function updateBounds() { const top = Math.min(BY - 700, -3700); Object.assign(BOUNDS, { x: -120, y: top, w: PCX + PCW + 200, h: Math.max(MH, py, sy) - top + 120 }); }
+const BOUNDS = {};
+// editing a person's or thread's name and words
+document.addEventListener('focusout', () => {}, true);
+const colX = i => SX + (i % SCOLS) * (SCW + SGAP), colW = SCW, colGap = SGAP, nS = C.sessions.length;
+layoutSessions(); layoutPeople();
+
+PCS.forEach(pc => { nodes[pc.id].title = choicesOf(pc).name || `New ${WORDS.char}`; });
+function refreshBacks() {
+  Object.entries(mentionsBy).forEach(([id, set]) => { const ss = [...new Set([...set].map(nid => { for (const s of allSessions()) if ((state.snotes[s.n] || []).some(n => n.id === nid)) return s.n; return null; }).filter(Boolean))].sort((a, b) => a - b);
+    [nodes['idx-' + id], nodes[id]].forEach(t => { const b = t?.el?.querySelector('.backs'); if (b) b.innerHTML = ss.length ? 'In sessions ' + ss.map(n => `<span class="chip" data-go="s${n}">S${n}</span>`).join(' ') : ''; }); });
+}
+refreshBacks();
+// loose notes
+let dragNote = null;
+function makeNote(nt) {
+  const e = add(world, 'loose', nt.x, nt.y, null, null, `<div class="grip"><span class="dots"></span><button aria-label="Delete note">✕</button></div><div class="body" contenteditable="true" spellcheck="false"></div><div class="rsz" title="Drag to resize"></div>`);
+  e.querySelector('.body').textContent = nt.text || '';
+  e.querySelector('.body').addEventListener('input', ev => { nt.text = ev.target.textContent; nodes[nt.id].title = nt.text.slice(0, 60) || 'Note'; persist(); });
+  e.querySelector('.grip button').addEventListener('click', () => { e.remove(); state.notes = state.notes.filter(n => n !== nt); delete nodes[nt.id]; persist(); });
+  e.querySelector('.grip').addEventListener('pointerdown', ev => { if (ev.target.closest('button')) return; ev.stopPropagation(); dragNote = { nt, e, sx: ev.clientX, sy: ev.clientY, ox: nt.x, oy: nt.y }; });
+  if (!nt.w) { const k = nt.k || 1; nt.w = 330 * k; nt.h = 180 * k; }   // a free rectangle: made at the zoom you were at, then any size and shape
+  reg(nt.id, { el: e, title: (nt.text || 'Note').slice(0, 60), kind: 'loose note', box: { x: nt.x, y: nt.y, w: nt.w, h: nt.h } });
+  requestAnimationFrame(() => sizeNote(nt, e));
+  return e;
+}
+if (!state.notes) state.notes = [
+  { id: 'n-1', x: IBX + 60, y: SY + 300, text: 'Ask Clutch’s player whether Clutch keeps the BigBeatle or trades up to a GunBug.' },
+  { id: 'n-2', x: IBX + 440, y: SY + 420, text: 'Grey paid ¥4,000 each. Where did that money come from?' },
+];
+state.notes.forEach(makeNote);
+// ------------------------------------------------------------------ at the table: round order and a dice tray, ON the canvas
+const TBX = SX, TBY = -1340, TBW = (SBW - 2 * SGAP) / 3, TBH = 900;
+label(world, 'At the table', TBX, TBY - 760, 640);
+const roundCard = add(world, 'card tablecard', TBX, TBY, TBW, TBH, '');
+reg('round', { el: roundCard, title: 'Round order', kind: 'table', icon: 'assets/tool-build.png', box: { x: TBX, y: TBY, w: TBW, h: TBH } });
+const diceCard = add(world, 'card tablecard', SX + TBW + SGAP, TBY, TBW, TBH, '');
+const logCard = add(world, 'card tablecard logcard', SX + 2 * (TBW + SGAP), TBY, TBW, TBH, '');
+reg('dice', { el: diceCard, title: 'Dice tray', kind: 'table', box: { x: SX + TBW + SGAP, y: TBY, w: TBW, h: TBH } });
+reg('log', { el: logCard, title: 'Log · rolls and chat', kind: 'table', box: { x: SX + 2 * (TBW + SGAP), y: TBY, w: TBW, h: TBH } });
+const helpCard = add(world, 'card helpcard', PX - 1900, -2240, 1800, 1180, `<h3>Getting around</h3><div class="t">
+  <b>Scroll</b> to pan · <b>pinch</b> or <b>ctrl-scroll</b> to zoom · <b>0</b> shows everything · <b>Alt ←</b> goes back<br>
+  <b>/</b> or <b>⌘K</b> opens the quickbar at the top: type a name, a place, a rule, or a command such as ${WORDS.helpCommands}, <i>round order</i><br>
+  <b>Double-click</b> a thing to fly to it, empty space for a note · <b>drop an image</b> on a portrait, or anywhere for art<br>
+  In a builder, <b>Tab</b> and <b>Shift+Tab</b> fly between steps · hover a <b>number</b> to see where it comes from</div>`);
+label(world, 'HELP', PX - 1900, -2240 - 1260, 1150);
+reg('help', { el: helpCard, title: 'Getting around', kind: 'help', box: { x: PX - 1900, y: -2240, w: 1800, h: 1180 } });
+let turn = { round: 1, at: 0 };
+function toast(rec, at) {
+  const t = $('#toast'); t.innerHTML = rollHtml(rec);
+  const r = at?.getBoundingClientRect?.(); t.style.left = (r ? Math.max(180, Math.min(W() - 180, r.left + r.width / 2)) : W() / 2) + 'px'; t.style.top = (r ? Math.max(130, r.top) : 150) + 'px';
+  t.hidden = false; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.hidden = true, 300); }, 2800);
+}
+var tableReady = false;
+// the log: every roll and every line of chat, in order (Harry, 13 Nov)
+state.log = saved.log || [];
+function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); o.log = state.log; localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {} renderLog(true); }
+let logSpeaker = 'gm';
+function speakerOf(id) { if (id === 'gm' || !id) return { name: 'GM', icon: null }; const pc = pcById[id]; return pc ? { name: choicesOf(pc).name || WORDS.Char, icon: portraitOf(pc, sheetOf(pc)).src } : { name: id, icon: null }; }
+function renderLog(stick) {
+  const list = logCard.querySelector('.loglist'), atEnd = !list || list.scrollTop + list.clientHeight >= list.scrollHeight - 8;
+  const fmt = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const rows = state.log.map(e => { const sp = speakerOf(e.who);
+    const face = sp.icon ? `<span class="lface"><img src="${sp.icon}" alt="" draggable="false"></span>` : `<span class="lface gm">${esc(sp.name.slice(0, 2))}</span>`;
+    return e.kind === 'roll' ? `<div class="lrow roll-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span>${rollHtml(e.rec)}</div></div>`
+      : `<div class="lrow chat-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span><b>${esc(sp.name)}</b> ${renderNote(e.text, '', new Set())}</div></div>`; }).join('');
+  const opts = [['gm', 'GM'], ...PCS.map(pc => [pc.id, choicesOf(pc).name || WORDS.Char])].map(([v, n]) => `<option value="${v}" ${v === logSpeaker ? 'selected' : ''}>${esc(n)}</option>`).join('');
+  const had = logCard.querySelector('.loginput'), draft = had ? had.value : '';
+  logCard.innerHTML = `<h3>Log <span class="sub3">rolls and chat</span></h3><div class="loglist scrolly">${rows || '<div class="none">Nothing yet. Rolls land here; so does anything said below or with <i>say</i> in the quickbar.</div>'}</div>
+    <div class="logsay"><select class="logwho" aria-label="Who is speaking">${opts}</select><input class="loginput" placeholder="Say something… (@names link)" aria-label="Say something" value="${esc(draft)}"><button class="btn" data-logsend="1">Say</button></div>`;
+  const l2 = logCard.querySelector('.loglist'); if (stick || atEnd) l2.scrollTop = l2.scrollHeight;
+}
+function say(text, who) { text = (text || '').trim(); if (!text) return; adoptMentions(text); logPush({ kind: 'chat', who: who || logSpeaker, text }); }
+document.addEventListener('click', ev => { if (ev.target.closest('[data-logsend]')) { const i = logCard.querySelector('.loginput'); say(i.value); logCard.querySelector('.loginput').focus({ preventScroll: true }); } });
+document.addEventListener('change', ev => { if (ev.target.closest?.('.logwho')) logSpeaker = ev.target.value; });
+document.addEventListener('keydown', ev => { if (ev.target.closest?.('.loginput') && ev.key === 'Enter') { ev.preventDefault(); say(ev.target.value); logCard.querySelector('.loginput')?.focus({ preventScroll: true }); } });
+function renderQuick() { if (tableReady) renderTable(); }
+document.addEventListener('click', ev => {
+  const ts = ev.target.closest('[data-ts]'); if (ts) { trayStep(ts.dataset.ts, +ts.dataset.d); renderTable(); return; }
+  const tr = ev.target.closest('[data-troll]'); if (tr) { trayRoll(tr); return; }
+  const tn = ev.target.closest('[data-turn]'); if (tn) { const n = initiative().length; if (tn.dataset.turn === 'next') { turn.at++; if (turn.at >= n) { turn.at = 0; turn.round++; } } else turn = { round: turn.round + 1, at: 0 }; renderTable(); }
+});
+tableReady = true; renderTable(); renderLog(true);
+
+// ------------------------------------------------------------------ the quickbar: one line of text at the top, like Turnip Works
+const qb = $('#qbar'), qin = $('#qbar textarea'), qres = $('#qres');
+let qrows = [], qhi = 0; const qhist = [];
+function runnerWord(w) { w = w.toLowerCase(); return PCS.find(pc => (choicesOf(pc).name || '').toLowerCase().startsWith(w) && w.length >= 2); }
+function commandsFor(q) {
+  const out = [], ws = q.trim().toLowerCase().split(/\s+/).filter(Boolean); if (!ws.length) return out;
+  const nums = ws.map(Number).filter(n => !isNaN(n));
+  const pcw = ws.map(runnerWord).find(Boolean);
+  out.push(...rigCommands(q, ws, nums, pcw));
+  if (('new ' + WORDS.char).startsWith(q.trim().toLowerCase()) && q.trim().length >= 3) out.push({ k: 'cmd', t: `Build a new ${WORDS.char}`, run: () => { const id = newRunner(); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); } });
+  if (ws[0] === 'build' && pcw) out.push({ k: 'cmd', t: `Open ${choicesOf(pcw).name}’s builder`, run: () => flyTo(`b-${pcw.id}-name`) });
+  if (['round', 'initiative', 'order', 'init'].some(w => w.startsWith(ws[0]) && ws[0].length >= 3)) out.push({ k: 'cmd', t: 'Round order', run: () => flyTo('round') });
+  if (ws[0] === 'say' && ws.length > 1) { const rest = q.trim().slice(3).trim(), first = rest.split(/\s+/)[0], who = first.endsWith(':') ? runnerWord(first.slice(0, -1)) : null, txt = who ? rest.slice(first.length).trim() : rest;
+    out.push({ k: 'cmd', t: `Say “${txt.slice(0, 60)}”${who ? ' as ' + choicesOf(who).name : ''}`, run: () => say(txt, who ? who.id : 'gm') }); }
+  if (['log', 'chat', 'history'].some(w => w.startsWith(ws[0]) && ws[0].length >= 3)) out.push({ k: 'cmd', t: 'Log · rolls and chat', run: () => flyTo('log') });
+  if (['dice', 'tray'].some(w => w.startsWith(ws[0]) && ws[0].length >= 3)) out.push({ k: 'cmd', t: 'Dice tray', run: () => flyTo('dice') });
+  if (['everything', 'overview', 'all'].some(w => w.startsWith(ws[0]) && ws[0].length >= 3)) out.push({ k: 'cmd', t: 'Show everything', run: overview });
+  if (ws[0] === 'back') out.push({ k: 'cmd', t: 'Back', run: goBack });
+  return out;
+}
+const KIND_SEC = { character: 'People', person: 'People', thread: 'Threads', place: 'Places', rule: 'Rules', session: 'Sessions', step: 'Builder', note: 'Notes', idea: 'Notes', karma: 'Notes', 'loose note': 'Notes', map: 'Places', book: 'Rules', table: 'At the table', action: 'At the table', help: 'At the table' };
+function searchFor(q) {
+  q = q.trim().toLowerCase(); const out = [];
+  const all = Object.values(nodes).filter(n => n.title && KIND_SEC[n.kind] && n.el);
+  const score = n => { const t = (n.title + ' ' + (n.sub || '') + ' ' + (n.text || '')).toLowerCase(); if (!q) return ['character', 'map', 'book', 'session', 'thread', 'person', 'table'].includes(n.kind) ? 1 : 0;
+    const i = n.title.toLowerCase().indexOf(q); if (i === 0) return 3; if (i > 0) return 2; return q.split(/\s+/).every(w => t.includes(w)) ? 1 : 0; };
+  all.map(n => [score(n), n]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, 10).forEach(([, n]) => out.push({ k: KIND_SEC[n.kind], t: n.title, sub: n.sub, icon: n.icon, run: () => flyTo(n.id) }));
+  return out;
+}
+function qrender() {
+  const tt = $('#toast'); tt.hidden = true;
+  const q = qin.value; qrows = [...commandsFor(q), ...searchFor(q)]; qhi = Math.min(qhi, Math.max(0, qrows.length - 1));
+  let last = null;
+  qres.innerHTML = qrows.map((r, i) => { const sec = r.k === 'cmd' ? 'Commands' : r.k; const h = sec !== last ? `<div class="qsec">${esc(sec)}</div>` : ''; last = sec;
+    return `${h}<div class="qrow${i === qhi ? ' on' : ''}" data-qi="${i}">${r.icon ? `<img src="${r.icon}" alt="">` : `<span class="qdot"></span>`}<span>${esc(r.t)}${r.sub ? ` <small>${esc(r.sub)}</small>` : ''}</span></div>`; }).join('') || '<div class="qsec">Nothing by that name</div>';
+  qres.hidden = false; qb.classList.add('open');
+}
+function qclose() { qres.hidden = true; qb.classList.remove('open'); qin.value = ''; qin.blur(); fitBar(); }
+function qrun(i) { const r = qrows[i]; if (!r) return; if (qin.value.trim()) qhist.unshift(qin.value.trim()); qclose(); r.run(); }
+function fitBar() { qin.style.height = '20px'; qin.style.height = Math.min(120, qin.scrollHeight) + 'px'; }
+function openPal() { qin.focus(); qrender(); }
+qin.addEventListener('focus', qrender);
+qin.addEventListener('input', () => { qin.value = qin.value.replace(/\n/g, ' '); qhi = 0; fitBar(); qrender(); });
+qin.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') { ev.preventDefault(); qclose(); }
+  else if (ev.key === 'Enter') { ev.preventDefault(); qrun(qhi); }
+  else if (ev.key === 'ArrowDown') { ev.preventDefault(); qhi = Math.min(qrows.length - 1, qhi + 1); qrender(); }
+  else if (ev.key === 'ArrowUp') { ev.preventDefault(); if (!qin.value && qhist.length) { qin.value = qhist[0]; qrender(); } else { qhi = Math.max(0, qhi - 1); qrender(); } }
+  ev.stopPropagation();
+});
+qres.addEventListener('click', ev => { const r = ev.target.closest('[data-qi]'); if (r) qrun(+r.dataset.qi); });
+document.addEventListener('pointerdown', ev => { if (!ev.target.closest('#qbar, #qres') && !qres.hidden) qclose(); });
+
+const lanes = [];
+// ---- build mode: Tab / Shift+Tab fly step to step; a live thread joins the step to its rule and to the sheet
+function setBuild(pcId, key) {
+  if (!pcById[pcId] || !ORDER.includes(key)) return;
+  const was = state.build?.pc;
+  state.build = { pc: pcId, key };
+  if (was && was !== pcId && sheetEls[was]) sheetEls[was].querySelector('.builder')?.classList.remove('active');
+  sheetEls[pcId].querySelector('.builder')?.classList.add('active');
+  dirty = true;
+}
+function endBuild(finish) {
+  const b = state.build; if (!b) return;
+  if (finish) { state.done[b.pc] = true; persist(); }
+  state.build = null; const pc = pcById[b.pc];
+  renderSheet(pc); dirty = true;
+  if (finish) flyTo(pc.id);
+}
+function stepOfEl(e) { const st = e?.closest?.('.bstep[data-id]'); if (!st) return null; const id = st.dataset.id; const key = id.split('-').pop(); return { pc: id.slice(2, id.length - key.length - 1), key }; }
+document.addEventListener('keydown', ev => {
+  if (!state.build || ev.target.closest?.('#qbar')) return;
+  if (ev.target.closest?.('.loose')) return;
+  if (ev.key === 'Tab') {
+    ev.preventDefault(); ev.stopPropagation();
+    const i = ORDER.indexOf(state.build.key), j = Math.max(0, Math.min(ORDER.length - 1, i + (ev.shiftKey ? -1 : 1)));
+    if (j !== i) { document.activeElement?.blur?.(); flyTo(`b-${state.build.pc}-${ORDER[j]}`); }
+  } else if (ev.key === 'Escape') { ev.preventDefault(); endBuild(false); }
+}, true);
+document.addEventListener('focusin', ev => { const st = stepOfEl(ev.target); if (st) setBuild(st.pc, st.key); });
+
+// ---- threads: drawn on the canvas in world units, so they scale with everything else
+const wsvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); wsvg.setAttribute('class', 'wthreads'); world.appendChild(wsvg);
+function worldRect(e) {
+  let x = e; while (x && !x.getClientRects().length) x = x.parentElement; if (!x) return null;
+  const r = x.getBoundingClientRect(); return { x: cam.x + r.left / cam.s, y: cam.y + r.top / cam.s, w: r.width / cam.s, h: r.height / cam.s };
+}
+function nearPt(r, to) { return [Math.max(r.x, Math.min(r.x + r.w, to[0])), Math.max(r.y, Math.min(r.y + r.h, to[1]))]; }
+function drawThreads() {
+  let d = '';
+  const link = (eA, eB, goB, cls = '') => {
+    const A = eA && worldRect(eA), B = eB && worldRect(eB); if (!A || !B) return;
+    const ca = [A.x + A.w / 2, A.y + A.h / 2], cb = [B.x + B.w / 2, B.y + B.h / 2];
+    const [x0, y0] = nearPt(A, cb), [x1, y1] = nearPt(B, ca);
+    const len = Math.hypot(x1 - x0, y1 - y0), lift = Math.min(900, 60 + len * 0.12), mx = (x0 + x1) / 2, my = Math.min(y0, y1) - lift;
+    const w = Math.max(3, Math.min(14, len / 300));
+    d += `<path class="${cls}" style="stroke-width:${w}px" d="M${x0},${y0} Q${mx},${my} ${x1},${y1}"/><circle class="${cls}" cx="${x0}" cy="${y0}" r="${w * 2.2}"/><circle class="${cls} far" ${goB ? `data-go="${goB}"` : ''} cx="${x1}" cy="${y1}" r="${w * 2.6}"><title>Fly there</title></circle>`;
+  };
+  if (threadSrc) {
+    const box = sheetEls[threadSrc.pcId], vEl = box?.querySelector(`.main [data-prov="${threadSrc.key}"]`);
+    if (vEl) (box._prov[threadSrc.key] || []).forEach(id => { const n = nodes[id]; if (n?.el) link(vEl, n.el, id); });
+  }
+  if (state.build) {
+    const { pc, key } = state.build, box = sheetEls[pc];
+    const stepEl = box?.querySelector(`[data-id="b-${pc}-${key}"]`), rule = STEP_RULE[key];
+    link(stepEl, nodes[rule]?.el, rule, 'build');
+    link(stepEl, box?.querySelector('.main ' + STEP_SHEET[key]), pc, 'build');
+  }
+  if (d !== wsvg._d) { wsvg.innerHTML = d; wsvg._d = d; }
+  threadsSvg.innerHTML = ''; tends.innerHTML = '';
+}
+
+// ---- portraits and art: drop an image, upload one, or take a Turnip Works token
+function shrinkImage(file) {
+  return new Promise((res, rej) => {
+    if (!file || !/^image\//.test(file.type)) return rej(new Error('not an image'));
+    const fr = new FileReader();
+    fr.onload = () => { const im = new Image(); im.onload = () => {
+      const k = Math.min(1, 720 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      res({ src: c.toDataURL('image/jpeg', 0.84), w: c.width, h: c.height }); }; im.onerror = rej; im.src = fr.result; };
+    fr.onerror = rej; fr.readAsDataURL(file);
+  });
+}
+function setPortrait(id, src) {
+  state.portraits[id] = src; persist();
+  if (pcById[id]) renderSheet(pcById[id]);
+  else document.querySelectorAll(`[data-portrait="${id}"] img`).forEach(i => i.src = src);
+}
+function makeArt(a) {
+  const e = add(world, 'artcard', a.x, a.y, a.w, null, `<div class="grip"><button aria-label="Remove image">✕</button></div><img src="${a.src}" alt="" draggable="false"><div class="rsz" title="Drag to resize"></div>`);
+  e.querySelector('.grip button').addEventListener('click', () => { e.remove(); state.art = state.art.filter(x => x !== a); delete nodes[a.id]; persist(); });
+  e.querySelector('.grip').addEventListener('pointerdown', ev => { if (ev.target.closest('button')) return; ev.stopPropagation(); dragNote = { nt: a, e, sx: ev.clientX, sy: ev.clientY, ox: a.x, oy: a.y }; });
+  reg(a.id, { el: e, title: 'Image', kind: 'art', box: { x: a.x, y: a.y, w: a.w, h: a.w * (a.ih || 1) } });
+}
+state.art.forEach(makeArt);
+document.addEventListener('dragstart', ev => { if (ev.target.closest?.('#world')) ev.preventDefault(); });   // Firefox: never drag the map image
+document.addEventListener('dragover', ev => { if ([...(ev.dataTransfer?.types || [])].includes('Files')) { ev.preventDefault(); ev.target.closest?.('[data-portrait]')?.classList.add('dropping'); } });
+document.addEventListener('dragleave', ev => ev.target.closest?.('[data-portrait]')?.classList.remove('dropping'));
+document.addEventListener('drop', async ev => {
+  const file = ev.dataTransfer?.files?.[0]; if (!file) return; ev.preventDefault();
+  document.querySelectorAll('.dropping').forEach(x => x.classList.remove('dropping'));
+  let img; try { img = await shrinkImage(file); } catch { return; }
+  const pk = ev.target.closest?.('[data-pocket]'); if (pk) { addScrap(pk.dataset.pocket, { kind: 'img', src: img.src }); return; }
+  const slot = ev.target.closest?.('[data-portrait]');
+  if (slot) { setPortrait(slot.dataset.portrait, img.src); return; }
+  const wx = cam.x + ev.clientX / cam.s, wy = cam.y + ev.clientY / cam.s, w = Math.max(300, 420 / cam.s * 0.6);
+  const a = { id: 'art-' + Date.now().toString(36), x: wx - w / 2, y: wy - w * img.h / img.w / 2, w, ih: img.h / img.w, src: img.src };
+  state.art.push(a); makeArt(a); persist();
+});
+document.addEventListener('change', async ev => {
+  const inp = ev.target.closest?.('input[data-upload]'); if (!inp) return;
+  try { const img = await shrinkImage(inp.files[0]); setPortrait(inp.dataset.upload, img.src); } catch {}
+});
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-tok]'); if (t) { setPortrait(t.dataset.pc, t.dataset.tok); return; }
+  if (ev.target.closest('[data-act="finish"]')) return;
+  const st = stepOfEl(ev.target); if (st) setBuild(st.pc, st.key);
+});
+
+// web fonts arrive after first paint and run a little larger: fit everything again once they are in
+document.fonts?.ready.then(() => { PCS.forEach(pc => fitSections(sheetEls[pc.id])); sessionEls.forEach(x => fitCard(x.card)); renderTable(); });
+
+// ---- keys mapped to what people already know (Harry, 13 Nov)
+//   ⌘[ / ⌘]  back / forward      ⌘Z / ⇧⌘Z  undo / redo a change to a sheet
+//   ⌘C  copy the thing under the pointer (or the last roll)      ⌘V  paste an image (portrait or art) or text (a note)
+//   Tab / ⇧Tab  next / previous builder step      Esc  close the quickbar, leave the builder
+let lastPt = { x: 0, y: 0 }, lastRollAt = 0;
+window.addEventListener('pointermove', ev => { lastPt = { x: ev.clientX, y: ev.clientY }; }, { passive: true });
+const undo = [], redo = [];
+function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof }); }
+function pushUndo() { undo.push(snap()); if (undo.length > 60) undo.shift(); redo.length = 0; }
+function restore(json) { const o = JSON.parse(json); Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof }); persist(); PCS.forEach(renderSheet); }
+function doUndo() { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); }
+function doRedo() { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); }
+const editable = t => t?.closest?.('input, textarea, select, [contenteditable]');
+document.addEventListener('keydown', ev => {
+  const mod = ev.metaKey || ev.ctrlKey;
+  if (mod && (ev.key === '[' || ev.key === ']')) { ev.preventDefault(); ev.stopPropagation(); ev.key === '[' ? goBack() : goFwd(); return; }
+  if (editable(ev.target)) return;
+  if (mod && ev.key.toLowerCase() === 'z') { ev.preventDefault(); ev.shiftKey ? doRedo() : doUndo(); return; }
+  if (mod && ev.key.toLowerCase() === 'y') { ev.preventDefault(); doRedo(); return; }
+  if (mod && ev.key.toLowerCase() === 'c' && !String(window.getSelection?.() || '')) {
+    ev.preventDefault();
+    let text = '';
+    const rolls = Object.values(state.rolls).map(a => a?.[0]).filter(Boolean);
+    if (Date.now() - lastRollAt < 8000 && rolls.length) { const r = $('#toast').textContent || ''; text = r; }
+    if (!text) { const hit = document.elementFromPoint(lastPt.x, lastPt.y)?.closest('[data-id]'); const n = hit && nodes[hit.dataset.id];
+      text = n ? [n.title, n.sub, n.text].filter(Boolean).join(' · ') : hit?.textContent?.trim().slice(0, 400) || ''; }
+    if (text) navigator.clipboard?.writeText(text).catch(() => {});
+  }
+}, true);
+document.addEventListener('click', ev => { if (ev.target.closest('[data-act="roll"], [data-troll], [data-act="sum-pick"]')) lastRollAt = Date.now(); }, true);
+document.addEventListener('paste', async ev => {
+  if (editable(ev.target)) return;
+  const items = [...(ev.clipboardData?.items || [])], img = items.find(i => i.type.startsWith('image/'));
+  ev.preventDefault();
+  const pocket = document.elementFromPoint(lastPt.x, lastPt.y)?.closest('[data-pocket]');
+  if (pocket) { if (img) { try { const pic = await shrinkImage(img.getAsFile()); addScrap(pocket.dataset.pocket, { kind: 'img', src: pic.src }); } catch {} }
+    else { const t = ev.clipboardData?.getData('text/plain'); if (t) addScrap(pocket.dataset.pocket, { kind: 'text', text: t.slice(0, 2000) }); } return; }
+  if (img) {
+    let pic; try { pic = await shrinkImage(img.getAsFile()); } catch { return; }
+    const slot = document.elementFromPoint(lastPt.x, lastPt.y)?.closest('[data-portrait]');
+    if (slot) { setPortrait(slot.dataset.portrait, pic.src); return; }
+    const wx = cam.x + lastPt.x / cam.s, wy = cam.y + lastPt.y / cam.s, w = Math.max(300, 250 / cam.s);
+    const a = { id: 'art-' + Date.now().toString(36), x: wx - w / 2, y: wy - w * pic.h / pic.w / 2, w, ih: pic.h / pic.w, src: pic.src };
+    state.art.push(a); makeArt(a); persist(); return;
+  }
+  const text = ev.clipboardData?.getData('text/plain'); if (!text) return;
+  const k = Math.max(0.05, Math.min(60, 0.85 / cam.s)); const nt = { id: 'n-' + Date.now().toString(36), x: cam.x + lastPt.x / cam.s - 165 * k, y: cam.y + lastPt.y / cam.s - 40 * k, k, text: text.slice(0, 2000) };
+  state.notes.push(nt); makeNote(nt); persist();
+});
+document.getElementById('qback')?.addEventListener('click', () => goBack());
+
+// ---- resize: drag the corner of a sticky note or a picture to scale it (Harry, 13 Nov)
+document.addEventListener('pointerdown', ev => {
+  const h = ev.target.closest?.('.rsz'); if (!h) return;
+  ev.preventDefault(); ev.stopPropagation();
+  const card = h.parentElement, id = card.dataset.id, isNote = card.classList.contains('loose');
+  const rec = isNote ? state.notes.find(n => n.id === id) : state.art.find(a => a.id === id); if (!rec) return;
+  const r0 = card.getBoundingClientRect(), x0 = ev.clientX, y0 = ev.clientY;
+  const k0 = isNote ? (rec.k || 1) : rec.w, w0 = rec.w || 330, h0 = rec.h || 180;
+  const move = e => {
+    const grow = Math.max((r0.width + (e.clientX - x0)) / r0.width, (r0.height + (e.clientY - y0)) / r0.height);
+    const f = Math.max(0.15, grow);
+    if (isNote) { rec.w = Math.max(8 / cam.s, w0 + (e.clientX - x0) / cam.s); rec.h = Math.max(8 / cam.s, h0 + (e.clientY - y0) / cam.s); sizeNote(rec, card); nodes[id].box = { ...nodes[id].box, w: rec.w, h: rec.h }; }
+    else { rec.w = Math.max(40, k0 * f); card.style.width = rec.w + 'px'; nodes[id].box = { ...nodes[id].box, w: rec.w, h: rec.w * (rec.ih || 1) }; }
+  };
+  const up = () => { window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); persist(); };
+  window.addEventListener('pointermove', move, true); window.addEventListener('pointerup', up, true);
+}, true);
+
+// ---- sticky notes are free rectangles; their text always fills them (Harry, 13 Nov)
+function sizeNote(nt, e) {
+  e.style.transform = ''; e.style.width = nt.w + 'px'; e.style.height = nt.h + 'px';
+  const gh = Math.max(3, Math.min(nt.h * 0.14, nt.w * 0.14, 90)), grip = e.querySelector('.grip'), body = e.querySelector('.body'), rz = e.querySelector('.rsz');
+  grip.style.height = gh + 'px'; grip.querySelector('button').style.fontSize = (gh * 0.55) + 'px'; grip.querySelector('.dots').style.transform = `scale(${gh / 26})`;
+  body.style.top = gh + 'px'; body.style.height = (nt.h - gh) + 'px'; body.style.padding = (gh * 0.35) + 'px ' + (gh * 0.45) + 'px';
+  if (rz) { rz.style.width = rz.style.height = Math.max(4, gh * 0.85) + 'px'; }
+  fitNoteText(e);
+}
+function fitNoteText(e) {
+  const body = e.querySelector('.body'); if (!body) return;
+  const empty = !body.textContent.trim();
+  if (empty) { body.style.fontSize = Math.max(2, Math.min(body.clientHeight * 0.2, body.clientWidth * 0.08)) + 'px'; return; }
+  let lo = 1, hi = Math.max(4, body.clientHeight);
+  for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; body.style.fontSize = mid + 'px';
+    if (body.scrollHeight <= body.clientHeight + 1 && body.scrollWidth <= body.clientWidth + 1) lo = mid; else hi = mid; }
+  body.style.fontSize = lo + 'px';
+}
+document.addEventListener('input', ev => { const n = ev.target.closest?.('.loose'); if (n) fitNoteText(n); });
+
+// ------------------------------------------------------------------ camera
+const cam = { x: 0, y: 0, s: 0.2 };
+const MIN_S = 0.02, MAX_S = 14;
+function W() { return vp.clientWidth; } function H() { return vp.clientHeight; }
+function apply() {
+  world.style.transform = `translate(${-cam.x * cam.s}px, ${-cam.y * cam.s}px) scale(${cam.s})`;
+  let step = 40; while (step * cam.s < 18) step *= 5; while (step * cam.s > 90) step /= 5;
+  const g = step * cam.s; vp.style.backgroundSize = `${g}px ${g}px`; vp.style.backgroundPosition = `${-cam.x * cam.s % g}px ${-cam.y * cam.s % g}px`;
+  dirty = true;
+}
+function zoomAt(sx, sy, f) {
+  const ns = Math.min(MAX_S, Math.max(MIN_S, cam.s * f));
+  const wx = cam.x + sx / cam.s, wy = cam.y + sy / cam.s;
+  cam.s = ns; cam.x = wx - sx / ns; cam.y = wy - sy / ns; apply();
+}
+const view = () => [cam.x + W() / 2 / cam.s, cam.y + H() / 2 / cam.s, W() / cam.s];   // center + world width
+function setView([cx, cy, w]) { cam.s = W() / w; cam.x = cx - w / 2; cam.y = cy - H() / 2 / cam.s; apply(); }
+// van Wijk & Nuij smooth zoom-pan (as in d3.interpolateZoom, rho = sqrt 2)
+function interpZoom(p0, p1) {
+  const rho = 2, rho2 = 4, rho4 = 16;   // wider than van Wijk's √2: a link pulls well back so you see where you are going (Harry, 13 Nov)
+  const [ux0, uy0, w0] = p0, [ux1, uy1, w1] = p1, dx = ux1 - ux0, dy = uy1 - uy0, d2 = dx * dx + dy * dy;
+  let i, S;
+  if (d2 < 1e-12) { S = Math.log(w1 / w0) / rho; i = t => [ux0 + t * dx, uy0 + t * dy, w0 * Math.exp(rho * t * S)]; }
+  else { const d1 = Math.sqrt(d2), b0 = (w1 * w1 - w0 * w0 + rho4 * d2) / (2 * w0 * rho2 * d1), b1 = (w1 * w1 - w0 * w0 - rho4 * d2) / (2 * w1 * rho2 * d1),
+    r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0), r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1); S = (r1 - r0) / rho;
+    i = t => { const s = t * S, c0 = Math.cosh(r0), u = w0 / (rho2 * d1) * (c0 * Math.tanh(rho * s + r0) - Math.sinh(r0)); return [ux0 + u * dx, uy0 + u * dy, w0 * c0 / Math.cosh(rho * s + r0)]; }; }
+  i.duration = Math.abs(S) * 1000; return i;
+}
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let anim = null;
+const hist = { back: [], fwd: [] };
+function flyToView(target, record = true) {
+  if (record) { hist.back.push(view()); hist.fwd = []; syncHist(); }
+  const from = view(); if (anim) cancelAnimationFrame(anim.raf);
+  if (reduced) { setView(target); return; }
+  const it = interpZoom(from, target), dur = Math.min(2600, Math.max(800, it.duration * 1.1)), t0 = performance.now();
+  const ease = t => 1 - Math.pow(1 - t, 3);   // fast out, slow in: the pull-back takes ~20% of the flight, the dive the rest, easing to a stop (Harry, 13 Nov)
+  const step = now => { const t = Math.min(1, (now - t0) / dur); setView(it(ease(t))); if (t < 1) anim = { raf: requestAnimationFrame(step) }; else anim = null; };
+  anim = { raf: requestAnimationFrame(step) };
+}
+function boxOf(id) {
+  const n = nodes[id]; if (!n) return null;
+  if (n.box) return n.box;
+  // nested things (cell notes, builder steps): measure on screen, convert to world
+  let e = n.el; while (e && !e.getClientRects().length) e = e.parentElement;
+  if (!e) return null; const r = e.getBoundingClientRect();
+  return { x: cam.x + r.left / cam.s, y: cam.y + r.top / cam.s, w: r.width / cam.s, h: r.height / cam.s };
+}
+function viewFor(b, pad = 1.18) { const eh = Math.max(240, H() - 70); const w = Math.max(b.w * pad, b.h * pad * W() / eh, W() / MAX_S); return [b.x + b.w / 2, b.y + b.h / 2 - 35 * w / W(), w]; }
+function flyTo(id) {
+  if (id.startsWith('b-') || id.startsWith('builder-')) { flyToBuilder(id); return; }
+  let b = boxOf(id);
+  if (!b) return;
+  if (nodes[id]?.kind === 'character') b = { ...b, w: b.w + 210 };   // the sheet and its pocket tab
+  flash(id);
+  flyToView(viewFor(b, 1.06));
+}
+const BSCALE = BK_K;
+function flyToBuilder(id) {
+  const pcId = id.replace(/^b-|^builder-/, '').replace(new RegExp('-(' + ORDER.join('|') + ')$'), '');
+  const sb = nodes[pcId].box, bx = sb.x + BREG.x, by = sb.y + BREG.y;
+  if (id.startsWith('builder-')) { flash(id); flyToView(viewFor({ x: bx, y: by, w: BREG.w, h: BREG.h }, 1.06)); return; }
+  const e = sheetEls[pcId].querySelector(`[data-id="${id}"]`); if (!e) return;
+  const col = e.parentElement, x = bx + col.offsetLeft * BK_K, y = by + (col.offsetTop + e.offsetTop) * BK_K, w = BIW * BK_K;
+  const h = Math.min(e.offsetHeight * BK_K, w * H() / W() * 1.3);
+  setBuild(pcId, id.split('-').pop());
+  flash(id); flyToView(viewFor({ x, y, w, h }, 1.08));
+}
+function flash(id) { const e = nodes[id]?.el; if (!e) return; e.classList.add('hl'); setTimeout(() => e.classList.remove('hl'), 1800); }
+function overview() { flyToView(viewFor(BOUNDS, 1.02)); }
+function syncHist() { const b = document.getElementById('qback'); if (b) b.hidden = !hist.back.length; }
+function goBack() { if (!hist.back.length) return; hist.fwd.push(view()); flyToView(hist.back.pop(), false); syncHist(); }
+function goFwd() { if (!hist.fwd.length) return; hist.back.push(view()); flyToView(hist.fwd.pop(), false); syncHist(); }
+
+// ------------------------------------------------------------------ semantic zoom pass
+function bumpLod() { dirty = true; }
+function lodPass() {
+  for (const n of lodNodes) {
+    if (!n.el.isConnected) { lodNodes.delete(n); continue; }
+    const sw = n.box.w * cam.s, z = sw < n.lod[0] ? 'far' : sw < n.lod[1] ? 'mid' : 'near';
+    if (n._z === z) continue;
+    n._z = z; n.el.dataset.z = z;
+    if (!n.lodEls) n.lodEls = ownLodEls(n.el);
+    for (const e of n.lodEls) {
+      const c = e.classList, show = c.contains('f') ? z === 'far' : c.contains('m') ? z !== 'far' : c.contains('nr') ? z === 'near' : z !== 'near';
+      c.toggle('lodoff', !show);
+    }
+  }
+}
+
+// ------------------------------------------------------------------ rulers, edge arrows, threads
+const rulerT = $('#rulerT'), rulerL = $('#rulerL'), arrowsEl = $('#arrows');
+function rulers() {}
+const anchors = [
+  { id: 'a-book', label: 'Rulebook', icon: 'assets/genre-modern.png', target: BK.id },
+  { id: 'a-map', label: 'Map', icon: 'assets/type-OFC.png', target: 'map' },
+  { id: 'a-party', label: 'Party', icon: 'assets/tool-pawns.png', target: 'party', box: { x: PX, y: -900, w: SW, h: SLOTS * RH + 900 } },
+  { id: 'a-sessions', label: 'Sessions', icon: 'assets/tool-build.png', target: 's1', box: { x: SX, y: SY, w: SBW, h: py - SY } },
+  { id: 'a-table', label: 'At the table', icon: 'assets/tool-build.png', target: 'round', box: { x: SX, y: TBY, w: SBW, h: TBH } },
+];
+arrowsEl.innerHTML = anchors.map(a => `<div class="arrow" data-anchor="${a.id}" tabindex="0" role="button" style="opacity:0;pointer-events:none"><img src="${a.icon}" alt=""><span>${a.label}</span><span class="dir">➜</span></div>`).join('');
+function contentCoverage() {
+  // how much of the screen is covered by real things (not bands/zones)
+  let area = 0; const vw = W(), vh = H();
+  for (const id in nodes) { const n = nodes[id]; if (!n.box || n.kind === 'zone' || n.kind === 'now') continue;
+    const x0 = Math.max(0, (n.box.x - cam.x) * cam.s), y0 = Math.max(0, (n.box.y - cam.y) * cam.s);
+    const x1 = Math.min(vw, (n.box.x + n.box.w - cam.x) * cam.s), y1 = Math.min(vh, (n.box.y + n.box.h - cam.y) * cam.s);
+    if (x1 > x0 && y1 > y0) area += (x1 - x0) * (y1 - y0); }
+  return area / (vw * vh);
+}
+function edgeArrows() {
+  const lost = contentCoverage() < 0.1, vw = W(), vh = H(), cx = vw / 2, cy = vh / 2, inset = 54;
+  const pts = [];
+  anchors.forEach(a => {
+    const e = arrowsEl.querySelector(`[data-anchor="${a.id}"]`), b = a.box || nodes[a.target].box;
+    const sx = (b.x + b.w / 2 - cam.x) * cam.s, sy = (b.y + b.h / 2 - cam.y) * cam.s;
+    const onScreen = (b.x + b.w - cam.x) * cam.s > 0 && (b.x - cam.x) * cam.s < vw && (b.y + b.h - cam.y) * cam.s > 0 && (b.y - cam.y) * cam.s < vh;
+    if (!lost || onScreen) { e.style.opacity = 0; e.style.pointerEvents = 'none'; return; }
+    const dx = sx - cx, dy = sy - cy, k = Math.min((vw / 2 - inset - 60) / Math.abs(dx || 1e-6), (vh / 2 - inset) / Math.abs(dy || 1e-6));
+    let px = cx + dx * k, py = cy + dy * k;
+    pts.forEach(p => { if (Math.abs(p[0] - px) < 150 && Math.abs(p[1] - py) < 44) py += py < cy ? 46 : -46; }); pts.push([px, py]);
+    e.style.left = px + 'px'; e.style.top = py + 'px'; e.style.opacity = 1; e.style.pointerEvents = 'auto';
+    e.querySelector('.dir').style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+  });
+}
+arrowsEl.addEventListener('click', ev => { const a = ev.target.closest('[data-anchor]'); if (!a) return; const an = anchors.find(x => x.id === a.dataset.anchor);
+  if (an.box) flyToView(viewFor(an.box, 1.05)); else flyTo(an.target); });
+arrowsEl.addEventListener('keydown', ev => { if (ev.key === 'Enter') ev.target.click(); });
+
+const threadsSvg = $('#threads'), tends = $('#tends');
+let threadSrc = null;       // { pcId, key, pinned }
+// ------------------------------------------------------------------ frame loop
+function labelPass() {
+  for (const l of labels) { const f = l.size * cam.s; const lo = l.over ? 40 : 70, hi = l.over ? 110 : 260; const end = l.over ? 0 : 0.05;
+    const o = f <= lo ? 0.9 : f >= hi ? end : 0.9 - (f - lo) / (hi - lo) * (0.9 - end); if (l._o !== o) { l.e.style.opacity = o.toFixed(2); l.e.style.visibility = o < 0.01 ? 'hidden' : ''; l._o = o; } }
+}
+function frame() {
+  if (dirty) { dirty = false; labelPass(); edgeArrows(); drawThreads(); pagesPass(); }
+  requestAnimationFrame(frame);
+}
+
+// ------------------------------------------------------------------ input
+let pan = null, pinch = null; const ptrs = new Map();
+const interactive = t => t.closest('button, input, select, textarea, label, a, [contenteditable], .chip, .tend, .arrow, [data-go], .opt, [data-act], [data-tok], .portrait');
+vp.addEventListener('pointerdown', ev => {
+  ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }; pan = null; return; }
+  if (dragNote || interactive(ev.target)) return;
+  pan = { sx: ev.clientX, sy: ev.clientY, cx: cam.x, cy: cam.y, moved: false };
+});
+window.addEventListener('pointermove', ev => {
+  if (ptrs.has(ev.pointerId)) ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (pinch && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+    cam.x -= (cx - pinch.cx) / cam.s; cam.y -= (cy - pinch.cy) / cam.s; zoomAt(cx, cy, d / pinch.d); pinch = { d, cx, cy }; return; }
+  if (dragNote) { const n = dragNote; n.nt.x = n.ox + (ev.clientX - n.sx) / cam.s; n.nt.y = n.oy + (ev.clientY - n.sy) / cam.s; place(n.e, n.nt.x, n.nt.y); nodes[n.nt.id].box = { ...nodes[n.nt.id].box, x: n.nt.x, y: n.nt.y }; return; }
+  if (!pan) return;
+  const dx = ev.clientX - pan.sx, dy = ev.clientY - pan.sy;
+  if (!pan.moved && Math.hypot(dx, dy) < 4) return;
+  if (!pan.moved) { pan.moved = true; vp.classList.add('panning'); if (anim) { cancelAnimationFrame(anim.raf); anim = null; } }
+  cam.x = pan.cx - dx / cam.s; cam.y = pan.cy - dy / cam.s; apply();
+});
+const up = ev => { ptrs.delete(ev.pointerId); if (ptrs.size < 2) pinch = null; if (dragNote) { dragNote = null; persist(); } pan = null; vp.classList.remove('panning'); };
+window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+vp.addEventListener('wheel', ev => {
+  { const sc = ev.target.closest?.('.scrolly'); if (sc && !ev.ctrlKey && !ev.metaKey && sc.scrollHeight > sc.clientHeight + 2) { ev.preventDefault(); sc.scrollTop += ev.deltaY / cam.s; return; } }
+  ev.preventDefault(); if (anim) { cancelAnimationFrame(anim.raf); anim = null; }
+  const mouseWheel = ev.deltaMode === 1 || (ev.deltaX === 0 && Math.abs(ev.deltaY) >= 50 && Number.isInteger(ev.deltaY));
+  if (ev.ctrlKey || ev.metaKey) zoomAt(ev.clientX, ev.clientY, Math.exp(-ev.deltaY * 0.01));
+  else if (mouseWheel && !ev.shiftKey) zoomAt(ev.clientX, ev.clientY, Math.exp(-ev.deltaY * (ev.deltaMode === 1 ? 0.05 : 0.0018)));
+  else { cam.x += (ev.shiftKey && !ev.deltaX ? ev.deltaY : ev.deltaX) / cam.s; cam.y += (ev.shiftKey && !ev.deltaX ? 0 : ev.deltaY) / cam.s; apply(); }
+}, { passive: false });
+vp.addEventListener('dblclick', ev => {
+  if (interactive(ev.target)) return;
+  const hit = ev.target.closest('[data-id]');
+  const id = hit?.dataset.id;
+  if (id && nodes[id] && !['zone'].includes(nodes[id].kind) && !hit.dataset.band) {
+    // the deepest meaningful thing: a builder region on a sheet, else the node
+    const b = ev.target.closest('.builder'); flyTo(b ? b.dataset.id : id); return;
+  }
+  const wx = cam.x + ev.clientX / cam.s, wy = cam.y + ev.clientY / cam.s;
+  const k = Math.max(0.05, Math.min(60, 0.85 / cam.s)); const nt = { id: 'n-' + Date.now().toString(36), x: wx - 110 * k, y: wy - 20 * k, k, text: '' };
+  state.notes.push(nt); const e = makeNote(nt); persist();
+  e.querySelector('.body').focus({ preventScroll: true });
+});
+document.addEventListener('click', ev => {
+  const go = ev.target.closest('[data-go]');
+  if (go && !ev.target.closest('.opt:not(.sel)')) { ev.preventDefault(); ev.stopPropagation(); flyTo(go.dataset.go); return; }
+  const act = ev.target.closest('[data-act]'); if (act && act.tagName === 'BUTTON' && !act.disabled) { doAct(act); return; }
+  const v = ev.target.closest('.main .pv[data-prov]');
+  if (v) { const pcId = v.closest('[data-id]').dataset.id; const same = threadSrc && threadSrc.pinned && threadSrc.pcId === pcId && threadSrc.key === v.dataset.prov;
+    document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned'));
+    threadSrc = same ? null : { pcId, key: v.dataset.prov, pinned: true }; if (threadSrc) v.classList.add('pinned'); dirty = true; return; }
+  if (threadSrc?.pinned && !pan) { threadSrc = null; document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned')); dirty = true; }
+}, true);
+document.addEventListener('pointerover', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v && !threadSrc?.pinned) { threadSrc = { pcId: v.closest('[data-id]').dataset.id, key: v.dataset.prov }; dirty = true; } });
+document.addEventListener('pointerout', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v && threadSrc && !threadSrc.pinned) { threadSrc = null; dirty = true; } });
+document.addEventListener('focusin', ev => { const v = ev.target.closest?.('.main .pv[data-prov]'); if (v) { threadSrc = { pcId: v.closest('[data-id]').dataset.id, key: v.dataset.prov }; dirty = true; } });
+// ---- builder and sheet actions: every control writes the choices object, then the sheet is recomputed
+function getPath(o, path) { return path.split('.').reduce((a, k) => a == null ? a : a[k], o); }
+function setPath(o, path, v) { const ks = path.split('.'), last = ks.pop(); const t = ks.reduce((a, k) => (a[k] = a[k] ?? {}), o); if (v === null || v === '' || (v === 0 && ks.length)) delete t[last]; else t[last] = v; }
+function doAct(a) {
+  if (a.dataset.act === 'finish') { endBuild(true); return; }
+  if (a.dataset.act === 'newpc') { const id = newRunner(a.dataset.slot); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); return; }
+  const pc = pcById[a.dataset.pc]; if (!pc) return;
+  const ch = choicesOf(pc), act = a.dataset.act, path = a.dataset.path;
+  if (!RIG_NO_UNDO.has(act)) pushUndo();
+  if (rigAct(act, a, pc, ch)) return;
+  if (act === 'inc') { const v = (getPath(ch, path) ?? (path.startsWith('skills.') ? 1 : 0)) + +a.dataset.d; setPath(ch, path, Math.max(+a.dataset.min, Math.min(+a.dataset.max, v))); }
+  else if (act === 'set') { const v = a.dataset.v; setPath(ch, path, getPath(ch, path) === v ? null : v); }
+  else if (act === 'flag') { setPath(ch, path, getPath(ch, path) ? null : 1); }
+  else if (act === 'toggle') { const arr = getPath(ch, path) || []; const v = a.dataset.v; const max = +a.dataset.max || 99;
+    setPath(ch, path, arr.includes(v) ? arr.filter(x => x !== v) : (arr.length >= max ? [...arr.slice(1), v] : [...arr, v])); }
+  else if (act === 'asof') { state.asof[pc.id] = +a.dataset.v; renderSheet(pc); return; }
+  persist(); renderSheet(pc);
+}
+document.addEventListener('input', ev => {
+  const i = ev.target.closest('input[data-act="name"], input[data-act="player"]'); if (!i) return; const pc = pcById[i.dataset.pc]; const ch = choicesOf(pc);
+  if (i.dataset.act === 'player') { pc.player = i.value; const x = state.extra.find(e => e.id === pc.id); if (x) x.player = i.value; persist(); box_who(pc); return; }
+  ch.name = i.value; persist();
+  const box = sheetEls[pc.id], nm = ch.name || `New ${WORDS.char}`; box.querySelector('.nm').textContent = nm; box.querySelector('.nm').classList.toggle('empty', !ch.name); nodes[pc.id].title = nm; });
+document.addEventListener('change', ev => { const s = ev.target.closest('select[data-act="wire"]'); if (!s) return; const pc = pcById[s.dataset.pc]; choicesOf(pc).wire = s.value || null; persist(); renderSheet(pc); });
+
+// ---- the book's pages: every page is always drawn; pdf.js sharpens a page once you are close
+let pdfDoc = null, pdfFailed = false;
+(async () => {
+  try {
+    if (!window.pdfjsLib) throw new Error('pdf.js did not load');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfDoc = await pdfjsLib.getDocument(C.book.file).promise; dirty = true;
+  } catch (e) { pdfFailed = true; console.warn('Book pages unavailable:', e.message);
+    pageFrames.forEach(o => { o.el.querySelector('.ph').innerHTML = `${o.n}<small style="display:block;font-size:30px">The page could not be drawn here.</small>`; }); }
+})();
+// every page is always there (E1): a thumbnail first, sharpened only when it is big on screen; a few sharp pages at a time
+let pagesBusy = 0;
+const SHARP_MAX = 14;
+function renderPage(o, width) {
+  pagesBusy++; o._busy = true;
+  return pdfDoc.getPage(o.n).then(page => { const v1 = page.getViewport({ scale: 1 }), v = page.getViewport({ scale: width / v1.width });
+    const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height);
+    return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { if (width <= 240) o._thumb = c; o.el.querySelector('.cv').replaceChildren(c); o._res = width; o._used = performance.now(); });
+  }).catch(e => console.warn('page', o.n, e.message)).finally(() => { pagesBusy--; o._busy = false; dirty = true; });
+}
+function pagesPass() {
+  if (!pdfDoc) return;
+  const vw = W(), vh = H(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const scored = pageFrames.map(o => { const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
+    return { o, sw, on: !(x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0) }; });
+  for (const { o, sw, on } of scored.sort((a, b) => (b.on - a.on) || (b.sw - a.sw))) {
+    if (pagesBusy >= 2) break;
+    if (o._busy) continue;
+    const want = !o._thumb ? 200 : on && sw * dpr > 1300 ? 2600 : on && sw * dpr > 240 ? 1300 : 0;
+    if (want && (o._res || 0) < want) renderPage(o, want);
+  }
+  if (pagesBusy < 2 && pageFrames.some(o => !o._thumb && !o._busy)) dirty = true;      // keep filling thumbnails in the background
+  const sharp = scored.filter(x => (x.o._res || 0) >= 1300 && !x.on).sort((a, b) => a.o._used - b.o._used);
+  const nSharp = pageFrames.filter(o => (o._res || 0) >= 1300).length;
+  for (let k = 0; k < nSharp - SHARP_MAX && k < sharp.length; k++) { const o = sharp[k].o; if (o._thumb) { o.el.querySelector('.cv').replaceChildren(o._thumb); o._res = 200; } }
+}
+document.addEventListener('keydown', ev => {
+  const typing = ev.target.closest('input, [contenteditable]');
+  if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); openPal(); return; }
+  if (typing) { if (ev.key === 'Escape') ev.target.blur(); return; }
+  if (ev.key === '/') { ev.preventDefault(); openPal(); }
+  else if (ev.altKey && ev.key === 'ArrowLeft') goBack();
+  else if (ev.altKey && ev.key === 'ArrowRight') goFwd();
+  else if (ev.key === '0') overview();
+  else if (ev.key === '+' || ev.key === '=') zoomAt(W() / 2, H() / 2, 1.4);
+  else if (ev.key === '-') zoomAt(W() / 2, H() / 2, 1 / 1.4);
+  else if (ev.key.startsWith('Arrow')) { const d = 120 / cam.s; if (ev.key === 'ArrowLeft') cam.x -= d; if (ev.key === 'ArrowRight') cam.x += d; if (ev.key === 'ArrowUp') cam.y -= d; if (ev.key === 'ArrowDown') cam.y += d; apply(); }
+});
+window.addEventListener('resize', apply);
+
+// ------------------------------------------------------------------ start: the whole cluster
+setView(viewFor(BOUNDS, 1.02));
+window.almanac = { cam, flyTo, nodes, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
+requestAnimationFrame(frame);
+})();
+</script>

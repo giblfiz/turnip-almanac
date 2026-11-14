@@ -685,3 +685,15 @@ img { max-width: none; }
 .sumside { flex: 1; min-width: 0; position: relative; overflow: hidden; }
 .ss-in { display: flex; flex-direction: column; gap: 8px; }
 .ss-in .mbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+/* BRP sheet: characteristics grid and skill categories */
+.chgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.chbox { background: var(--band); border-radius: 14px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.chbox .k { font-size: 13px; letter-spacing: .1em; color: var(--ink-2); font-weight: 600; }
+.chbox .crl { font-size: 14px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.chbox .crl .die { width: 30px; height: 30px; font-size: 15px; }
+.skgrid { columns: 3; column-gap: 18px; }
+.skcat { break-inside: avoid; margin-bottom: 12px; background: var(--band); border-radius: 14px; overflow: hidden; }
+.skcat .sk { grid-template-columns: max-content auto auto; justify-content: space-between; }
+.rollall { width: 100%; }
+.roll .dd i.big { font-weight: 800; }
+.roll .dd i.bad { background: #b3412c; color: #fff; border-color: #b3412c; }

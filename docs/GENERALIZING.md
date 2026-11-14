@@ -109,6 +109,20 @@ The evals in SPEC §3 carry over unchanged and must pass on the rebuilt page.
    virtualisation (95%), and the chargen grammar needs one new widget (a level-by-level progression) (60%).
 If prediction 1 fails, the seam is wrong; fix the seam before touching the big book.
 
+**Result (2026-11-13): the seam was tested with Basic Roleplaying instead** (ORC, 303 pages, d100 roll-under; chosen
+over the two above as big *and* not D&D-shaped). Scoring the predictions that transfer:
+- *Zero engine changes* — **failed, mildly.** Five leaks had to be closed in the engine (per-campaign storage key, dice
+  tray, book anchor id, shelf layout, the builder's step list). None changed the seam's shape; all were SSR names
+  hard-coded where the rig should have been asked. After them, the engine runs both systems unchanged.
+- *A complete rig in a modest size* — rig 102 lines + rig UI 222 lines + extracted data (JSON). Larger than the
+  150-line L&F guess, as expected for a full system.
+- *The chargen grammar needs one new widget* — **held**: "roll characteristics". Everything else (steppers,
+  pick-one grids, pick-many lists, the All done step) reused the seven.
+- *Big sheets hit the fit floor* — **nearly held**: 58 skills fit at zoom 0.47 against a 0.45 floor. A bigger
+  sheet needs a second page or a taller sheet; that is the next E2/E6 decision.
+- *The book needs virtualisation* — **held in part**: 303 pages needed progressive thumbnails and a cap of 14
+  sharp pages to stay smooth.
+
 ## 7. Open, not decided
 - The notes language (H: "a whole language… needs real consideration"): @mentions create people today; what about
   places, items, times, rolls, secrets?
