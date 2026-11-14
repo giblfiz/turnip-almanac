@@ -96,6 +96,7 @@ window.RIG = (() => {
     'Skill category bonuses (optional rule, p.18) are off.',
     'Powers: magic is budgeted by power level (4 spells at Normal); the other four systems are listed for choosing without a budget yet.',
     'The magic spell Ward is costed at 3 PP (its entry), not 1 (the summary table).',
+    'Experience: a successful roll made in the Almanac ticks the skill\'s check; the GM takes back checks for Easy rolls. The improvement roll is d100 plus the experience bonus, needing to beat the skill; a gain is 1D6 (1D8 Epic, 1D10 Superhuman), rolled rather than the flat option.',
   ];
   return { D, CH, CH_NAME, SK, SKILLS, PROF, LEVELS, WEAPONS, W_BY, ARMOR, A_BY, POWERS, powerList, P, evalF, baseOf, skillOfWeapon, dmgBonus,
     blank, compute, roll, resistance, rollDice, rollChars, interpretations, name: 'Basic Roleplaying (ORC)' };

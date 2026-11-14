@@ -766,6 +766,13 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .notemenu .nmfoot { font-size: 12px; color: var(--ink-3); line-height: 1.35; }
 .loose .grip .dots, .loose .grip .nvis { pointer-events: none; }
 .loose .grip .nmenu, .loose .grip .ndel { z-index: 1; }
+/* advancement */
+.karmabar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 10px 0 14px; font-size: 22px; }
+.karmabar > span:first-child { font-weight: 600; }
+.karmabar .e { color: var(--ink-2); font-size: 18px; }
+.karmabar select { font: 500 20px var(--f-body); padding: 10px 12px; border-radius: 12px; border: 2px solid var(--rule); background: var(--paper); color: var(--ink); max-width: 100%; }
+.karmabar .opt { flex: 1 1 260px; }
+.sk.xp .k::after { content: ' ✓'; color: var(--ochre); font-weight: 700; font-size: .8em; }
 </style>
 <div id="vp" aria-label="Campaign canvas"><div id="world"></div></div>
 <svg id="threads"></svg>
@@ -798,11 +805,11 @@ const store = {
   set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -983,18 +990,18 @@ function choicesOf(pc) { return state.choices[pc.id] || (state.choices[pc.id] = 
 const sheetEls = {};
 // Simplified Shadowrun 2e: the rule-specific half of the app (builder steps, sheet, rolls, summons, round order,
 // dice tray, quickbar vocabulary). Inserted by build.sh at /*@RIG-UI@*/ inside the app's scope.
-const WORDS = { quickHint: 'Jump or do: tusk guns, roll 6 tn 4, new runner, round order…', char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
+const WORDS = { xp: 'Karma', xpVerb: 'Karma', quickHint: 'Jump or do: tusk guns, roll 6 tn 4, new runner, round order…', char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
 // an advancement entry (karma spent) as text for the session cards
 function advanceText(k) { return (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', '); }
 const RIG_NO_UNDO = new Set(['roll', 'sroll', 'sum-open', 'sum-cancel']);
-const STEP_NAME = { done: 'all done', meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
+const STEP_NAME = { adv: 'advancement', done: 'all done', meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
 const BCOLS = [['name', 'meta', 'attr', 'life', 'deck'], ['skills', 'magic'], ['cyber', 'veh'], ['gear', 'circles', 'done']];
-const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done'];
-const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start' };
-const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4', magic: '.l-magic', cyber: '.l-cyber', gear: '.l-gear', veh: '.l-veh', deck: '.l-veh', circles: '.l-circles', life: '.l-life', done: '.budget' };
+const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done', 'adv'];
+const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start', adv: 'p-karma' };
+const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4', magic: '.l-magic', cyber: '.l-cyber', gear: '.l-gear', veh: '.l-veh', deck: '.l-veh', circles: '.l-circles', life: '.l-life', done: '.budget', adv: '.budget' };
 const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
 // how much each step holds (measured at one column's width); the engine splits the builder into golden cells by these
-const BAREA = { name: 0.45, meta: 0.9, attr: 0.5, skills: 1.15, magic: 1.0, cyber: 1.2, gear: 1.4, veh: 1.05, deck: 0.75, circles: 0.9, life: 0.45, done: 0.5 };
+const BAREA = { name: 0.45, meta: 0.9, attr: 0.5, skills: 1.15, magic: 1.0, cyber: 1.2, gear: 1.4, veh: 1.05, deck: 0.75, circles: 0.9, life: 0.45, done: 0.5, adv: 1.1 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -1075,6 +1082,20 @@ function stepHtml(pc, S, key) {
     h += `${stepHead(S, 'circles', '9', 'Social circles', P.circles)}<div class="hint">Contact 1 pt [6L], friend 3 [9M], patron 5 [12S]. First two contacts free.</div><div class="rows one">`;
     R.CIRCLES.forEach(c => { const cur = ch.circles[c] || ''; h += `<div class="row${cur ? ' on' : ''}"><div><b>${c}</b></div><div class="seg">${['', 'contact', 'friend', 'patron'].map(l => `<button class="${cur === l ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="circles.${c}" data-v="${l}">${l ? R.CIRCLE_LV[l].name : 'None'}</button>`).join('')}</div></div>`; });
     h += `</div>`;
+  }
+  if (key === 'adv') {
+    // after creation: karma for the latest session, then spend it (rules p.4: the next point costs what it costs at
+    // creation; a spell costs 3; skills stop at the karma cap)
+    const n = advSession(), mine = (state.adv[pc.id] || []).find(x => x.s === n) || {}, left = S.karma.earned - S.karma.spent;
+    const rated = sk => { let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; })); return r; };
+    h += `${stepHead(S, 'adv', '★', 'Advancement', STEP_RULE.adv)}<div class="hint">Karma for S${n} (the latest session), then spend it. A skill's next point costs what it would at creation; a spell costs 3; skills stop at ${R.KARMA_CAP}.</div>
+      <div class="karmabar"><span>Karma for S${n}</span><div class="stepper"><button data-act="kaward" data-pc="${pc.id}" data-d="-1" ${(mine.award || 0) <= 0 ? 'disabled' : ''} aria-label="Less karma">−</button><output>${mine.award || 0}</output><button data-act="kaward" data-pc="${pc.id}" data-d="1" aria-label="More karma">+</button></div>
+      <b>${left} to spend</b> <span class="e">${S.karma.earned} earned in all</span>${(mine.buy || []).length ? ` <button class="opt kundo" data-act="kundo" data-pc="${pc.id}"><b>Take back the last spend</b></button>` : ''}</div><div class="opts">`;
+    R.ALL_SKILLS.forEach(sk => { const r = rated(sk), c = r >= R.KARMA_CAP ? null : R.skillCost(r, r + 1), ok = c != null && c <= left;
+      h += `<button class="opt" data-act="kbuy" data-pc="${pc.id}" data-skill="${sk}" ${ok ? '' : 'disabled'}><b>${esc(R.SK_NAME[sk])} ${r} → ${r + 1}${c != null ? `<em>${c}</em>` : ''}</b><span>${c == null ? 'at the cap' : ok ? 'karma' : 'not enough karma'}</span></button>`; });
+    h += `</div>`;
+    if (S.trad && ch.trad !== 'adept') { const known = new Set([...(ch.spells || []), ...karmaOf(pc).flatMap(k => (k.buy || []).filter(b => b.spell).map(b => b.spell))]);
+      h += `<div class="grouph"><span>Learn a spell · 3 karma</span></div><div class="opts">` + R.SPELLS.filter(sp => !known.has(sp.id)).map(sp => `<button class="opt" data-act="kspell" data-pc="${pc.id}" data-spell="${sp.id}" ${left >= 3 ? '' : 'disabled'}><b>${esc(sp.name)}<em>3</em></b><span>${esc(sp.eff || '')}</span></button>`).join('') + `</div>`; }
   }
   if (key === 'done') {
     const legal = !S.warn.length;
@@ -1277,6 +1298,14 @@ function rigCommands(q, ws, nums, pcw) {
   return out;
 }
 function rigAct(act, a, pc, ch) {
+  if (act === 'kaward' || act === 'kbuy' || act === 'kspell' || act === 'kundo') {
+    const n = advSession(), e = advEntry(pc, n), nm = ch.name || 'A runner';
+    if (act === 'kaward') { e.award = Math.max(0, (e.award || 0) + +a.dataset.d); historyNote(`${nm}: karma for S${n} now ${e.award}`); }
+    if (act === 'kbuy') { const sk = a.dataset.skill; let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; }));
+      (e.buy = e.buy || []).push({ skill: sk, to: r + 1 }); historyNote(`${nm}: ${R.SK_NAME[sk]} ${r} → ${r + 1} with karma`); }
+    if (act === 'kspell') { (e.buy = e.buy || []).push({ spell: a.dataset.spell }); historyNote(`${nm} learned ${R.SPELL_BY_ID[a.dataset.spell].name} with karma`); }
+    if (act === 'kundo') { const b = (e.buy || []).pop(); if (b) historyNote(`${nm}: took back ${b.skill ? R.SK_NAME[b.skill] + ' → ' + b.to : R.SPELL_BY_ID[b.spell].name}`); }
+    refreshAdv(pc, n); return true; }
   if (act === 'sroll') { const sm = summonOf(pc); if (!sm) return true; const t = R.SUMMONS.find(x => x.id === sm.type), r = R.roll(sm.rating, 4);
     const rec = { label: `${choicesOf(pc).name || 'Runner'} · ${t.name} · ${a.dataset.tool}`, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
     (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec }); toast(rec, a); renderSheet(pc); return true; }
@@ -1365,7 +1394,16 @@ function fitSections(box) {
     f.style.zoom = lo; f.style.width = (W / lo) + 'px'; f.dataset.z = lo.toFixed(2);
   });
 }
-function sheetOf(pc) { return R.compute(choicesOf(pc), pc.karma || [], state.asof[pc.id] ?? 99); }
+// advancement (H, 14 Nov: "how experience gets spent … comes up in every system"): the campaign's own log for a character,
+// then what was added at this table, each entry filed under a session. The rig says what an entry can hold.
+function karmaOf(pc) { return [...(pc.karma || []), ...(state.adv[pc.id] || [])].sort((a, b) => a.s - b.s); }
+// the session advancement is filed under: the latest one played
+function advSession() { let L; try { L = allSessions(); } catch { L = C.sessions; } return Math.max(0, ...L.filter(x => !x.prep).map(x => x.n)); }
+function advEntry(pc, n = advSession()) { const L = state.adv[pc.id] = state.adv[pc.id] || []; let e = L.find(x => x.s === n);
+  if (!e) { e = { s: n, id: `adv-${pc.id}-${n}` }; L.push(e); } return e; }
+// after an advancement change: the sheet, and the session card it is filed under
+function refreshAdv(pc, n) { persist(); renderSheet(pc); const x = (typeof sessionEls !== 'undefined' ? sessionEls : []).find(q => q.s.n === n); if (x) { renderSessionCard(x); fitCard(x.card); } }
+function sheetOf(pc) { return R.compute(choicesOf(pc), karmaOf(pc), state.asof[pc.id] ?? 99); }
 
 function placeSheet(pc, slot) {
   if (sheetEls[pc.id]) { sheetEls[pc.id].remove(); }
@@ -1503,7 +1541,7 @@ function renderSessionCard(x, measuring) {
   const s = x.s, card = x.card, meta = state.smeta[s.n] || {};
   const groups = [];
   (state.snotes[s.n] || []).forEach(n => { let g = groups.find(q => q.who === n.who); if (!g) groups.push(g = { who: n.who, notes: [] }); g.notes.push(n); });
-  C.pcs.forEach(pc => { const ks = (pc.karma || []).filter(k => k.s === s.n); if (!ks.length) return; let g = groups.find(q => q.who === pc.id); if (!g) groups.push(g = { who: pc.id, notes: [] }); g.karma = ks; });
+  PCS.forEach(pc => { const ks = karmaOf(pc).filter(k => k.s === s.n && (k.award || advanceText(k))); if (!ks.length) return; let g = groups.find(q => q.who === pc.id); if (!g) groups.push(g = { who: pc.id, notes: [] }); g.karma = ks; });
   const order = id => pcById[id] ? 0 : npcIndex[id] ? 1 : C.threads.find(t => t.id === id) ? 2 : 3;
   groups.sort((a, b) => order(a.who) - order(b.who));
   const title = meta.title ?? s.title, recap = meta.recap ?? (s.recap || 'Ideas sit here, unsettled, until the table makes them true.');
@@ -1518,7 +1556,7 @@ function renderSessionCard(x, measuring) {
     const ge = el('div', 'sgroup' + (sj.thread ? ' thread' : ''), `<div class="sgh" ${sj.go ? `data-go="${sj.go}"` : ''}>${sj.icon ? `<span class="sgimg"><img src="${sj.icon}" alt="" draggable="false"></span>` : `<span class="tdot">${sj.general ? '✎' : '?'}</span>`}<b>${esc(sj.name)}</b></div>`);
     (g.karma || []).forEach(k => {
       const buys = advanceText(k);
-      const e = el('div', 'snote karma', `<span class="kk">Karma +${k.award || 0}</span>${buys ? ` <b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
+      const e = el('div', 'snote karma', `${k.award ? `<span class="kk">${WORDS.xp || 'Karma'} +${k.award}</span> ` : `<span class="kk">${WORDS.xpVerb || 'Advanced'}</span> `}${buys ? `<b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
       ge.appendChild(e); reg(k.id, { el: e, title: `${sj.name} · karma S${s.n}${buys ? ': ' + buys : ''}`, kind: 'karma', sub: `S${s.n}` });
     });
     g.notes.forEach(n => { const ms = new Set(); const e = el('div', 'snote ed' + (s.prep ? ' idea' : ''), renderNote(n.text, n.id, ms)); e.dataset.note = n.id; e.dataset.s = s.n; e.tabIndex = 0; ge.appendChild(e);
@@ -1966,10 +2004,10 @@ document.fonts?.ready.then(() => { PCS.forEach(pc => fitSections(sheetEls[pc.id]
 let lastPt = { x: 0, y: 0 }, lastRollAt = 0;
 window.addEventListener('pointermove', ev => { lastPt = { x: ev.clientX, y: ev.clientY }; }, { passive: true });
 const undo = [], redo = [];
-function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof, order: state.order, removed: state.removed }); }
+function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof, order: state.order, removed: state.removed, adv: state.adv, checks: state.checks }); }
 function pushUndo() { undo.push(snap()); if (undo.length > 60) undo.shift(); redo.length = 0; }
 function restore(json) { const o = JSON.parse(json); const party = JSON.stringify([o.order, o.removed]) !== JSON.stringify([state.order, state.removed]);
-  Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof, order: o.order || state.order, removed: o.removed || state.removed }); persist();
+  Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof, order: o.order || state.order, removed: o.removed || state.removed, adv: o.adv || state.adv, checks: o.checks || state.checks }); persist();
   if (party) { location.reload(); return; } PCS.forEach(renderSheet); }
 function doUndo() { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); }
 function doRedo() { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); }

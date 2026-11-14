@@ -2,18 +2,18 @@
 // Contract (what the engine calls): WORDS, RIG_NO_UNDO, advanceText, STEP_NAME, BCOLS, ORDER, STEP_RULE, STEP_SHEET,
 // BIW, BINNER, BREG, BK_K, stepHtml, renderSheet, rollHtml, portraitOf, initiative, renderTable, freeRoll, qdice2,
 // trayStep, trayRoll, rigCommands, rigAct, box_who.
-const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', quickHint: 'Jump or do: ada dodge, roll 45, resist 12 10, new investigator…', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
+const WORDS = { xp: 'Experience', xpVerb: 'Improved', char: 'investigator', Char: 'Investigator', party: 'The investigators', quickHint: 'Jump or do: ada dodge, roll 45, resist 12 10, new investigator…', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
 const RIG_NO_UNDO = new Set(['roll', 'croll']);
 const P = R.P;
 function advanceText(k) { return (k.gain || []).map(g => `${R.SK[g.skill]?.name || g.skill} +${g.n}`).join(', '); }
-const STEP_NAME = { name: 'name', power: 'power level', chars: 'characteristics', prof: 'profession', profskills: 'professional skills', personal: 'personal skills', powers: 'powers', weapons: 'weapons', armor: 'armour', done: 'all done' };
-const ORDER = ['name', 'power', 'chars', 'prof', 'profskills', 'personal', 'powers', 'weapons', 'armor', 'done'];
+const STEP_NAME = { adv: 'advancement', name: 'name', power: 'power level', chars: 'characteristics', prof: 'profession', profskills: 'professional skills', personal: 'personal skills', powers: 'powers', weapons: 'weapons', armor: 'armour', done: 'all done' };
+const ORDER = ['name', 'power', 'chars', 'prof', 'profskills', 'personal', 'powers', 'weapons', 'armor', 'done', 'adv'];
 const BCOLS = [['name', 'power', 'chars', 'prof'], ['profskills', 'armor', 'done'], ['personal'], ['powers', 'weapons']];
-const STEP_RULE = { name: 'brp-step-1', power: 'brp-power-level', chars: 'brp-step-1', prof: 'brp-professions', profskills: 'brp-step-7', personal: 'brp-step-7', powers: 'brp-how-do-characters-get-powers', weapons: 'brp-weapons', armor: 'brp-armor', done: 'brp-step-7' };
-const STEP_SHEET = { name: '.nm', power: '.who', chars: '.chgrid', prof: '.who', profskills: '.skgrid', personal: '.skgrid', powers: '.l-powers', weapons: '.l-weapons', armor: '.l-armor', done: '.budget' };
+const STEP_RULE = { name: 'brp-step-1', power: 'brp-power-level', chars: 'brp-step-1', prof: 'brp-professions', profskills: 'brp-step-7', personal: 'brp-step-7', powers: 'brp-how-do-characters-get-powers', weapons: 'brp-weapons', armor: 'brp-armor', done: 'brp-step-7', adv: 'brp-increasing-skills-by-experience' };
+const STEP_SHEET = { name: '.nm', power: '.who', chars: '.chgrid', prof: '.who', profskills: '.skgrid', personal: '.skgrid', powers: '.l-powers', weapons: '.l-weapons', armor: '.l-armor', done: '.budget', adv: '.skgrid' };
 const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
 // how much each step holds (its share of the builder); the engine splits the builder into golden cells by these
-const BAREA = { name: 0.45, power: 0.5, chars: 1.1, prof: 2.4, profskills: 1.2, personal: 2.8, powers: 1.7, weapons: 2.5, armor: 1.2, done: 0.55 };
+const BAREA = { name: 0.45, power: 0.5, chars: 1.1, prof: 2.4, profskills: 1.2, personal: 2.8, powers: 1.7, weapons: 2.5, armor: 1.2, done: 0.55, adv: 1.2 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -80,6 +80,17 @@ function stepHtml(pc, S, key) {
     R.ARMOR.forEach(a => h += opt('armor', a.id, ch.armor, a.name, `AP ${a.ap} · ${a.era || ''}`));
     h += `</div>`;
   }
+  if (key === 'adv') {
+    // experience (rules p.138): a skill used successfully earns a check; at the adventure's end each checked skill is
+    // rolled: d100 plus the experience bonus over the skill raises it by 1D6 (1D8 Epic, 1D10 Superhuman)
+    const n = advSession(), checks = state.checks[pc.id] || [], gd = gainDie(ch);
+    h += `${stepHead(S, 'adv', '★', 'Advancement', STEP_RULE.adv)}<div class="hint">A skill used successfully earns a check (rolls made here tick it; take back any that were Easy). At the end of the session, each checked skill rolls d100 + ${S.der.xpBonus} (experience bonus) over its value to gain ${gd}.</div>
+      <div class="grouph"><span>Checks for S${n}</span></div><div class="opts">${checks.map(sk => `<button class="opt sel" data-act="xpdel" data-pc="${pc.id}" data-skill="${sk}"><b>${esc(R.SK[sk].name)}<em>${S.skill[sk]}%</em></b><span>checked · tap to take back</span></button>`).join('') || '<div class="crease">No checks yet. Succeed at a skill roll, or add one below.</div>'}</div>
+      <div class="karmabar"><select data-xpadd="${pc.id}" aria-label="Add an experience check"><option value="">+ Add a check…</option>${R.SKILLS.filter(x => !checks.includes(x.id)).map(x => `<option value="${x.id}">${esc(x.name)} (${S.skill[x.id]}%)</option>`).join('')}</select>
+      <button class="opt" data-act="xproll" data-pc="${pc.id}" ${checks.length ? '' : 'disabled'}><b>⚄ End of session: roll for improvement</b><span>${checks.length} skill${checks.length === 1 ? '' : 's'} · filed under S${n}</span></button></div>`;
+    const past = karmaOf(pc).filter(k => (k.gain || []).length || (k.tried || []).length);
+    if (past.length) h += `<div class="grouph"><span>Improvements so far</span></div><div class="rows one">` + past.map(k => `<div class="row on"><div><b>S${k.s}</b><span>${[...(k.gain || []).map(g => `${esc(R.SK[g.skill]?.name || g.skill)} +${g.n}${g.roll ? ` (rolled ${g.roll})` : ''}`), ...(k.tried || []).map(t => `${esc(R.SK[t.skill]?.name || t.skill)} no gain (rolled ${t.roll})`)].join(' · ')}</span></div></div>`).join('') + `</div>`;
+  }
   if (key === 'done') {
     const legal = !S.warn.length;
     h += `<div class="q"><span class="no">✓</span><h3>All done?</h3></div>
@@ -97,7 +108,9 @@ function rollHtml(r) {
 }
 function recFor(label, target) { const r = R.roll(target); return { label, roll: r.roll, target: r.target, level: r.level, ok: r.ok }; }
 function pushRoll(pc, rec, at) { const k = pc ? pc.id : '_free'; (state.rolls[k] = state.rolls[k] || []).unshift(rec); state.rolls[k] = state.rolls[k].slice(0, 8); persist(); toast(rec, at); logPush({ kind: 'roll', who: pc ? pc.id : 'gm', rec }); }
-function rollFor(pc, target, label, at) { pushRoll(pc, recFor(`${choicesOf(pc).name || WORDS.Char} · ${label}`, target), at); renderSheet(pc); }
+function rollFor(pc, target, label, at) { const rec = recFor(`${choicesOf(pc).name || WORDS.Char} · ${label}`, target); pushRoll(pc, rec, at);
+  const sk = at?.dataset?.skill; if (sk && rec.ok) { const L = state.checks[pc.id] = state.checks[pc.id] || []; if (!L.includes(sk)) { L.push(sk); historyNote(`${choicesOf(pc).name || WORDS.Char}: experience check in ${R.SK[sk].name}`); persist(); } }
+  renderSheet(pc); }
 
 // portraits: TW's modern townsfolk, picked by profession
 const TOKEN_FILES = window.TOKEN_FILES || {};
@@ -121,12 +134,12 @@ function renderSheet(pc) {
   const chip = (id, lab) => printIndex[id] ? `<span class="chip" data-go="${id}">${lab || 'p.' + printIndex[id].page}</span>` : '';
   const has = new Set((pc.karma || []).map(k => k.s));
   const asofBtns = ['Start', ...C.sessions.map(s => 'S' + s.n), 'Now'].map((lab, i) => { const val = lab === 'Now' ? 99 : i; const on = asOf === val; return `<button data-act="asof" data-pc="${pc.id}" data-v="${val}" class="${on ? 'on' : ''}${has.has(i) ? ' has' : ''}" aria-pressed="${on}">${lab}</button>`; }).join('');
-  const die = (target, label) => `<button class="die" data-act="roll" data-pc="${pc.id}" data-target="${target}" data-label="${esc(label)}" title="Roll ${esc(label)}: d100 vs ${target}%" aria-label="Roll ${esc(label)}">⚄</button>`;
+  const die = (target, label, sk) => `<button class="die" data-act="roll" data-pc="${pc.id}" data-target="${target}" data-label="${esc(label)}"${sk ? ` data-skill="${sk}"` : ''} title="Roll ${esc(label)}: d100 vs ${target}%" aria-label="Roll ${esc(label)}">⚄</button>`;
   const chars = R.D.characteristics.map(c => { const r = Object.values(S.croll).find(x => x.src === c.src); return `<div class="chbox"><div class="k">${c.id.toUpperCase()}</div>${pv('c:' + c.id, S.char[c.id] || '—', 'mid')}${r ? `<div class="crl">${esc(r.name.replace(' roll', ''))} ${r.v}% ${die(r.v, r.name)}</div>` : ''}</div>`; }).join('');
   const hpBoxes = Array.from({ length: S.der.hp }, (_, i) => `<button class="${live.dmg[i] ? 'L' : ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Hit point ${i + 1}">${live.dmg[i] ? '×' : ''}</button>`).join('');
   const hurt = live.dmg.filter(Boolean).length;
   const cats = [...new Set(R.SKILLS.map(s => s.category || 'Other'))];
-  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k" data-rule-of="s:${s.id}" role="link" tabindex="0">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
+  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}${(state.checks[pc.id] || []).includes(s.id) ? ' xp' : ''}" ${(state.checks[pc.id] || []).includes(s.id) ? 'title="Experience check this session"' : ''}><span class="k" data-rule-of="s:${s.id}" role="link" tabindex="0">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name, s.id)}</div>`).join('')}</div>`).join('');
   const weaponRows = S.weapons.map(w => { const sk = R.skillOfWeapon(w), v = sk ? S.skill[sk] : 0; return `<div><b>${esc(w.name)}</b> <span class="e">${esc(w.damage || '')}${w.range ? ' · ' + esc(w.range) : ''}</span> <button class="die sm" data-act="roll" data-pc="${pc.id}" data-target="${v}" data-label="${esc(w.name)}">⚄ ${esc(R.SK[sk]?.name || 'skill')} ${v}%</button></div>`; }).join('');
   const tok = portraitOf(pc, S);
   box.innerHTML = `
@@ -217,7 +230,21 @@ function rigCommands(q, ws, nums, pcw) {
   if (ws[0] === 'heal' && pcw) out.push({ k: 'cmd', t: `Clear ${choicesOf(pcw).name}’s damage`, run: () => { liveOf(pcw).dmg = []; persist(); renderSheet(pcw); } });
   return out;
 }
+const gainDie = ch => ({ epic: '1D8', superhuman: '1D10' })[ch.power] || '1D6';
+document.addEventListener('change', ev => { const sel = ev.target.closest?.('select[data-xpadd]'); if (!sel || !sel.value) return; const pc = pcById[sel.dataset.xpadd]; if (!pc) return;
+  pushUndo(); const L = state.checks[pc.id] = state.checks[pc.id] || []; if (!L.includes(sel.value)) L.push(sel.value); historyNote(`${choicesOf(pc).name || WORDS.Char}: experience check in ${R.SK[sel.value].name} (added by hand)`); persist(); renderSheet(pc); });
 function rigAct(act, a, pc, ch) {
+  if (act === 'xpdel') { state.checks[pc.id] = (state.checks[pc.id] || []).filter(x => x !== a.dataset.skill); historyNote(`${ch.name || WORDS.Char}: took back the check in ${R.SK[a.dataset.skill].name}`); persist(); renderSheet(pc); return true; }
+  if (act === 'xproll') {
+    const n = advSession(), e = advEntry(pc, n), S = sheetOf(pc), checks = state.checks[pc.id] || [], gd = gainDie(ch), out = [];
+    checks.forEach(sk => { const r = 1 + Math.floor(Math.random() * 100), over = r + S.der.xpBonus > S.skill[sk];
+      if (over) { const g = R.rollDice(gd); (e.gain = e.gain || []).push({ skill: sk, n: g, roll: r }); out.push(`${R.SK[sk].name} +${g} (${r}+${S.der.xpBonus} over ${S.skill[sk]})`); }
+      else { (e.tried = e.tried || []).push({ skill: sk, roll: r }); out.push(`${R.SK[sk].name} no gain (${r}+${S.der.xpBonus})`); } });
+    state.checks[pc.id] = [];
+    historyNote(`${ch.name || WORDS.Char} rolled for improvement after S${n}: ${out.join('; ')}`);
+    logPush({ kind: 'note', who: pc.id, text: `improvement rolls after S${n}: ${out.join('; ')}` });
+    toast({ msg: `${ch.name || WORDS.Char}: ${(e.gain || []).length} improved`, note: out.join(' · ') }, a);
+    refreshAdv(pc, n); return true; }
   if (act === 'roll') { rollFor(pc, +a.dataset.target, a.dataset.label, a); return true; }
   if (act === 'rollchars') { ch.char = R.rollChars(); persist(); renderSheet(pc); return true; }
   if (act === 'dmg') { const d = liveOf(pc).dmg, i = +a.dataset.i; d[i] = d[i] ? 0 : 1; persist(); renderSheet(pc); return true; }

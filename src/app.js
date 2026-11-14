@@ -15,11 +15,11 @@ const store = {
   set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -263,7 +263,16 @@ function fitSections(box) {
     f.style.zoom = lo; f.style.width = (W / lo) + 'px'; f.dataset.z = lo.toFixed(2);
   });
 }
-function sheetOf(pc) { return R.compute(choicesOf(pc), pc.karma || [], state.asof[pc.id] ?? 99); }
+// advancement (H, 14 Nov: "how experience gets spent … comes up in every system"): the campaign's own log for a character,
+// then what was added at this table, each entry filed under a session. The rig says what an entry can hold.
+function karmaOf(pc) { return [...(pc.karma || []), ...(state.adv[pc.id] || [])].sort((a, b) => a.s - b.s); }
+// the session advancement is filed under: the latest one played
+function advSession() { let L; try { L = allSessions(); } catch { L = C.sessions; } return Math.max(0, ...L.filter(x => !x.prep).map(x => x.n)); }
+function advEntry(pc, n = advSession()) { const L = state.adv[pc.id] = state.adv[pc.id] || []; let e = L.find(x => x.s === n);
+  if (!e) { e = { s: n, id: `adv-${pc.id}-${n}` }; L.push(e); } return e; }
+// after an advancement change: the sheet, and the session card it is filed under
+function refreshAdv(pc, n) { persist(); renderSheet(pc); const x = (typeof sessionEls !== 'undefined' ? sessionEls : []).find(q => q.s.n === n); if (x) { renderSessionCard(x); fitCard(x.card); } }
+function sheetOf(pc) { return R.compute(choicesOf(pc), karmaOf(pc), state.asof[pc.id] ?? 99); }
 
 function placeSheet(pc, slot) {
   if (sheetEls[pc.id]) { sheetEls[pc.id].remove(); }
@@ -401,7 +410,7 @@ function renderSessionCard(x, measuring) {
   const s = x.s, card = x.card, meta = state.smeta[s.n] || {};
   const groups = [];
   (state.snotes[s.n] || []).forEach(n => { let g = groups.find(q => q.who === n.who); if (!g) groups.push(g = { who: n.who, notes: [] }); g.notes.push(n); });
-  C.pcs.forEach(pc => { const ks = (pc.karma || []).filter(k => k.s === s.n); if (!ks.length) return; let g = groups.find(q => q.who === pc.id); if (!g) groups.push(g = { who: pc.id, notes: [] }); g.karma = ks; });
+  PCS.forEach(pc => { const ks = karmaOf(pc).filter(k => k.s === s.n && (k.award || advanceText(k))); if (!ks.length) return; let g = groups.find(q => q.who === pc.id); if (!g) groups.push(g = { who: pc.id, notes: [] }); g.karma = ks; });
   const order = id => pcById[id] ? 0 : npcIndex[id] ? 1 : C.threads.find(t => t.id === id) ? 2 : 3;
   groups.sort((a, b) => order(a.who) - order(b.who));
   const title = meta.title ?? s.title, recap = meta.recap ?? (s.recap || 'Ideas sit here, unsettled, until the table makes them true.');
@@ -416,7 +425,7 @@ function renderSessionCard(x, measuring) {
     const ge = el('div', 'sgroup' + (sj.thread ? ' thread' : ''), `<div class="sgh" ${sj.go ? `data-go="${sj.go}"` : ''}>${sj.icon ? `<span class="sgimg"><img src="${sj.icon}" alt="" draggable="false"></span>` : `<span class="tdot">${sj.general ? '✎' : '?'}</span>`}<b>${esc(sj.name)}</b></div>`);
     (g.karma || []).forEach(k => {
       const buys = advanceText(k);
-      const e = el('div', 'snote karma', `<span class="kk">Karma +${k.award || 0}</span>${buys ? ` <b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
+      const e = el('div', 'snote karma', `${k.award ? `<span class="kk">${WORDS.xp || 'Karma'} +${k.award}</span> ` : `<span class="kk">${WORDS.xpVerb || 'Advanced'}</span> `}${buys ? `<b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
       ge.appendChild(e); reg(k.id, { el: e, title: `${sj.name} · karma S${s.n}${buys ? ': ' + buys : ''}`, kind: 'karma', sub: `S${s.n}` });
     });
     g.notes.forEach(n => { const ms = new Set(); const e = el('div', 'snote ed' + (s.prep ? ' idea' : ''), renderNote(n.text, n.id, ms)); e.dataset.note = n.id; e.dataset.s = s.n; e.tabIndex = 0; ge.appendChild(e);
@@ -864,10 +873,10 @@ document.fonts?.ready.then(() => { PCS.forEach(pc => fitSections(sheetEls[pc.id]
 let lastPt = { x: 0, y: 0 }, lastRollAt = 0;
 window.addEventListener('pointermove', ev => { lastPt = { x: ev.clientX, y: ev.clientY }; }, { passive: true });
 const undo = [], redo = [];
-function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof, order: state.order, removed: state.removed }); }
+function snap() { return JSON.stringify({ choices: state.choices, live: state.live, summons: state.summons, done: state.done, asof: state.asof, order: state.order, removed: state.removed, adv: state.adv, checks: state.checks }); }
 function pushUndo() { undo.push(snap()); if (undo.length > 60) undo.shift(); redo.length = 0; }
 function restore(json) { const o = JSON.parse(json); const party = JSON.stringify([o.order, o.removed]) !== JSON.stringify([state.order, state.removed]);
-  Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof, order: o.order || state.order, removed: o.removed || state.removed }); persist();
+  Object.assign(state, { choices: o.choices, live: o.live, summons: o.summons, done: o.done, asof: o.asof, order: o.order || state.order, removed: o.removed || state.removed, adv: o.adv || state.adv, checks: o.checks || state.checks }); persist();
   if (party) { location.reload(); return; } PCS.forEach(renderSheet); }
 function doUndo() { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); }
 function doRedo() { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); }

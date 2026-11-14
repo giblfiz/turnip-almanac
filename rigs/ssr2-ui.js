@@ -1,17 +1,17 @@
 // Simplified Shadowrun 2e: the rule-specific half of the app (builder steps, sheet, rolls, summons, round order,
 // dice tray, quickbar vocabulary). Inserted by build.sh at /*@RIG-UI@*/ inside the app's scope.
-const WORDS = { quickHint: 'Jump or do: tusk guns, roll 6 tn 4, new runner, round order…', char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
+const WORDS = { xp: 'Karma', xpVerb: 'Karma', quickHint: 'Jump or do: tusk guns, roll 6 tn 4, new runner, round order…', char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
 // an advancement entry (karma spent) as text for the session cards
 function advanceText(k) { return (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', '); }
 const RIG_NO_UNDO = new Set(['roll', 'sroll', 'sum-open', 'sum-cancel']);
-const STEP_NAME = { done: 'all done', meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
+const STEP_NAME = { adv: 'advancement', done: 'all done', meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
 const BCOLS = [['name', 'meta', 'attr', 'life', 'deck'], ['skills', 'magic'], ['cyber', 'veh'], ['gear', 'circles', 'done']];
-const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done'];
-const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start' };
-const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4', magic: '.l-magic', cyber: '.l-cyber', gear: '.l-gear', veh: '.l-veh', deck: '.l-veh', circles: '.l-circles', life: '.l-life', done: '.budget' };
+const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done', 'adv'];
+const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start', adv: 'p-karma' };
+const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4', magic: '.l-magic', cyber: '.l-cyber', gear: '.l-gear', veh: '.l-veh', deck: '.l-veh', circles: '.l-circles', life: '.l-life', done: '.budget', adv: '.budget' };
 const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
 // how much each step holds (measured at one column's width); the engine splits the builder into golden cells by these
-const BAREA = { name: 0.45, meta: 0.9, attr: 0.5, skills: 1.15, magic: 1.0, cyber: 1.2, gear: 1.4, veh: 1.05, deck: 0.75, circles: 0.9, life: 0.45, done: 0.5 };
+const BAREA = { name: 0.45, meta: 0.9, attr: 0.5, skills: 1.15, magic: 1.0, cyber: 1.2, gear: 1.4, veh: 1.05, deck: 0.75, circles: 0.9, life: 0.45, done: 0.5, adv: 1.1 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -92,6 +92,20 @@ function stepHtml(pc, S, key) {
     h += `${stepHead(S, 'circles', '9', 'Social circles', P.circles)}<div class="hint">Contact 1 pt [6L], friend 3 [9M], patron 5 [12S]. First two contacts free.</div><div class="rows one">`;
     R.CIRCLES.forEach(c => { const cur = ch.circles[c] || ''; h += `<div class="row${cur ? ' on' : ''}"><div><b>${c}</b></div><div class="seg">${['', 'contact', 'friend', 'patron'].map(l => `<button class="${cur === l ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="circles.${c}" data-v="${l}">${l ? R.CIRCLE_LV[l].name : 'None'}</button>`).join('')}</div></div>`; });
     h += `</div>`;
+  }
+  if (key === 'adv') {
+    // after creation: karma for the latest session, then spend it (rules p.4: the next point costs what it costs at
+    // creation; a spell costs 3; skills stop at the karma cap)
+    const n = advSession(), mine = (state.adv[pc.id] || []).find(x => x.s === n) || {}, left = S.karma.earned - S.karma.spent;
+    const rated = sk => { let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; })); return r; };
+    h += `${stepHead(S, 'adv', '★', 'Advancement', STEP_RULE.adv)}<div class="hint">Karma for S${n} (the latest session), then spend it. A skill's next point costs what it would at creation; a spell costs 3; skills stop at ${R.KARMA_CAP}.</div>
+      <div class="karmabar"><span>Karma for S${n}</span><div class="stepper"><button data-act="kaward" data-pc="${pc.id}" data-d="-1" ${(mine.award || 0) <= 0 ? 'disabled' : ''} aria-label="Less karma">−</button><output>${mine.award || 0}</output><button data-act="kaward" data-pc="${pc.id}" data-d="1" aria-label="More karma">+</button></div>
+      <b>${left} to spend</b> <span class="e">${S.karma.earned} earned in all</span>${(mine.buy || []).length ? ` <button class="opt kundo" data-act="kundo" data-pc="${pc.id}"><b>Take back the last spend</b></button>` : ''}</div><div class="opts">`;
+    R.ALL_SKILLS.forEach(sk => { const r = rated(sk), c = r >= R.KARMA_CAP ? null : R.skillCost(r, r + 1), ok = c != null && c <= left;
+      h += `<button class="opt" data-act="kbuy" data-pc="${pc.id}" data-skill="${sk}" ${ok ? '' : 'disabled'}><b>${esc(R.SK_NAME[sk])} ${r} → ${r + 1}${c != null ? `<em>${c}</em>` : ''}</b><span>${c == null ? 'at the cap' : ok ? 'karma' : 'not enough karma'}</span></button>`; });
+    h += `</div>`;
+    if (S.trad && ch.trad !== 'adept') { const known = new Set([...(ch.spells || []), ...karmaOf(pc).flatMap(k => (k.buy || []).filter(b => b.spell).map(b => b.spell))]);
+      h += `<div class="grouph"><span>Learn a spell · 3 karma</span></div><div class="opts">` + R.SPELLS.filter(sp => !known.has(sp.id)).map(sp => `<button class="opt" data-act="kspell" data-pc="${pc.id}" data-spell="${sp.id}" ${left >= 3 ? '' : 'disabled'}><b>${esc(sp.name)}<em>3</em></b><span>${esc(sp.eff || '')}</span></button>`).join('') + `</div>`; }
   }
   if (key === 'done') {
     const legal = !S.warn.length;
@@ -294,6 +308,14 @@ function rigCommands(q, ws, nums, pcw) {
   return out;
 }
 function rigAct(act, a, pc, ch) {
+  if (act === 'kaward' || act === 'kbuy' || act === 'kspell' || act === 'kundo') {
+    const n = advSession(), e = advEntry(pc, n), nm = ch.name || 'A runner';
+    if (act === 'kaward') { e.award = Math.max(0, (e.award || 0) + +a.dataset.d); historyNote(`${nm}: karma for S${n} now ${e.award}`); }
+    if (act === 'kbuy') { const sk = a.dataset.skill; let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; }));
+      (e.buy = e.buy || []).push({ skill: sk, to: r + 1 }); historyNote(`${nm}: ${R.SK_NAME[sk]} ${r} → ${r + 1} with karma`); }
+    if (act === 'kspell') { (e.buy = e.buy || []).push({ spell: a.dataset.spell }); historyNote(`${nm} learned ${R.SPELL_BY_ID[a.dataset.spell].name} with karma`); }
+    if (act === 'kundo') { const b = (e.buy || []).pop(); if (b) historyNote(`${nm}: took back ${b.skill ? R.SK_NAME[b.skill] + ' → ' + b.to : R.SPELL_BY_ID[b.spell].name}`); }
+    refreshAdv(pc, n); return true; }
   if (act === 'sroll') { const sm = summonOf(pc); if (!sm) return true; const t = R.SUMMONS.find(x => x.id === sm.type), r = R.roll(sm.rating, 4);
     const rec = { label: `${choicesOf(pc).name || 'Runner'} · ${t.name} · ${a.dataset.tool}`, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
     (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec }); toast(rec, a); renderSheet(pc); return true; }

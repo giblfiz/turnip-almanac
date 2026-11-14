@@ -60,6 +60,9 @@ rejected designs. The implementation is replaceable; these contracts are not.
   version can be gone back to (a new version itself). It lives far out past the map's west edge: the past is to the left. Every dice button carries a tiny count of its presses.
 - E4a **Party order** (H, 14 Nov): a new character goes on top, just under the launcher, and the rest slide down; removing
   one closes the gap (undo or history brings them back).
+- E15a **Advancement is a builder step** (after All done): what was earned and spent, filed under the latest session,
+  shown on that session's card and counted by the sheet's As of. The rig decides the economy (SSR karma buys; BRP
+  experience checks and improvement rolls); the engine keeps the log (`karmaOf`, `state.adv`, `state.checks`).
 - E15 **Build mode**: a live two-ended thread joins the current builder step to its rule and to the part of the
   sheet it writes; an "All done" step says legal/illegal and points left.
 - E16 **Tools roll their skill**: weapons, cyberware weapons, kits, decks, rides, spells, circles and lifestyles

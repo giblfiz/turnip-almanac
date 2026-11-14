@@ -57,6 +57,9 @@ one Claude Code session; commits in this repo.
 | P-46 | H: rolling all stats again and again leaves no trace; count every roll button | roll counts on every dice button; characteristic rolls named in the history and log | verified ("rolled characteristics (3rd time)") | |
 | P-47 | H: pictures in notes, and visibility, from a little icon on the note's bar | note menu: picture; who can see it (everyone, GM, me, some players) | verified; **visibility recorded, not enforced** (one seat) | a drag that moved now stops all click handlers (stopImmediatePropagation): the earlier guard let the document's own handler through |
 
+| P-48 | H: History out in the left suburbs ("back in time") | history west of the map | verified (in the overview; edge arrow; quickbar) | |
+| P-49 | H: build advancement for both systems | an Advancement step after All done, filed under the latest session | verified. SSR: karma award ±, skills raised at their creation cost up to the cap, spells at 3, take back the last spend; the session card shows it. BRP: a successful roll ticks the skill's check, checks added or taken back by hand, an end-of-session roll (d100 + experience bonus over the skill → 1D6/1D8/1D10) logged to the Log and History | one engine seam: `karmaOf(pc)` = the campaign's log + this table's entries; each rig decides what an entry holds (SSR `award`/`buy`, BRP `gain`/`tried`) |
+
 ## Evaluator note (automation frontier, 2026-11-13; Claude Opus 5.5 builder; Gemini via agy-run as the blind reader)
 Gemini blind reads found real bugs (mojibake, LOD leak, missing toast CSS, Contact duplication, crop framing) and
 made confident false claims (a "clipped" note that measured fine, a "missing" Soak button, a "duplicate" toast).

@@ -759,3 +759,10 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .notemenu .nmfoot { font-size: 12px; color: var(--ink-3); line-height: 1.35; }
 .loose .grip .dots, .loose .grip .nvis { pointer-events: none; }
 .loose .grip .nmenu, .loose .grip .ndel { z-index: 1; }
+/* advancement */
+.karmabar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 10px 0 14px; font-size: 22px; }
+.karmabar > span:first-child { font-weight: 600; }
+.karmabar .e { color: var(--ink-2); font-size: 18px; }
+.karmabar select { font: 500 20px var(--f-body); padding: 10px 12px; border-radius: 12px; border: 2px solid var(--rule); background: var(--paper); color: var(--ink); max-width: 100%; }
+.karmabar .opt { flex: 1 1 260px; }
+.sk.xp .k::after { content: ' ✓'; color: var(--ochre); font-weight: 700; font-size: .8em; }
