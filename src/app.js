@@ -1027,6 +1027,9 @@ function startPan(ev) { pan = { sx: ev.clientX, sy: ev.clientY, cx: cam.x, cy: c
   scrolly: ev.pointerType !== 'mouse' ? ev.target.closest?.('.scrolly') : null, st: 0 }; if (pan.scrolly) pan.st = pan.scrolly.scrollTop; }
 vp.addEventListener('pointerdown', ev => {
   stopFling();
+  // a new first finger means no other finger is down: drop any pointer whose 'up' never arrived (a page canvas swapped
+  // out under a finger can lose it), or a stale entry would make every later pinch look like three fingers
+  if (ev.isPrimary) { ptrs.clear(); pinch = null; }
   ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
   if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }; pan = null; clearTimeout(press?.t); press = null;
     if (anim) { cancelAnimationFrame(anim.raf); anim = null; } return; }
@@ -1081,7 +1084,8 @@ window.addEventListener('pointerup', up); window.addEventListener('pointercancel
 document.addEventListener('click', ev => { if (performance.now() < suppressClickUntil) { ev.preventDefault(); ev.stopPropagation(); } }, true);
 // the page never zooms (iOS Safari gesture events); only the canvas does
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
-document.addEventListener('touchmove', e => { if (e.touches.length > 1 || !typing(e.target)) e.preventDefault(); }, { passive: false });
+// only multi-finger moves (iOS would zoom the page); cancelling a one-finger move makes Android drop the tap's click
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 function doubleTapAt(target, x, y) {
   const hit = target.closest?.('[data-id]'), id = hit?.dataset.id;
   if (id && nodes[id] && nodes[id].kind !== 'zone' && id !== 'map' && !hit.dataset.band) { const b = target.closest('.builder'); flyTo(b ? b.dataset.id : id); return; }
@@ -1169,7 +1173,7 @@ let pdfDoc = null, pdfFailed = false;
 })();
 // every page is always there (E1): a thumbnail first, sharpened only when it is big on screen; a few sharp pages at a time
 let pagesBusy = 0;
-const SHARP_MAX = 14;
+const SHARP_MAX = matchMedia('(pointer: coarse)').matches ? 6 : 14;
 function renderPage(o, width) {
   pagesBusy++; o._busy = true;
   return pdfDoc.getPage(o.n).then(page => { const v1 = page.getViewport({ scale: 1 }), v = page.getViewport({ scale: width / v1.width });
@@ -1177,15 +1181,17 @@ function renderPage(o, width) {
     return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { if (width <= 240) o._thumb = c; o.el.querySelector('.cv').replaceChildren(c); o._res = width; o._used = performance.now(); });
   }).catch(e => console.warn('page', o.n, e.message)).finally(() => { pagesBusy--; o._busy = false; dirty = true; });
 }
+const COARSE = matchMedia('(pointer: coarse)').matches;   // a phone or tablet: smaller sharpenings, fewer kept
 function pagesPass() {
   if (!pdfDoc) return;
+  if (ptrs.size || fling) { dirty = true; return; }   // never render (on the main thread) under a finger or a coasting flick
   const vw = W(), vh = H(), dpr = Math.min(2, window.devicePixelRatio || 1);
   const scored = pageFrames.map(o => { const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
     return { o, sw, on: !(x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0) }; });
   for (const { o, sw, on } of scored.sort((a, b) => (b.on - a.on) || (b.sw - a.sw))) {
     if (pagesBusy >= 2) break;
     if (o._busy) continue;
-    const want = !o._thumb ? 200 : on && sw * dpr > 1300 ? 2600 : on && sw * dpr > 240 ? 1300 : 0;
+    const want = !o._thumb ? 200 : on && sw * dpr > 1300 ? (COARSE ? 1600 : 2600) : on && sw * dpr > 240 ? 1300 : 0;
     if (want && (o._res || 0) < want) renderPage(o, want);
   }
   if (pagesBusy < 2 && pageFrames.some(o => !o._thumb && !o._busy)) dirty = true;      // keep filling thumbnails in the background

@@ -47,6 +47,10 @@ one Claude Code session; commits in this repo.
 | P-38 | H: clicking a skill's name did nothing, clicking its number went to the rules: "backwards" | E14a | verified (Grapple → p.40) | |
 | P-39 | found on the way: the BRP page's quickbar hint was Shadowrun's ("tusk guns…"), cut off by an ellipsis on a phone | hint from the rig; short on phones | verified | Gemini's blind read caught it; the DOM confirmed |
 
+| P-40 | H (Android): zoomed in to read a page, pinch stopped working in both directions | pinch always works | **fixed blind** (not reproducible in emulation, even at 4× CPU throttle): a new first finger clears stale pointers; no page renders under a finger or a flick; phones sharpen to 1600 px, 6 pages | suspected: a page canvas swapped under a finger lost its 'up', leaving a phantom pointer, so two real fingers counted as three |
+| P-41 | H (Android): tapping quickbar results did nothing | taps work | **fixed blind** (emulated taps worked): the page cancelled every one-finger touchmove, and Chrome drops the click of a tap that wiggled | now only multi-finger moves are cancelled (iOS page zoom) |
+| P-42 | H: drop the chapter numbers ("why is 3 below 11?") | the cluster order is free | verified | the numbers fought the golden arrangement's order |
+
 ## Evaluator note (automation frontier, 2026-11-13; Claude Opus 5.5 builder; Gemini via agy-run as the blind reader)
 Gemini blind reads found real bugs (mojibake, LOD leak, missing toast CSS, Contact duplication, crop framing) and
 made confident false claims (a "clipped" note that measured fine, a "missing" Soak button, a "duplicate" toast).
