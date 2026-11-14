@@ -721,7 +721,7 @@ const store = {
   set(v) { try { localStorage.setItem('turnip-almanac-2', JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['pc-tusk', 'map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
@@ -816,9 +816,13 @@ const PCS = [...C.pcs, ...state.extra];
 const pcById = Object.fromEntries(PCS.map(p => [p.id, p]));
 function choicesOf(pc) { return state.choices[pc.id] || (state.choices[pc.id] = clone(pc.choices || R.blank(''))); }
 const sheetEls = {};
+// Simplified Shadowrun 2e: the rule-specific half of the app (builder steps, sheet, rolls, summons, round order,
+// dice tray, quickbar vocabulary). Inserted by build.sh at /*@RIG-UI@*/ inside the app's scope.
+const WORDS = { char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
+// an advancement entry (karma spent) as text for the session cards
+function advanceText(k) { return (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', '); }
+const RIG_NO_UNDO = new Set(['roll', 'sroll', 'sum-open', 'sum-cancel']);
 const STEP_NAME = { done: 'all done', meta: 'metatype', attr: 'attributes', skills: 'skills', magic: 'magic', cyber: 'cyberware', gear: 'gear', veh: 'vehicles', deck: 'deck & chips', circles: 'social circles', life: 'lifestyle', name: 'name' };
-const resolveSrc = (pc, id) => id.startsWith('B:') ? `b-${pc.id}-${id.slice(2)}` : id;
-// builder: fixed columns, so nothing ever moves when a choice opens a step
 const BCOLS = [['name', 'meta', 'attr', 'life', 'deck'], ['skills', 'magic'], ['cyber', 'veh'], ['gear', 'circles', 'done']];
 const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done'];
 const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start' };
@@ -826,9 +830,6 @@ const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4'
 const BIW = 880, BGAP = 40, BINNER = { w: 30 + 4 * BIW + 3 * BGAP + 30, h: 2860 }, BREG = { x: 30, y: 950, w: 440, h: 320 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
-function stepper(pc, path, v, min, max, lab) {
-  return `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-1" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${lab}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="1" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${lab}">+</button></div>`;
-}
 function stepHead(S, key, no, title, rule) {
   const used = S.spend.filter(x => x.src[0] === 'B:' + key).reduce((s, x) => s + x.pts, 0);
   return `<div class="q"><span class="no">${no}</span><h3>${title}</h3>${rule ? `<span class="chip" data-go="${rule}">p.${printIndex[rule].page}</span>` : ''}<span class="sub">${used ? used + ' pts · ' : ''}${S.left} left</span></div>`;
@@ -922,9 +923,6 @@ function stepHtml(pc, S, key) {
   }
   return h + '</div>';
 }
-function builderInner(pc, S) {
-  return BCOLS.map((col, i) => `<div class="bcol" style="left:${30 + i * (BIW + BGAP)}px;width:${BIW}px">${col.map(k => stepHtml(pc, S, k)).join('')}</div>`).join('');
-}
 function toolRolls(pc, S, key, toolLabel) {
   return (R.TOOL_SKILL[key] || []).map(sk => `<button class="die sm" data-act="roll" data-pc="${pc.id}" data-skill="${sk}" data-tool="${esc(toolLabel)}" title="Roll ${R.SK_NAME[sk]} with ${esc(toolLabel)}: ${S.skill[sk]}d6">⚄ ${R.SK_NAME[sk]} ${S.skill[sk]}</button>`).join('');
 }
@@ -932,7 +930,6 @@ function rollHtml(r) {
   const dice = r.dice.map(d => `<i class="${d.ok ? 'ok' : ''}">${d.chain.join('+')}</i>`).join('');
   return `<div class="roll"><b>${esc(r.label)}</b><span class="tn">${r.pool}d6 · TN ${r.tn}</span><span class="dd">${dice}</span><span class="verdict${r.succ ? '' : ' fail'}">${r.succ} · ${esc(r.verdict)}</span></div>`;
 }
-// portraits: an uploaded image, else the Turnip Works runner token that best fits the build
 const TOKENS = ['adept-elf-f', 'adept-human-m', 'adept-troll-f', 'decker-dwarf-m', 'decker-elf-f', 'decker-human-f', 'face-elf-m', 'face-human-f', 'face-ork-m', 'mage-dwarf-m', 'mage-elf-m', 'mage-human-f', 'merc-dwarf-m', 'merc-ork-m', 'merc-troll-f', 'rigger-dwarf-f', 'rigger-human-m', 'rigger-ork-m', 'shaman-human-f', 'shaman-ork-f', 'shaman-troll-m', 'street-samurai-elf-f', 'street-samurai-human-m', 'street-samurai-ork-f', 'street-samurai-troll-m', 'technomancer-dwarf-f', 'technomancer-human-m'];
 const TOKEN_FILES = window.TOKEN_FILES || {};
 function archetypeOf(ch, S) {
@@ -950,7 +947,6 @@ function portraitOf(pc, S) {
   const src = close(state.portraits[pc.id] || options[0] || '');
   return { src, options: options.map(close) };
 }
-// summons: one at a time; a tiny sheet inside the summoner's sheet (rules p.2)
 function summonOf(pc) { if (!(pc.id in state.summons) && pc.summon) state.summons[pc.id] = { ...pc.summon }; return state.summons[pc.id] || null; }
 function summonsHtml(pc, ch, S, W8) {
   const head = `<div class="sec">Summons <span class="chip" data-go="p-summons">p.2</span> <span class="chip" data-go="p-spirits">types</span></div>`;
@@ -981,32 +977,9 @@ function summonsHtml(pc, ch, S, W8) {
   }
   return head + `<button class="btn big" data-act="sum-open" data-pc="${pc.id}">Summon ${kind === 'spirit' ? 'a spirit' : 'an elemental'} ⚄</button>${state.lastSummon?.[pc.id] ? `<div class="sumfail">${esc(state.lastSummon[pc.id])}</div>` : ''}<div class="hint2">One summon at a time. It gets a card of its own, here.</div>`;
 }
-function fitInto(box, inner, max = 3) {
-  if (!box || !inner || !box.clientWidth) return; const W = box.clientWidth, H = box.clientHeight; let lo = 0.15, hi = max;
-  for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; inner.style.zoom = m; inner.style.width = (W / m) + 'px';
-    const r = inner.getBoundingClientRect(), b = box.getBoundingClientRect(); if (r.height <= b.height * 0.98 && inner.scrollWidth <= inner.clientWidth + 3) lo = m; else hi = m; }
-  inner.style.zoom = lo; inner.style.width = (W / lo) + 'px';
-}
 function fitSummon(box) { box.querySelectorAll('.sumrow').forEach(r => { fitInto(r.querySelector('.scard2'), r.querySelector('.sc-in')); fitInto(r.querySelector('.sumside'), r.querySelector('.ss-in')); }); }
-const isToken = src => /assets\/tokens\//.test(src || '');
-// fill every section: scale its contents (CSS zoom) until they exactly fill the box, so no sheet carries dead space
-function fitSections(box) {
-  box.querySelectorAll('.main > section:not(.sP):not(.sS)').forEach(sec => {
-    let f = sec.querySelector(':scope > .fit');
-    if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
-    const sr = sec.getBoundingClientRect(); if (!sr.height) return;
-    const W = sec.clientWidth;
-    let lo = 0.45, hi = 2.6;
-    const wide = () => [...f.querySelectorAll('.acol, .sk, .ahead, .budget > div, .der > div, .list > div, .track, .asof, .roll, .grid4, .der, .budget')].some(e => e.scrollWidth > e.clientWidth + 1) || [...f.querySelectorAll('.sk .k, .ahead .an')].some(k => { const r = k.getBoundingClientRect(), p2 = k.closest('.sk, .ahead').getBoundingClientRect(); return r.right > p2.right + 0.5; });
-    for (let i = 0; i < 11; i++) { const mid = (lo + hi) / 2; f.style.zoom = mid; f.style.width = (W / mid) + 'px';
-      if (f.getBoundingClientRect().height <= sr.height * 0.98 && !wide()) lo = mid; else hi = mid; }
-    f.style.zoom = lo; f.style.width = (W / lo) + 'px'; f.dataset.z = lo.toFixed(2);
-  });
-}
 function liveOf(pc) { return state.live[pc.id] || (state.live[pc.id] = { dmg: pc.id === 'pc-tusk' ? ['L', 'L', 'B'] : [] }); }
 function woundOf(pc, S) { const f = liveOf(pc).dmg.filter(Boolean).length; return { filled: f, tn: S.adept ? 0 : f >= 4 ? 3 : f >= 1 ? 1 : 0 }; }
-function sheetOf(pc) { return R.compute(choicesOf(pc), pc.karma || [], state.asof[pc.id] ?? 99); }
-
 function renderSheet(pc) {
   const box = sheetEls[pc.id], ch = choicesOf(pc), S = sheetOf(pc), asOf = state.asof[pc.id] ?? 99;
   const live = liveOf(pc), W8 = woundOf(pc, S);
@@ -1088,6 +1061,110 @@ function renderSheet(pc) {
   fitSections(box); fitSummon(box);
   renderQuick(); dirty = true;
 }
+function initiative() {
+  return PCS.filter(pc => choicesOf(pc).meta || choicesOf(pc).name).map(pc => ({ pc, S: sheetOf(pc) }))
+    .sort((a, b) => b.S.actions - a.S.actions || b.S.attr.coord - a.S.attr.coord || b.S.skill.palming - a.S.skill.palming);
+}
+const qdice2 = { pool: 6, tn: 4 };
+function renderTable() {
+  const o = initiative(); if (turn.at >= o.length) turn.at = 0;
+  roundCard.innerHTML = `<div class="fit"><h3>Round order <span class="chip" data-go="p-turns">p.3</span></h3><div class="t">Total Actions, then Coordination, then Palming. Each round, everyone with actions left acts once.</div>
+    <div class="rmeta">Turn ${turn.round} · round order <button class="tb" data-turn="next">Next ›</button><button class="tb" data-turn="reset">New turn</button></div>
+    <ol class="init">${o.map(({ pc, S }, i) => { const live = liveOf(pc), w = woundOf(pc, S); const tok = portraitOf(pc, S).src;
+      return `<li class="${i === turn.at ? 'on' : ''}"><span class="${isToken(tok) ? 'closeup' : ''} rimg"><img src="${tok}" alt="" draggable="false"></span><span class="who2" data-go="${pc.id}">${esc(choicesOf(pc).name || 'New runner')}</span><span class="nums">${S.actions} Actions · Coord ${S.attr.coord} · Palming ${S.skill.palming}</span><span class="dots">${Array.from({ length: S.health }, (_, k) => `<i class="${live.dmg[k] || ''}"></i>`).join('')}</span>${w.tn ? `<span class="wtn">TN +${w.tn}</span>` : ''}</li>`; }).join('')}</ol></div>`; fitCard(roundCard);
+  diceCard.innerHTML = `<div class="fit"><h3>Dice tray <span class="chip" data-go="p-rolls">p.3</span></h3><div class="t">Any pool against any target number. Sixes add a die, or carry on past TN 6.</div>
+    <div class="qdice"><label>Dice ${tstep('pool', 1, 30)}</label><label>TN ${tstep('tn', 0, 18)}</label><button class="tb go" data-troll="1">Roll ${qdice2.pool}d6</button></div>
+    <div class="rolls">${[...(state.rolls._free || [])].slice(0, 5).map(rollHtml).join('') || '<div class="none">No rolls yet. Rolls from the quickbar land here too.</div>'}</div></div>`; fitCard(diceCard);
+}
+function tstep(k, min, max) { return `<span class="stepper"><button data-ts="${k}" data-d="-1" ${qdice2[k] <= min ? 'disabled' : ''}>−</button><output>${qdice2[k]}</output><button data-ts="${k}" data-d="1" ${qdice2[k] >= max ? 'disabled' : ''}>+</button></span>`; }
+function freeRoll(pool, tn, label = 'Free roll', at) {
+  const r = R.roll(pool, tn); const rec = { label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
+  (state.rolls._free = state.rolls._free || []).unshift(rec); state.rolls._free = state.rolls._free.slice(0, 8); persist(); renderTable(); toast(rec, at); logPush({ kind: 'roll', who: 'gm', rec }); return rec;
+}
+function skillWord(w) { w = w.toLowerCase(); return R.ALL_SKILLS.find(s => s === w || R.SK_NAME[s].toLowerCase().startsWith(w)); }
+function rollFor(pc, skill, soak, srcEl) {
+  const S = sheetOf(pc), w = woundOf(pc, S);
+  const r = R.roll(S.skill[skill], S.tn(skill) + w.tn);
+  r.label = `${choicesOf(pc).name || 'Runner'} · ${srcEl?.dataset?.tool ? srcEl.dataset.tool + ' · ' : ''}${soak ? 'Soak' : R.SK_NAME[skill]}`;
+  if (soak && r.succ) r.verdict = `Soak ${1 + r.bonuses} damage`;
+  const rec = { label: r.label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
+  (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec });
+  const t = $('#toast'), rr = srcEl?.getBoundingClientRect();
+  t.innerHTML = rollHtml(rec); t.style.left = Math.max(180, Math.min(W() - 180, rr ? rr.left + rr.width / 2 : W() / 2)) + 'px'; t.style.top = Math.max(90, rr ? rr.top : H() / 2) + 'px';
+  const pop = srcEl?.closest('#qpop'); if (pop) { const pr = pop.getBoundingClientRect(); t.style.left = (pr.left + pr.width / 2) + 'px'; t.style.top = pr.top + 'px'; }
+  t.hidden = false; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.hidden = true, 300); }, 2600);
+  renderSheet(pc);
+}
+function box_who(pc) { const S = sheetOf(pc); sheetEls[pc.id].querySelector('.who').textContent = `${[S.meta?.name, pc.archetype].filter(Boolean).join(' · ') || 'Not built yet'} · played by ${pc.player || '—'}`; }
+function rigCommands(q, ws, nums, pcw) {
+  const out = [];
+  const sk = ws.map(skillWord).find(Boolean);
+  if (ws[0] === 'roll' || ws[0] === 'r') {
+    if (pcw && sk) out.push({ k: 'cmd', t: `Roll ${choicesOf(pcw).name}’s ${R.SK_NAME[sk]}`, run: () => rollFor(pcw, sk, sk === 'soak') });
+    else if (nums.length) { const pool = nums[0], tn = ws.includes('tn') ? nums[1] ?? 4 : nums[1] ?? 4; out.push({ k: 'cmd', t: `Roll ${pool}d6 at TN ${tn}`, run: () => freeRoll(pool, tn, `Roll ${pool}d6`, qb) }); }
+  } else if (pcw && sk) out.push({ k: 'cmd', t: `Roll ${choicesOf(pcw).name}’s ${R.SK_NAME[sk]}`, run: () => rollFor(pcw, sk, sk === 'soak') });
+  if ((ws[0] === 'damage' || ws[0] === 'hurt') && pcw) { const n = nums[0] || 1, lethal = ws.some(w => w.startsWith('l')) && ws.some(w => w === 'lethal'); out.push({ k: 'cmd', t: `${choicesOf(pcw).name} takes ${n} ${lethal ? 'lethal' : 'bashing'}`, run: () => { const S = sheetOf(pcw), d = liveOf(pcw).dmg; let left = n; for (let i = 0; i < S.health && left; i++) if (!d[i]) { d[i] = lethal ? 'L' : 'B'; left--; } persist(); renderSheet(pcw); } }); }
+  if (ws[0] === 'heal' && pcw) out.push({ k: 'cmd', t: `Clear ${choicesOf(pcw).name}’s damage`, run: () => { liveOf(pcw).dmg = []; persist(); renderSheet(pcw); } });
+  return out;
+}
+function rigAct(act, a, pc, ch) {
+  if (act === 'sroll') { const sm = summonOf(pc); if (!sm) return true; const t = R.SUMMONS.find(x => x.id === sm.type), r = R.roll(sm.rating, 4);
+    const rec = { label: `${choicesOf(pc).name || 'Runner'} · ${t.name} · ${a.dataset.tool}`, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
+    (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec }); toast(rec, a); renderSheet(pc); return true; }
+  else if (act === 'sum-open') { state.summonPick[pc.id] = true; renderSheet(pc); return true; }
+  else if (act === 'sum-cancel') { state.summonPick[pc.id] = false; renderSheet(pc); return true; }
+  else if (act === 'sum-pick') {
+    const S = sheetOf(pc), w = woundOf(pc, S), res = R.summon(a.dataset.type, S, w.tn), t = R.SUMMONS.find(x => x.id === a.dataset.type);
+    const rec = { label: `${choicesOf(pc).name || 'Runner'} · summon ${t.name}`, pool: res.roll.pool, tn: res.roll.tn, dice: res.roll.dice, succ: res.roll.succ, verdict: res.rating ? `${t.name} at rating ${res.rating}` : 'Nothing answers' };
+    (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8);
+    logPush({ kind: 'roll', who: pc.id, rec });
+    (state.lastSummon = state.lastSummon || {})[pc.id] = res.rating ? null : `Nothing answered the ${t.name}: ${res.roll.succ} successes at TN ${res.roll.tn}.`;
+    state.summonPick[pc.id] = false; if (res.rating) state.summons[pc.id] = { type: t.id, rating: res.rating, max: res.rating };
+    persist(); toast(rec, a); renderSheet(pc); return true;
+  }
+  else if (act === 'sum-dmg' || act === 'sum-drain') { const sm = summonOf(pc); if (!sm) return true; sm.rating -= 1;
+    if (act === 'sum-drain') { const d = liveOf(pc).dmg, i = d.lastIndexOf('B'); if (i >= 0) d[i] = null; }
+    if (sm.rating <= 0) state.summons[pc.id] = null; persist(); renderSheet(pc); return true; }
+  else if (act === 'sum-heal') { const sm = summonOf(pc); if (sm && sm.rating < sm.max) sm.rating += 1; persist(); renderSheet(pc); return true; }
+  else if (act === 'sum-release') { state.summons[pc.id] = null; persist(); renderSheet(pc); return true; }
+  else if (act === 'dmg') { const live = liveOf(pc); const i = +a.dataset.i; const cur = live.dmg[i]; live.dmg[i] = cur === 'B' ? 'L' : cur === 'L' ? null : 'B'; persist(); renderSheet(pc); return true; }
+  else if (act === 'roll') { rollFor(pc, a.dataset.skill, !!a.dataset.soak, a); return true; }
+  return false;
+}
+
+const resolveSrc = (pc, id) => id.startsWith('B:') ? `b-${pc.id}-${id.slice(2)}` : id;
+// builder: fixed columns, so nothing ever moves when a choice opens a step
+function stepper(pc, path, v, min, max, lab) {
+  return `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-1" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${lab}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="1" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${lab}">+</button></div>`;
+}
+function builderInner(pc, S) {
+  return BCOLS.map((col, i) => `<div class="bcol" style="left:${30 + i * (BIW + BGAP)}px;width:${BIW}px">${col.map(k => stepHtml(pc, S, k)).join('')}</div>`).join('');
+}
+// portraits: an uploaded image, else the Turnip Works runner token that best fits the build
+// summons: one at a time; a tiny sheet inside the summoner's sheet (rules p.2)
+function fitInto(box, inner, max = 3) {
+  if (!box || !inner || !box.clientWidth) return; const W = box.clientWidth, H = box.clientHeight; let lo = 0.15, hi = max;
+  for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; inner.style.zoom = m; inner.style.width = (W / m) + 'px';
+    const r = inner.getBoundingClientRect(), b = box.getBoundingClientRect(); if (r.height <= b.height * 0.98 && inner.scrollWidth <= inner.clientWidth + 3) lo = m; else hi = m; }
+  inner.style.zoom = lo; inner.style.width = (W / lo) + 'px';
+}
+const isToken = src => /assets\/tokens\//.test(src || '');
+// fill every section: scale its contents (CSS zoom) until they exactly fill the box, so no sheet carries dead space
+function fitSections(box) {
+  box.querySelectorAll('.main > section:not(.sP):not(.sS)').forEach(sec => {
+    let f = sec.querySelector(':scope > .fit');
+    if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
+    const sr = sec.getBoundingClientRect(); if (!sr.height) return;
+    const W = sec.clientWidth;
+    let lo = 0.45, hi = 2.6;
+    const wide = () => [...f.querySelectorAll('.acol, .sk, .ahead, .budget > div, .der > div, .list > div, .track, .asof, .roll, .grid4, .der, .budget')].some(e => e.scrollWidth > e.clientWidth + 1) || [...f.querySelectorAll('.sk .k, .ahead .an')].some(k => { const r = k.getBoundingClientRect(), p2 = k.closest('.sk, .ahead').getBoundingClientRect(); return r.right > p2.right + 0.5; });
+    for (let i = 0; i < 11; i++) { const mid = (lo + hi) / 2; f.style.zoom = mid; f.style.width = (W / mid) + 'px';
+      if (f.getBoundingClientRect().height <= sr.height * 0.98 && !wide()) lo = mid; else hi = mid; }
+    f.style.zoom = lo; f.style.width = (W / lo) + 'px'; f.dataset.z = lo.toFixed(2);
+  });
+}
+function sheetOf(pc) { return R.compute(choicesOf(pc), pc.karma || [], state.asof[pc.id] ?? 99); }
+
 function placeSheet(pc, slot) {
   if (sheetEls[pc.id]) { sheetEls[pc.id].remove(); }
   const e = add(world, 'sheet', PX, pcRowY(slot), SW, SH); sheetEls[pc.id] = e; pc.slot = slot;
@@ -1096,8 +1173,8 @@ function placeSheet(pc, slot) {
 }
 
 // the launcher: above the party, straddling the map's top-right corner
-const launch = add(world, 'launch', PX - 1900, -900, SW + 1900, 760, `<button class="launchbtn" data-act="newpc"><span class="plus">+</span><span><b>Build a new runner</b><small>Opens a blank sheet in the next empty seat and takes you to its builder.</small></span></button>`);
-reg('launch', { el: launch, title: 'Build a new runner', kind: 'action', icon: 'assets/tool-pawns.png', box: { x: PX - 1900, y: -900, w: SW + 1900, h: 760 } });
+const launch = add(world, 'launch', PX - 1900, -900, SW + 1900, 760, `<button class="launchbtn" data-act="newpc"><span class="plus">+</span><span><b>Build a new ${WORDS.char}</b><small>Opens a blank sheet in the next empty seat and takes you to its builder.</small></span></button>`);
+reg('launch', { el: launch, title: `Build a new ${WORDS.char}`, kind: 'action', icon: 'assets/tool-pawns.png', box: { x: PX - 1900, y: -900, w: SW + 1900, h: 760 } });
 label(world, 'The party', PX, -1240, 300);
 
 PCS.forEach((pc, i) => placeSheet(pc, pc.slot ?? i));
@@ -1105,15 +1182,15 @@ function emptySeats() { const used = new Set(PCS.map(p => p.slot)); return [...A
 const seatEls = {};
 function renderSeats() {
   Object.values(seatEls).forEach(e => e.remove());
-  emptySeats().forEach(i => { const e = add(world, 'seat', PX, pcRowY(i), SW, SH, `<button class="seatbtn" data-act="newpc" data-slot="${i}"><span class="plus">+</span> Empty seat · build a new runner here</button>`); seatEls[i] = e; });
+  emptySeats().forEach(i => { const e = add(world, 'seat', PX, pcRowY(i), SW, SH, `<button class="seatbtn" data-act="newpc" data-slot="${i}"><span class="plus">+</span> Empty seat · build a new ${WORDS.char} here</button>`); seatEls[i] = e; });
 }
 renderSeats();
 function newRunner(slot) {
   const free = emptySeats(); if (!free.length) return null;
   slot = slot != null && free.includes(+slot) ? +slot : free[0];
   const id = 'pc-x' + Date.now().toString(36);
-  const pc = { id, player: '', archetype: 'New runner', choices: null, karma: [], slot };
-  state.extra.push({ id, player: '', archetype: 'New runner', choices: null, karma: [], slot });
+  const pc = { id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot };
+  state.extra.push({ id, player: '', archetype: `New ${WORDS.char}`, choices: null, karma: [], slot });
   PCS.push(pc); pcById[id] = pc; placeSheet(pc, slot); renderSeats(); persist();
   return id;
 }
@@ -1203,7 +1280,7 @@ function adoptMentions(text) {
   });
   return made;
 }
-const subjOf = id => pcById[id] ? { name: choicesOf(pcById[id]).name || 'New runner', icon: portraitOf(pcById[id], sheetOf(pcById[id])).src, go: id } : npcIndex[id] ? { name: npcIndex[id].name, icon: state.portraits[id] || npcIndex[id].icon, go: id } : C.threads.find(t => t.id === id) ? { name: C.threads.find(t => t.id === id).name, icon: null, go: id, thread: true } : { name: 'Table notes', icon: null, go: null, general: true };
+const subjOf = id => pcById[id] ? { name: choicesOf(pcById[id]).name || `New ${WORDS.char}`, icon: portraitOf(pcById[id], sheetOf(pcById[id])).src, go: id } : npcIndex[id] ? { name: npcIndex[id].name, icon: state.portraits[id] || npcIndex[id].icon, go: id } : C.threads.find(t => t.id === id) ? { name: C.threads.find(t => t.id === id).name, icon: null, go: id, thread: true } : { name: 'Table notes', icon: null, go: null, general: true };
 const mentionsBy = {};                                   // subject id -> Set of note ids that mention it
 function renderSessionCard(x, measuring) {
   const s = x.s, card = x.card, meta = state.smeta[s.n] || {};
@@ -1223,7 +1300,7 @@ function renderSessionCard(x, measuring) {
     const sj = subjOf(g.who);
     const ge = el('div', 'sgroup' + (sj.thread ? ' thread' : ''), `<div class="sgh" ${sj.go ? `data-go="${sj.go}"` : ''}>${sj.icon ? `<span class="sgimg"><img src="${sj.icon}" alt="" draggable="false"></span>` : `<span class="tdot">${sj.general ? '✎' : '?'}</span>`}<b>${esc(sj.name)}</b></div>`);
     (g.karma || []).forEach(k => {
-      const buys = (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', ');
+      const buys = advanceText(k);
       const e = el('div', 'snote karma', `<span class="kk">Karma +${k.award || 0}</span>${buys ? ` <b>${esc(buys)}</b>` : ''}${k.note ? ` <span class="e">${esc(k.note)}</span>` : ''}`);
       ge.appendChild(e); reg(k.id, { el: e, title: `${sj.name} · karma S${s.n}${buys ? ': ' + buys : ''}`, kind: 'karma', sub: `S${s.n}` });
     });
@@ -1337,7 +1414,7 @@ document.addEventListener('focusout', () => {}, true);
 const colX = i => SX + (i % SCOLS) * (SCW + SGAP), colW = SCW, colGap = SGAP, nS = C.sessions.length;
 layoutSessions(); layoutPeople();
 
-PCS.forEach(pc => { nodes[pc.id].title = choicesOf(pc).name || 'New runner'; });
+PCS.forEach(pc => { nodes[pc.id].title = choicesOf(pc).name || `New ${WORDS.char}`; });
 function refreshBacks() {
   Object.entries(mentionsBy).forEach(([id, set]) => { const ss = [...new Set([...set].map(nid => { for (const s of allSessions()) if ((state.snotes[s.n] || []).some(n => n.id === nid)) return s.n; return null; }).filter(Boolean))].sort((a, b) => a - b);
     [nodes['idx-' + id], nodes[id]].forEach(t => { const b = t?.el?.querySelector('.backs'); if (b) b.innerHTML = ss.length ? 'In sessions ' + ss.map(n => `<span class="chip" data-go="s${n}">S${n}</span>`).join(' ') : ''; }); });
@@ -1372,32 +1449,12 @@ reg('dice', { el: diceCard, title: 'Dice tray', kind: 'table', box: { x: SX + TB
 reg('log', { el: logCard, title: 'Log · rolls and chat', kind: 'table', box: { x: SX + 2 * (TBW + SGAP), y: TBY, w: TBW, h: TBH } });
 const helpCard = add(world, 'card helpcard', PX - 1900, -2240, 1800, 1180, `<h3>Getting around</h3><div class="t">
   <b>Scroll</b> to pan · <b>pinch</b> or <b>ctrl-scroll</b> to zoom · <b>0</b> shows everything · <b>Alt ←</b> goes back<br>
-  <b>/</b> or <b>⌘K</b> opens the quickbar at the top: type a name, a place, a rule, or a command such as <i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>, <i>round order</i><br>
+  <b>/</b> or <b>⌘K</b> opens the quickbar at the top: type a name, a place, a rule, or a command such as ${WORDS.helpCommands}, <i>round order</i><br>
   <b>Double-click</b> a thing to fly to it, empty space for a note · <b>drop an image</b> on a portrait, or anywhere for art<br>
   In a builder, <b>Tab</b> and <b>Shift+Tab</b> fly between steps · hover a <b>number</b> to see where it comes from</div>`);
 label(world, 'HELP', PX - 1900, -2240 - 1260, 1150);
 reg('help', { el: helpCard, title: 'Getting around', kind: 'help', box: { x: PX - 1900, y: -2240, w: 1800, h: 1180 } });
 let turn = { round: 1, at: 0 };
-function initiative() {
-  return PCS.filter(pc => choicesOf(pc).meta || choicesOf(pc).name).map(pc => ({ pc, S: sheetOf(pc) }))
-    .sort((a, b) => b.S.actions - a.S.actions || b.S.attr.coord - a.S.attr.coord || b.S.skill.palming - a.S.skill.palming);
-}
-const qdice2 = { pool: 6, tn: 4 };
-function renderTable() {
-  const o = initiative(); if (turn.at >= o.length) turn.at = 0;
-  roundCard.innerHTML = `<div class="fit"><h3>Round order <span class="chip" data-go="p-turns">p.3</span></h3><div class="t">Total Actions, then Coordination, then Palming. Each round, everyone with actions left acts once.</div>
-    <div class="rmeta">Turn ${turn.round} · round order <button class="tb" data-turn="next">Next ›</button><button class="tb" data-turn="reset">New turn</button></div>
-    <ol class="init">${o.map(({ pc, S }, i) => { const live = liveOf(pc), w = woundOf(pc, S); const tok = portraitOf(pc, S).src;
-      return `<li class="${i === turn.at ? 'on' : ''}"><span class="${isToken(tok) ? 'closeup' : ''} rimg"><img src="${tok}" alt="" draggable="false"></span><span class="who2" data-go="${pc.id}">${esc(choicesOf(pc).name || 'New runner')}</span><span class="nums">${S.actions} Actions · Coord ${S.attr.coord} · Palming ${S.skill.palming}</span><span class="dots">${Array.from({ length: S.health }, (_, k) => `<i class="${live.dmg[k] || ''}"></i>`).join('')}</span>${w.tn ? `<span class="wtn">TN +${w.tn}</span>` : ''}</li>`; }).join('')}</ol></div>`; fitCard(roundCard);
-  diceCard.innerHTML = `<div class="fit"><h3>Dice tray <span class="chip" data-go="p-rolls">p.3</span></h3><div class="t">Any pool against any target number. Sixes add a die, or carry on past TN 6.</div>
-    <div class="qdice"><label>Dice ${tstep('pool', 1, 30)}</label><label>TN ${tstep('tn', 0, 18)}</label><button class="tb go" data-troll="1">Roll ${qdice2.pool}d6</button></div>
-    <div class="rolls">${[...(state.rolls._free || [])].slice(0, 5).map(rollHtml).join('') || '<div class="none">No rolls yet. Rolls from the quickbar land here too.</div>'}</div></div>`; fitCard(diceCard);
-}
-function tstep(k, min, max) { return `<span class="stepper"><button data-ts="${k}" data-d="-1" ${qdice2[k] <= min ? 'disabled' : ''}>−</button><output>${qdice2[k]}</output><button data-ts="${k}" data-d="1" ${qdice2[k] >= max ? 'disabled' : ''}>+</button></span>`; }
-function freeRoll(pool, tn, label = 'Free roll', at) {
-  const r = R.roll(pool, tn); const rec = { label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
-  (state.rolls._free = state.rolls._free || []).unshift(rec); state.rolls._free = state.rolls._free.slice(0, 8); persist(); renderTable(); toast(rec, at); logPush({ kind: 'roll', who: 'gm', rec }); return rec;
-}
 function toast(rec, at) {
   const t = $('#toast'); t.innerHTML = rollHtml(rec);
   const r = at?.getBoundingClientRect?.(); t.style.left = (r ? Math.max(180, Math.min(W() - 180, r.left + r.width / 2)) : W() / 2) + 'px'; t.style.top = (r ? Math.max(130, r.top) : 150) + 'px';
@@ -1408,7 +1465,7 @@ var tableReady = false;
 state.log = saved.log || [];
 function logPush(e) { state.log.push({ t: Date.now(), ...e }); if (state.log.length > 400) state.log.splice(0, state.log.length - 400); try { const o = JSON.parse(localStorage.getItem('turnip-almanac-2') || '{}'); o.log = state.log; localStorage.setItem('turnip-almanac-2', JSON.stringify(o)); } catch {} renderLog(true); }
 let logSpeaker = 'gm';
-function speakerOf(id) { if (id === 'gm' || !id) return { name: 'GM', icon: null }; const pc = pcById[id]; return pc ? { name: choicesOf(pc).name || 'Runner', icon: portraitOf(pc, sheetOf(pc)).src } : { name: id, icon: null }; }
+function speakerOf(id) { if (id === 'gm' || !id) return { name: 'GM', icon: null }; const pc = pcById[id]; return pc ? { name: choicesOf(pc).name || WORDS.Char, icon: portraitOf(pc, sheetOf(pc)).src } : { name: id, icon: null }; }
 function renderLog(stick) {
   const list = logCard.querySelector('.loglist'), atEnd = !list || list.scrollTop + list.clientHeight >= list.scrollHeight - 8;
   const fmt = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1416,7 +1473,7 @@ function renderLog(stick) {
     const face = sp.icon ? `<span class="lface"><img src="${sp.icon}" alt="" draggable="false"></span>` : `<span class="lface gm">${esc(sp.name.slice(0, 2))}</span>`;
     return e.kind === 'roll' ? `<div class="lrow roll-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span>${rollHtml(e.rec)}</div></div>`
       : `<div class="lrow chat-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span><b>${esc(sp.name)}</b> ${renderNote(e.text, '', new Set())}</div></div>`; }).join('');
-  const opts = [['gm', 'GM'], ...PCS.map(pc => [pc.id, choicesOf(pc).name || 'Runner'])].map(([v, n]) => `<option value="${v}" ${v === logSpeaker ? 'selected' : ''}>${esc(n)}</option>`).join('');
+  const opts = [['gm', 'GM'], ...PCS.map(pc => [pc.id, choicesOf(pc).name || WORDS.Char])].map(([v, n]) => `<option value="${v}" ${v === logSpeaker ? 'selected' : ''}>${esc(n)}</option>`).join('');
   const had = logCard.querySelector('.loginput'), draft = had ? had.value : '';
   logCard.innerHTML = `<h3>Log <span class="sub3">rolls and chat</span></h3><div class="loglist scrolly">${rows || '<div class="none">Nothing yet. Rolls land here; so does anything said below or with <i>say</i> in the quickbar.</div>'}</div>
     <div class="logsay"><select class="logwho" aria-label="Who is speaking">${opts}</select><input class="loginput" placeholder="Say something… (@names link)" aria-label="Say something" value="${esc(draft)}"><button class="btn" data-logsend="1">Say</button></div>`;
@@ -1437,19 +1494,13 @@ tableReady = true; renderTable(); renderLog(true);
 // ------------------------------------------------------------------ the quickbar: one line of text at the top, like Turnip Works
 const qb = $('#qbar'), qin = $('#qbar textarea'), qres = $('#qres');
 let qrows = [], qhi = 0; const qhist = [];
-function skillWord(w) { w = w.toLowerCase(); return R.ALL_SKILLS.find(s => s === w || R.SK_NAME[s].toLowerCase().startsWith(w)); }
 function runnerWord(w) { w = w.toLowerCase(); return PCS.find(pc => (choicesOf(pc).name || '').toLowerCase().startsWith(w) && w.length >= 2); }
 function commandsFor(q) {
   const out = [], ws = q.trim().toLowerCase().split(/\s+/).filter(Boolean); if (!ws.length) return out;
   const nums = ws.map(Number).filter(n => !isNaN(n));
-  const pcw = ws.map(runnerWord).find(Boolean), sk = ws.map(skillWord).find(Boolean);
-  if (ws[0] === 'roll' || ws[0] === 'r') {
-    if (pcw && sk) out.push({ k: 'cmd', t: `Roll ${choicesOf(pcw).name}’s ${R.SK_NAME[sk]}`, run: () => rollFor(pcw, sk, sk === 'soak') });
-    else if (nums.length) { const pool = nums[0], tn = ws.includes('tn') ? nums[1] ?? 4 : nums[1] ?? 4; out.push({ k: 'cmd', t: `Roll ${pool}d6 at TN ${tn}`, run: () => freeRoll(pool, tn, `Roll ${pool}d6`, qb) }); }
-  } else if (pcw && sk) out.push({ k: 'cmd', t: `Roll ${choicesOf(pcw).name}’s ${R.SK_NAME[sk]}`, run: () => rollFor(pcw, sk, sk === 'soak') });
-  if ((ws[0] === 'damage' || ws[0] === 'hurt') && pcw) { const n = nums[0] || 1, lethal = ws.some(w => w.startsWith('l')) && ws.some(w => w === 'lethal'); out.push({ k: 'cmd', t: `${choicesOf(pcw).name} takes ${n} ${lethal ? 'lethal' : 'bashing'}`, run: () => { const S = sheetOf(pcw), d = liveOf(pcw).dmg; let left = n; for (let i = 0; i < S.health && left; i++) if (!d[i]) { d[i] = lethal ? 'L' : 'B'; left--; } persist(); renderSheet(pcw); } }); }
-  if (ws[0] === 'heal' && pcw) out.push({ k: 'cmd', t: `Clear ${choicesOf(pcw).name}’s damage`, run: () => { liveOf(pcw).dmg = []; persist(); renderSheet(pcw); } });
-  if ('new runner'.startsWith(q.trim().toLowerCase()) && q.trim().length >= 3) out.push({ k: 'cmd', t: 'Build a new runner', run: () => { const id = newRunner(); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); } });
+  const pcw = ws.map(runnerWord).find(Boolean);
+  out.push(...rigCommands(q, ws, nums, pcw));
+  if (('new ' + WORDS.char).startsWith(q.trim().toLowerCase()) && q.trim().length >= 3) out.push({ k: 'cmd', t: `Build a new ${WORDS.char}`, run: () => { const id = newRunner(); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); } });
   if (ws[0] === 'build' && pcw) out.push({ k: 'cmd', t: `Open ${choicesOf(pcw).name}’s builder`, run: () => flyTo(`b-${pcw.id}-name`) });
   if (['round', 'initiative', 'order', 'init'].some(w => w.startsWith(ws[0]) && ws[0].length >= 3)) out.push({ k: 'cmd', t: 'Round order', run: () => flyTo('round') });
   if (ws[0] === 'say' && ws.length > 1) { const rest = q.trim().slice(3).trim(), first = rest.split(/\s+/)[0], who = first.endsWith(':') ? runnerWord(first.slice(0, -1)) : null, txt = who ? rest.slice(first.length).trim() : rest;
@@ -1898,55 +1949,21 @@ function doAct(a) {
   if (a.dataset.act === 'newpc') { const id = newRunner(a.dataset.slot); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); return; }
   const pc = pcById[a.dataset.pc]; if (!pc) return;
   const ch = choicesOf(pc), act = a.dataset.act, path = a.dataset.path;
-  if (act !== 'roll' && act !== 'sroll' && act !== 'sum-open' && act !== 'sum-cancel') pushUndo();
+  if (!RIG_NO_UNDO.has(act)) pushUndo();
+  if (rigAct(act, a, pc, ch)) return;
   if (act === 'inc') { const v = (getPath(ch, path) ?? (path.startsWith('skills.') ? 1 : 0)) + +a.dataset.d; setPath(ch, path, Math.max(+a.dataset.min, Math.min(+a.dataset.max, v))); }
   else if (act === 'set') { const v = a.dataset.v; setPath(ch, path, getPath(ch, path) === v ? null : v); }
   else if (act === 'flag') { setPath(ch, path, getPath(ch, path) ? null : 1); }
   else if (act === 'toggle') { const arr = getPath(ch, path) || []; const v = a.dataset.v; const max = +a.dataset.max || 99;
     setPath(ch, path, arr.includes(v) ? arr.filter(x => x !== v) : (arr.length >= max ? [...arr.slice(1), v] : [...arr, v])); }
-  else if (act === 'sroll') { const sm = summonOf(pc); if (!sm) return; const t = R.SUMMONS.find(x => x.id === sm.type), r = R.roll(sm.rating, 4);
-    const rec = { label: `${choicesOf(pc).name || 'Runner'} · ${t.name} · ${a.dataset.tool}`, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
-    (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec }); toast(rec, a); renderSheet(pc); return; }
-  else if (act === 'sum-open') { state.summonPick[pc.id] = true; renderSheet(pc); return; }
-  else if (act === 'sum-cancel') { state.summonPick[pc.id] = false; renderSheet(pc); return; }
-  else if (act === 'sum-pick') {
-    const S = sheetOf(pc), w = woundOf(pc, S), res = R.summon(a.dataset.type, S, w.tn), t = R.SUMMONS.find(x => x.id === a.dataset.type);
-    const rec = { label: `${choicesOf(pc).name || 'Runner'} · summon ${t.name}`, pool: res.roll.pool, tn: res.roll.tn, dice: res.roll.dice, succ: res.roll.succ, verdict: res.rating ? `${t.name} at rating ${res.rating}` : 'Nothing answers' };
-    (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8);
-    logPush({ kind: 'roll', who: pc.id, rec });
-    (state.lastSummon = state.lastSummon || {})[pc.id] = res.rating ? null : `Nothing answered the ${t.name}: ${res.roll.succ} successes at TN ${res.roll.tn}.`;
-    state.summonPick[pc.id] = false; if (res.rating) state.summons[pc.id] = { type: t.id, rating: res.rating, max: res.rating };
-    persist(); toast(rec, a); renderSheet(pc); return;
-  }
-  else if (act === 'sum-dmg' || act === 'sum-drain') { const sm = summonOf(pc); if (!sm) return; sm.rating -= 1;
-    if (act === 'sum-drain') { const d = liveOf(pc).dmg, i = d.lastIndexOf('B'); if (i >= 0) d[i] = null; }
-    if (sm.rating <= 0) state.summons[pc.id] = null; persist(); renderSheet(pc); return; }
-  else if (act === 'sum-heal') { const sm = summonOf(pc); if (sm && sm.rating < sm.max) sm.rating += 1; persist(); renderSheet(pc); return; }
-  else if (act === 'sum-release') { state.summons[pc.id] = null; persist(); renderSheet(pc); return; }
   else if (act === 'asof') { state.asof[pc.id] = +a.dataset.v; renderSheet(pc); return; }
-  else if (act === 'dmg') { const live = liveOf(pc); const i = +a.dataset.i; const cur = live.dmg[i]; live.dmg[i] = cur === 'B' ? 'L' : cur === 'L' ? null : 'B'; persist(); renderSheet(pc); return; }
-  else if (act === 'roll') { rollFor(pc, a.dataset.skill, !!a.dataset.soak, a); return; }
   persist(); renderSheet(pc);
-}
-function rollFor(pc, skill, soak, srcEl) {
-  const S = sheetOf(pc), w = woundOf(pc, S);
-  const r = R.roll(S.skill[skill], S.tn(skill) + w.tn);
-  r.label = `${choicesOf(pc).name || 'Runner'} · ${srcEl?.dataset?.tool ? srcEl.dataset.tool + ' · ' : ''}${soak ? 'Soak' : R.SK_NAME[skill]}`;
-  if (soak && r.succ) r.verdict = `Soak ${1 + r.bonuses} damage`;
-  const rec = { label: r.label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
-  (state.rolls[pc.id] = state.rolls[pc.id] || []).unshift(rec); state.rolls[pc.id] = state.rolls[pc.id].slice(0, 8); persist(); logPush({ kind: 'roll', who: pc.id, rec });
-  const t = $('#toast'), rr = srcEl?.getBoundingClientRect();
-  t.innerHTML = rollHtml(rec); t.style.left = Math.max(180, Math.min(W() - 180, rr ? rr.left + rr.width / 2 : W() / 2)) + 'px'; t.style.top = Math.max(90, rr ? rr.top : H() / 2) + 'px';
-  const pop = srcEl?.closest('#qpop'); if (pop) { const pr = pop.getBoundingClientRect(); t.style.left = (pr.left + pr.width / 2) + 'px'; t.style.top = pr.top + 'px'; }
-  t.hidden = false; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.hidden = true, 300); }, 2600);
-  renderSheet(pc);
 }
 document.addEventListener('input', ev => {
   const i = ev.target.closest('input[data-act="name"], input[data-act="player"]'); if (!i) return; const pc = pcById[i.dataset.pc]; const ch = choicesOf(pc);
   if (i.dataset.act === 'player') { pc.player = i.value; const x = state.extra.find(e => e.id === pc.id); if (x) x.player = i.value; persist(); box_who(pc); return; }
   ch.name = i.value; persist();
-  const box = sheetEls[pc.id], nm = ch.name || 'New runner'; box.querySelector('.nm').textContent = nm; box.querySelector('.nm').classList.toggle('empty', !ch.name); nodes[pc.id].title = nm; });
-function box_who(pc) { const S = sheetOf(pc); sheetEls[pc.id].querySelector('.who').textContent = `${[S.meta?.name, pc.archetype].filter(Boolean).join(' · ') || 'Not built yet'} · played by ${pc.player || '—'}`; }
+  const box = sheetEls[pc.id], nm = ch.name || `New ${WORDS.char}`; box.querySelector('.nm').textContent = nm; box.querySelector('.nm').classList.toggle('empty', !ch.name); nodes[pc.id].title = nm; });
 document.addEventListener('change', ev => { const s = ev.target.closest('select[data-act="wire"]'); if (!s) return; const pc = pcById[s.dataset.pc]; choicesOf(pc).wire = s.value || null; persist(); renderSheet(pc); });
 
 // ---- the book's pages: every page is always drawn; pdf.js sharpens a page once you are close
