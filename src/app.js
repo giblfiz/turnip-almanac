@@ -52,6 +52,7 @@ function linkify(text, fromId) {
 // ------------------------------------------------------------------ geometry (world units)
 // Tight clusters at every scale, about the golden ratio: the whole canvas, each sheet (2100 × 1300), the builder block.
 const MAP = window.MAPMETA || { width: 9000, height: 8000 };
+const HISTW = 1300;   // the history card's width (it lives far left of the map)
 const SW = 2100, SH = 1300, RH = SH + 60, SLOTS = 6;       // party: six seats down the map's right edge
 const rowsTop = 40;
 const pcRowY = i => rowsTop + i * RH;
@@ -521,7 +522,7 @@ function layoutPeople() {
   ghostT = add(world, 'ghost', PCX + (PCW + SGAP) / 2, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newthread="1"><span class="plus">+</span><span>Thread</span></button>`);
   py = y + 360; refreshBacks(); updateBounds();
 }
-function updateBounds() { const top = Math.min(BY - 700, -3700); Object.assign(BOUNDS, { x: -120, y: top, w: PCX + PCW + 200, h: Math.max(MH, py, sy) - top + 120 }); }
+function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 2600; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy) - top + 120 }); }
 const BOUNDS = {};
 // editing a person's or thread's name and words
 document.addEventListener('focusout', () => {}, true);
@@ -1050,6 +1051,7 @@ const anchors = [
   { id: 'a-party', label: 'Party', icon: 'assets/tool-pawns.png', target: 'party', box: { x: PX, y: -900, w: SW, h: SLOTS * RH + 900 } },
   { id: 'a-sessions', label: 'Sessions', icon: 'assets/tool-build.png', target: 's1', box: { x: SX, y: SY, w: SBW, h: py - SY } },
   { id: 'a-table', label: 'At the table', icon: 'assets/tool-build.png', target: 'round', box: { x: SX, y: TBY, w: SBW, h: TBH } },
+  { id: 'a-history', label: 'History', icon: 'assets/tool-build.png', target: 'history' },
 ];
 arrowsEl.innerHTML = anchors.map(a => `<div class="arrow" data-anchor="${a.id}" tabindex="0" role="button" style="opacity:0;pointer-events:none"><img src="${a.icon}" alt=""><span>${a.label}</span><span class="dir">➜</span></div>`).join('');
 function contentCoverage() {
@@ -1346,9 +1348,12 @@ function histGoBack(id) {
   try { sessionStorage.setItem('turnip-almanac-histnote', `Went back to ${new Date(v.t).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}`); } catch {}
   location.reload();
 }
-const HBX = SX + 3 * (TBW + SGAP);
-const histCard = add(world, 'card tablecard histcard', HBX, TBY, TBW, TBH, '');
-reg('history', { el: histCard, title: 'History · every change, newest first', kind: 'table', box: { x: HBX, y: TBY, w: TBW, h: TBH } });
+// out in the left suburbs, past the map's west edge: the past lies to the left (H, 14 Nov)
+const HBW = HISTW, HBH = Math.round(HBW * 1.618), HBX = -HBW - 2400, HBY = Math.round(MH / 2 - HBH / 2);
+label(world, 'History', HBX, HBY - 700, 560);
+const histCard = add(world, 'card tablecard histcard', HBX, HBY, HBW, HBH, '');
+reg('history', { el: histCard, title: 'History · every change, newest first', kind: 'table', box: { x: HBX, y: HBY, w: HBW, h: HBH } });
+updateBounds();
 function renderHistory() {
   const vs = HIST.vs.slice(-200).reverse(), day = t => new Date(t).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   let lastDay = '', rows = '';
