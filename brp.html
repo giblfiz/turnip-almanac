@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Turnip Almanac</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -574,7 +574,9 @@ img { max-width: none; }
 .wthreads path.build { stroke-dasharray: 18 12; opacity: .55; }
 .wthreads circle { fill: var(--ochre); opacity: .7; }
 .wthreads circle.far { pointer-events: auto; cursor: pointer; opacity: .85; }
-#threads, #tends { display: none; }
+#threads { display: none; }
+#tends { position: fixed; inset: 0; pointer-events: none; z-index: 6; }
+#tends .tend { pointer-events: auto; }
 /* a roll button beside each tool */
 .die.sm { width: auto; height: 24px; padding: 0 8px; font: 600 12px var(--f-body); border-radius: 7px; margin-left: 4px; vertical-align: middle; box-shadow: 0 2px 0 var(--ledge) !important; }
 .list > div { line-height: 1.6; }
@@ -704,6 +706,33 @@ img { max-width: none; }
 .rollall { width: 100%; }
 .roll .dd i.big { font-weight: 800; }
 .roll .dd i.bad { background: #b3412c; color: #fff; border-color: #b3412c; }
+/* chapter blocks on the shelf (scaled as a whole; see the shelf in app.js) */
+.chapblk { background: color-mix(in srgb, var(--band) 55%, transparent); border-radius: 30px; }
+.chapblk .chaphead { position: absolute; left: 30px; top: 22px; right: 30px; height: 80px; display: flex; align-items: baseline; gap: 24px; white-space: nowrap; }
+.chapblk .chaphead b { font: 700 64px/1 var(--f-display); color: var(--ochre); }
+.chapblk .chaphead span { font: 500 34px var(--f-body); color: var(--ink-3); }
+.lbl.chaplbl { color: var(--ochre); white-space: normal; line-height: .95; text-shadow: 0 0 .08em var(--paper), 0 0 .2em var(--paper); }
+/* builder cells (rigs that give BAREA): each step fills its own golden cell */
+.bstep.cell { position: absolute; margin: 0; box-sizing: border-box; overflow: hidden; contain: layout; padding: 0; }
+.bstep.cell > .bfit { padding: 22px 26px; box-sizing: border-box; display: flex; flex-direction: column; }
+.bstep.cell > .bfit > .crease { flex: 1; }
+.bstep.cell .opts, .bstep.cell .rows { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); }
+.bstep.cell .crease { min-height: 160px; }
+.seg.era { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 4px; }
+/* quick-follow buttons on thread ends: small keycaps, outside what they point at */
+#tends .tend { position: fixed; z-index: 6; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--ochre); background: var(--btn-face, var(--paper)); box-shadow: 0 2px 0 var(--ledge, #a8770f); color: var(--ink); font: 600 12.5px var(--f-body); padding: 3px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; opacity: .92; }
+#tends .tend.left { transform: translate(-100%, -50%); }
+#tends .tend.right { transform: translate(0, -50%); }
+#tends .tend:active { transform: translate(-50%, calc(-50% + 2px)); box-shadow: none; }
+#tends .tend i { font-style: normal; color: var(--ochre); display: inline-block; }
+#tends .tend.build { border-style: dashed; }
+/* a stat's name is a link to its rule (its number shows where the number came from) */
+.main [data-rule-of] { cursor: pointer; text-decoration: underline dotted color-mix(in srgb, var(--ochre) 55%, transparent); text-underline-offset: .18em; }
+.main [data-rule-of]:hover { color: var(--ochre); }
+/* touch: no text selection or callouts while panning the canvas; text fields still select */
+#vp { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+#vp input, #vp textarea, #vp [contenteditable] { -webkit-user-select: text; user-select: text; }
+html, body { touch-action: none; overscroll-behavior: none; }
 </style>
 <div id="vp" aria-label="Campaign canvas"><div id="world"></div></div>
 <svg id="threads"></svg>
@@ -753,7 +782,7 @@ const labels = [];
 function label(parent, text, x, y, size, opts = {}) {
   const e = add(parent, 'lbl' + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
   e.style.fontSize = size + 'px'; if (opts.align) e.style.textAlign = opts.align;
-  labels.push({ e, size, over: !!opts.over }); return e;
+  labels.push({ e, size: size * (opts.k || 1), over: !!opts.over, ww: opts.w != null ? opts.w * (opts.k || 1) : null }); return e;
 }
 
 const printIndex = Object.fromEntries(C.print.map(p => [p.id, p]));
@@ -793,44 +822,119 @@ C.places.forEach(p => {
 
 // ------------------------------------------------------------------ the shelf: the book, its index beside its real pages
 const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
-// the index: chapters from the book's list, or from each print entry's chapter
-const chapters = BK.chapters ? BK.chapters.map(ch => ({ title: ch.title, entries: C.print.filter(p => ch.page ? p.page === ch.page : p.chapter === ch.title) }))
-  : [...new Set(C.print.map(p => p.chapter || 'Rules'))].map(t => ({ title: t, entries: C.print.filter(p => (p.chapter || 'Rules') === t) }));
-const ICOLS = 4, ICW = 316, IRH = 150, IDXW = ICOLS * (ICW + 10);
-const idxH = chapters.reduce((h, ch) => h + 50 + Math.ceil(ch.entries.length / ICOLS) * IRH + 24, 0);
-// the pages: a grid whose column count makes the whole book about golden (E2)
-let PCOLS = 1, best = 1e9;
-for (let c = 1; c <= BK.pages; c++) { const rows = Math.ceil(BK.pages / c), w = 100 + IDXW + c * (PW + PG), h = 300 + Math.max(idxH, rows * (PH + PG)), d = Math.abs(w / h - 1.618); if (d < best) { best = d; PCOLS = c; } }
-const PROWS = Math.ceil(BK.pages / PCOLS);
-const bookW = 40 + IDXW + 60 + PCOLS * PW + (PCOLS - 1) * PG + 40, BX = 0;
-const pagesX = 40 + IDXW + 60, pagesY = 260;
-const bookH = pagesY + Math.max(idxH, PROWS * (PH + PG) - PG) + 60, BY = -bookH - 260;
+// The book is a cluster of chapter blocks (a squarified treemap in a golden box), each block an index column beside its
+// pages, scaled as a whole to fill its cell (E2, E6). The whole book is sized against the map so the map stays the
+// anchor (H, 14 Nov: "why is this thing 5 times bigger than the map?"): pages shrink, chapters get fading headlines (E1).
+const parts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: BK.pages }]).map(pt => ({ ...pt,
+  n: pt.to - pt.from + 1, entries: C.print.filter(p => p.page >= pt.from && p.page <= pt.to) }));
+const ICW = 316, IRH = 150, IGAP = 10, HEADH = 120, PPAD = 30;
+function partNatural(n, m, c, ic) {   // natural size (u = 1) of a chapter block with c page columns and ic index columns
+  const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;
+  return { w: PPAD * 2 + (ic ? ic * (ICW + IGAP) + 40 : 0) + c * (PW + PG) - PG, h: HEADH + Math.max(rows * (PH + PG) - PG, ih - IGAP) + PPAD, rows };
+}
+const natArea = pt => { let best = 1e18; for (let c = 1; c <= pt.n; c++) { const ic = pt.entries.length ? Math.max(1, Math.ceil(pt.entries.length * IRH / ((Math.ceil(pt.n / c)) * (PH + PG)))) : 0; const d = partNatural(pt.n, pt.entries.length, c, ic); best = Math.min(best, d.w * d.h); } return best; };
+parts.forEach(pt => pt.area = natArea(pt));
+const INTERP = { title: 'Where this book is open', interp: true, area: 0 };
+// size: at most ~40% of the map's area (the map is MW × MH, laid out above), never larger than the natural size
+const BOOK_TOP = 300;   // the strip with the book's own title
+const natTotal = parts.reduce((t, pt) => t + pt.area, 0);
+INTERP.area = 1700 * 800;   // its natural size: readable when the pages are
+const bookArea = Math.min((natTotal + INTERP.area) * 1.08, 0.40 * MW * MH);
+// ordered golden treemap: split the chapter list (in reading order) in two and the box along its longer side, choosing
+// the split whose cells come out nearest the golden ratio; recurse. Reading order runs left→right, top→bottom.
+const PHI = 1.618, dev = (w, h) => { const a = Math.max(w, h) / Math.min(w, h); return a >= PHI ? a / PHI : PHI / a; };
+function goldenSplit(items, x, y, w, h) {
+  // the score depends only on the aspect ratio, so memoise on (range, aspect): a few thousand calls, not millions
+  const pre = [0]; items.forEach(i => pre.push(pre.at(-1) + i.area)); const memo = new Map();
+  function best(i, j, asp) {   // asp = w / h of the box holding items[i..j)
+    const key = i + ',' + j + ',' + Math.round(Math.log(asp) * 40); const hit = memo.get(key); if (hit) return hit;
+    let r;
+    if (j - i === 1) r = { score: dev(asp, 1), plan: null };
+    else { r = null; const tot = pre[j] - pre[i];
+      for (let k = i + 1; k < j; k++) { const f = (pre[k] - pre[i]) / tot;
+        for (const horiz of [true, false]) {
+          const aA = horiz ? asp * f : asp / f, aB = horiz ? asp * (1 - f) : asp / (1 - f);
+          const l = best(i, k, aA), rr = best(k, j, aB), score = Math.max(l.score, rr.score) + 0.15 * (l.score + rr.score);
+          if (!r || score < r.score) r = { score, plan: { k, f, horiz } };
+        } } }
+    memo.set(key, r); return r;
+  }
+  const cells = [];
+  (function place(i, j, x, y, w, h) {
+    const r = best(i, j, w / h); if (!r.plan) { cells.push({ i: items[i], x, y, w, h }); return; }
+    const { k } = r.plan, f = (pre[k] - pre[i]) / (pre[j] - pre[i]);
+    if (r.plan.horiz) { place(i, k, x, y, w * f, h); place(k, j, x + w * f, y, w * (1 - f), h); }
+    else { place(i, k, x, y, w, h * f); place(k, j, x, y + h * f, w, h * (1 - f)); }
+  })(0, items.length, x, y, w, h);
+  return { cells, score: best(0, items.length, w / h).score };
+}
+// try a few orders (reading order, largest first, and swaps of neighbours) and keep the best-shaped
+function goldenLayout(items, x, y, w, h) {
+  let order = [...items].sort((a, b) => b.area - a.area), cur = goldenSplit(order, x, y, w, h);
+  const read = goldenSplit(items, x, y, w, h); if (read.score <= cur.score * 1.05) { order = [...items]; cur = read; }
+  for (let pass = 0; pass < 1; pass++) for (let t = 0; t + 1 < order.length; t++) {
+    const o = [...order]; [o[t], o[t + 1]] = [o[t + 1], o[t]]; const r = goldenSplit(o, x, y, w, h);
+    if (r.score < cur.score - 1e-6) { order = o; cur = r; } }
+  return { ...cur, order };
+}
+// the book's own outline may flex (1.0–2.2) if that lets every chapter come out nearer golden; it must leave room for the
+// help card and the launcher above the map's right end (PX − 1900)
+let bookW, bookH, cells;
+{ let bestL = null;
+  const w0 = Math.min(Math.sqrt(bookArea * PHI), PX - 2000), order = goldenLayout([...parts, INTERP], 40, BOOK_TOP, w0 - 80, bookArea / w0 - 40).order;
+  for (let asp = 1.0; asp <= 2.21; asp += 0.1) {
+    const w = Math.min(Math.sqrt(bookArea * asp), PX - 2000), h = bookArea / w;
+    const L = goldenSplit(order, 40, BOOK_TOP, w - 80, h - 40);
+    const sc = L.score + 0.3 * dev(w, h + BOOK_TOP);   // the book itself should be near golden too
+    if (!bestL || sc < bestL.sc) bestL = { sc, L, w, h };
+  }
+  bookW = Math.round(bestL.w); bookH = Math.round(bestL.h + BOOK_TOP); cells = bestL.L.cells; }
+const U0 = Math.min(1, Math.sqrt(bookArea / ((natTotal + INTERP.area) * 1.08)));   // the shelf's overall scale
+const BX = 0, BY = -bookH - 260, CGAP = 40;
 const bk = add(world, 'bk', BX, BY, bookW, bookH, `<div class="bhead"><img src="${BK.icon || 'assets/genre-modern.png'}" alt=""><div><h2>${esc(BK.fullTitle || BK.title)}</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
 reg(BK.id, { el: bk, title: BK.fullTitle || BK.title, kind: 'book', icon: BK.icon || 'assets/genre-modern.png', box: { x: BX, y: BY, w: bookW, h: bookH } });
 label(world, 'The rulebook', BX, BY - 420, 300);
-let iy = 260;
-chapters.forEach(ch => {
-  add(bk, 'chap', 40, iy, IDXW, 40, esc(ch.title)); iy += 50;
-  ch.entries.forEach((p, i) => {
-    const x = 40 + (i % ICOLS) * (ICW + 10), y = iy + Math.floor(i / ICOLS) * IRH;
-    const ce = add(bk, 'entry card', x, y, ICW, IRH - 10, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
-    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: { x: BX + x, y: BY + y, w: ICW, h: IRH - 10 } });
-  });
-  iy += Math.ceil(ch.entries.length / ICOLS) * IRH + 24;
-});
 const pageFrames = [];
-for (let n = 1; n <= BK.pages; n++) {
-  const px = pagesX + ((n - 1) % PCOLS) * (PW + PG), py = pagesY + Math.floor((n - 1) / PCOLS) * (PH + PG);
-  const pf = add(bk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
-  label(pf, String(n), PW - 170, 20, 200, { cls: 'pnumlbl', over: true });
-  pageFrames.push(reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: { x: BX + px, y: BY + py, w: PW, h: PH }, n }));
-}
-C.print.forEach(p => {
-  const k = PW / BK.pw, [x, y, w, h] = p.rect, pf = nodes['page-' + p.page];
-  const re = add(pf.el, 'region', x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}</span>`);
-  reg(p.id, { el: re, title: p.title, kind: 'rule', sub: `p.${p.page}`, text: p.text, box: { x: pf.box.x + x * k - 6, y: pf.box.y + y * k - 6, w: w * k + 12, h: h * k + 12 } });
+cells.forEach(cell => {
+  const cx = cell.x + CGAP / 2, cy = cell.y + CGAP / 2, cw = cell.w - CGAP, chh = cell.h - CGAP, pt = cell.i;
+  if (pt.interp) { const e = add(bk, 'card interpcard', cx, cy, cw / U0, chh / U0, `<div class="fit"><h3>Where this book is open, the Almanac decides</h3><div class="t">${R.interpretations.map(esc).join('<br>')}</div></div>`); e.style.transformOrigin = '0 0'; e.style.transform = `scale(${U0})`; requestAnimationFrame(() => fitCard(e)); document.fonts?.ready.then(() => fitCard(e)); return; }
+  // the block's own layout: the page-column count and index-column count that let it fill its cell at the largest scale
+  let best = null; const m = pt.entries.length;
+  for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 8) : 0); ic++) {
+    const d = partNatural(pt.n, m, c, ic), u = Math.min(cw / d.w, chh / d.h, 1);
+    if (!best || u > best.u + 1e-9) best = { c, ic, u, d };
+  }
+  const { c, ic, u, d } = best;
+  // justify: spread what is left of the cell into the gaps, so the block fills its cell (no dead margin, E6)
+  const ex = cw / u - d.w, ey = chh / u - d.h, gx = c > 1 || ic ? ex / ((c - 1) + (ic ? 1 : 0) + 2) : ex / 2, gy = d.rows > 1 ? ey / (d.rows + 1) : ey / 2;
+  const blk = add(bk, 'chapblk', cx, cy, cw / u, chh / u, `<div class="chaphead"><b>${esc(pt.title)}</b> <span>pages ${pt.from}–${pt.to}</span></div>`);
+  blk.style.transformOrigin = '0 0'; blk.style.transform = `scale(${u})`;
+  pt.box = { x: BX + cx, y: BY + cy, w: cw, h: chh };
+  reg('part-' + pt.from, { el: blk, title: pt.title, kind: 'chapter', box: pt.box });
+  const W = (x, y, w, h) => ({ x: BX + cx + x * u, y: BY + cy + y * u, w: w * u, h: h * u });
+  const x0 = PPAD + gx, y0 = HEADH;
+  pt.entries.forEach((p, i) => {
+    const col = Math.floor(i / Math.ceil(m / ic)), row = i % Math.ceil(m / ic);
+    const x = x0 + col * (ICW + IGAP), y = y0 + row * IRH;
+    const ce = add(blk, 'entry card', x, y, ICW, IRH - IGAP, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+    reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: W(x, y, ICW, IRH - IGAP) });
+  });
+  const px0 = x0 + (ic ? ic * (ICW + IGAP) + 40 + gx : 0);
+  for (let n = pt.from; n <= pt.to; n++) {
+    const k = n - pt.from, px = px0 + (k % c) * (PW + PG + gx), py = y0 + gy + Math.floor(k / c) * (PH + PG + gy);
+    const pf = add(blk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
+    label(pf, String(n), PW - 170, 20, 200, { cls: 'pnumlbl', over: true, k: u });
+    pageFrames.push(reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: W(px, py, PW, PH), n }));
+  }
+  // the chapter's headline: big over the block, fading as its pages become readable (E1)
+  if (parts.length > 1) { const size = Math.min(chh * 0.32, cw * 1.7 / Math.max(6, pt.title.length)); label(world, pt.title, BX + cx, BY + cy + chh / 2 - size * 0.55, size, { over: true, w: cw, align: 'center', cls: 'chaplbl' }); }
 });
-add(world, 'card interpcard', BX + bookW + 120, BY + bookH - 520, 1700, 520, `<h3>Where this book is open, the Almanac decides</h3><div class="t">${R.interpretations.map(esc).join('<br>')}</div>`);
+C.print.forEach(p => {
+  const k = PW / BK.pw, [x, y, w, h] = p.rect, pf = nodes['page-' + p.page]; if (!pf) return;
+  const u = pf.box.w / PW;
+  const re = add(pf.el, 'region', x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}</span>`);
+  reg(p.id, { el: re, title: p.title, kind: 'rule', sub: `p.${p.page}`, text: p.text, box: { x: pf.box.x + (x * k - 6) * u, y: pf.box.y + (y * k - 6) * u, w: (w * k + 12) * u, h: (h * k + 12) * u } });
+});
 
 // ------------------------------------------------------------------ party: sheets as rows down the map's left edge
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -842,7 +946,7 @@ const sheetEls = {};
 // Contract (what the engine calls): WORDS, RIG_NO_UNDO, advanceText, STEP_NAME, BCOLS, ORDER, STEP_RULE, STEP_SHEET,
 // BIW, BINNER, BREG, BK_K, stepHtml, renderSheet, rollHtml, portraitOf, initiative, renderTable, freeRoll, qdice2,
 // trayStep, trayRoll, rigCommands, rigAct, box_who.
-const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
+const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', quickHint: 'Jump or do: ada dodge, roll 45, resist 12 10, new investigator…', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
 const RIG_NO_UNDO = new Set(['roll', 'croll']);
 const P = R.P;
 function advanceText(k) { return (k.gain || []).map(g => `${R.SK[g.skill]?.name || g.skill} +${g.n}`).join(', '); }
@@ -851,7 +955,9 @@ const ORDER = ['name', 'power', 'chars', 'prof', 'profskills', 'personal', 'powe
 const BCOLS = [['name', 'power', 'chars', 'prof'], ['profskills', 'armor', 'done'], ['personal'], ['powers', 'weapons']];
 const STEP_RULE = { name: 'brp-step-1', power: 'brp-power-level', chars: 'brp-step-1', prof: 'brp-professions', profskills: 'brp-step-7', personal: 'brp-step-7', powers: 'brp-how-do-characters-get-powers', weapons: 'brp-weapons', armor: 'brp-armor', done: 'brp-step-7' };
 const STEP_SHEET = { name: '.nm', power: '.who', chars: '.chgrid', prof: '.who', profskills: '.skgrid', personal: '.skgrid', powers: '.l-powers', weapons: '.l-weapons', armor: '.l-armor', done: '.budget' };
-const BIW = 880, BGAP = 40, BINNER = { w: 30 + 4 * BIW + 3 * BGAP + 30, h: 5200 }, BREG = { x: 30, y: 950, w: 440, h: 320 };
+const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
+// how much each step holds (its share of the builder); the engine splits the builder into golden cells by these
+const BAREA = { name: 0.45, power: 0.5, chars: 1.1, prof: 2.4, profskills: 1.2, personal: 2.8, powers: 1.7, weapons: 2.5, armor: 1.2, done: 0.55 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -884,7 +990,7 @@ function stepHtml(pc, S, key) {
   if (key === 'profskills') {
     h += `${stepHead(S, 'profskills', '4', 'Professional skills', STEP_RULE.profskills)}<div class="hint">Spend ${S.profPool} points on your profession's skills, 5 at a time. No skill above ${S.cap}% at creation.</div>`;
     const prof = S.prof;
-    if (!prof) h += `<div class="crease" style="height:600px">Choose a profession first</div>`;
+    if (!prof) h += `<div class="crease">Choose a profession first</div>`;
     else { h += `<div class="rows one">`; const seen = new Set();
       prof.skills.forEach(x => { if (!x.skill || seen.has(x.skill)) return; seen.add(x.skill); const s = R.SK[x.skill]; if (!s) return; const v = ch.profAlloc[x.skill] || 0, base = R.baseOf(s, S.char, ch);
         h += row(v > 0, `${esc(x.text || s.name)} → ${S.skill[s.id]}%`, `base ${base}%`, `+${v}`, step5('profAlloc.' + s.id, v, 0, Math.max(0, S.cap - base - (ch.persAlloc[s.id] || 0)), s.name)); });
@@ -896,21 +1002,22 @@ function stepHtml(pc, S, key) {
     h += `</div>`;
   }
   if (key === 'powers') {
-    h += `${stepHead(S, 'powers', '6', 'Powers', STEP_RULE.powers)}<div class="hint">Most Normal-level games have none. Choose a system to open its list.</div><div class="opts three">`;
-    h += opt('psys', '', ch.psys || '', 'None', 'No powers'); R.POWERS.forEach(k => h += opt('psys', k, ch.psys || '', R.D.powers[k].name || k, ''));
-    h += `</div><div style="height:1500px;margin-top:14px">`;
-    if (ch.psys) { h += `<div class="grouph"><span>${esc(R.D.powers[ch.psys].name || ch.psys)}${S.powerNote ? ' · ' + S.powerNote : ''}</span></div><div class="opts three">`;
-      R.powerList(ch.psys).forEach(pw => { const on = (ch.powers || []).includes(pw.name); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="powers" data-v="${esc(pw.name)}" aria-pressed="${on}"><b style="font-size:19px">${esc(pw.name)}</b><span style="font-size:15px">${esc(pw.cost || '')} · ${esc((pw.effect || '').slice(0, 70))}</span></button>`; });
+    h += `${stepHead(S, 'powers', '6', 'Powers', STEP_RULE.powers)}<div class="hint">Most Normal-level games have none. Choose a system to open its list.</div><div class="seg era">`;
+    h += [['', 'None'], ...R.POWERS.map(k => [k, R.D.powers[k].name || k])].map(([k, n]) => `<button class="${(ch.psys || '') === k ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="psys" data-v="${k}" aria-pressed="${(ch.psys || '') === k}">${esc(n)}</button>`).join('') + `</div>`;
+    if (ch.psys) { h += `<div class="grouph"><span>${esc(R.D.powers[ch.psys].name || ch.psys)}${S.powerNote ? ' · ' + S.powerNote : ''}</span></div><div class="opts">`;
+      R.powerList(ch.psys).forEach(pw => { const on = (ch.powers || []).includes(pw.name); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="powers" data-v="${esc(pw.name)}" aria-pressed="${on}"><b style="font-size:19px">${esc(pw.name)}</b><span style="font-size:15px">${esc(pw.cost || '')}</span></button>`; });
       h += `</div>`; }
-    else h += `<div class="crease" style="height:1500px">A power system's list opens here</div>`;
-    h += `</div>`;
+    else { h += `<div class="opts">` + R.POWERS.map(k => { const P2 = R.D.powers[k]; return `<button class="opt" data-act="set" data-pc="${pc.id}" data-path="psys" data-v="${k}"><b>${esc(P2.name || k)}<em>p.${esc(String(P2.page || ''))}</em></b><span>${R.powerList(k).length} to choose from · ${esc(String(P2.resource?.type || '').replace(/\s*\(.*$/, ''))}</span></button>`; }).join('') + `</div>`; }
   }
   if (key === 'weapons') {
-    h += `${stepHead(S, 'weapons', '7', 'Weapons', STEP_RULE.weapons)}<div class="hint">Pick what they carry. Each weapon rolls its own skill.</div>`;
-    const cats = [...new Set(R.WEAPONS.map(w => w.category))];
-    cats.forEach(cat => { h += `<div class="grouph"><span>${esc(cat)}</span></div><div class="opts four">`;
-      R.WEAPONS.filter(w => w.category === cat).forEach(w => { const on = (ch.weapons || []).includes(w.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:6px 8px" data-act="toggle" data-pc="${pc.id}" data-path="weapons" data-v="${w.id}" aria-pressed="${on}"><b style="font-size:17px">${esc(w.name)}</b><span style="font-size:14px">${esc(w.damage || '')}</span></button>`; });
-      h += `</div>`; });
+    // one era at a time (the book's eras); what they carry stays listed whatever era is open
+    const ERAS = [['Primitive', /Primitive|Ancient/], ['Historic', /^Historic/], ['Modern', /Modern/], ['Advanced', /Advanced/]];
+    const era = ch.wEra || 'Modern', re = (ERAS.find(e => e[0] === era) || ERAS[2])[1];
+    const carried = (ch.weapons || []).map(id => R.W_BY[id]).filter(Boolean);
+    h += `${stepHead(S, 'weapons', '7', 'Weapons', STEP_RULE.weapons)}<div class="hint">Pick what they carry. Each weapon rolls its own skill.${carried.length ? ' Carrying: ' + carried.map(w => esc(w.name)).join(', ') + '.' : ''}</div><div class="seg era">`;
+    h += ERAS.map(([e]) => `<button class="${e === era ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="wEra" data-v="${e}" aria-pressed="${e === era}">${e}</button>`).join('') + `</div><div class="opts">`;
+    R.WEAPONS.filter(w => re.test(w.era || '') || re.test(w.category || '')).forEach(w => { const on = (ch.weapons || []).includes(w.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:6px 8px" data-act="toggle" data-pc="${pc.id}" data-path="weapons" data-v="${w.id}" aria-pressed="${on}"><b style="font-size:17px">${esc(w.name)}</b><span style="font-size:14px">${esc((w.category || '').replace(/ Weapons$/, '').replace(/^\S+ /, ''))} · ${esc(w.damage || '')}</span></button>`; });
+    h += `</div>`;
   }
   if (key === 'armor') {
     h += `${stepHead(S, 'armor', '8', 'Armour', STEP_RULE.armor)}<div class="hint">One suit. Modern and future armour stops the most.</div><div class="opts three">`;
@@ -963,7 +1070,7 @@ function renderSheet(pc) {
   const hpBoxes = Array.from({ length: S.der.hp }, (_, i) => `<button class="${live.dmg[i] ? 'L' : ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Hit point ${i + 1}">${live.dmg[i] ? '×' : ''}</button>`).join('');
   const hurt = live.dmg.filter(Boolean).length;
   const cats = [...new Set(R.SKILLS.map(s => s.category || 'Other'))];
-  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
+  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k" data-rule-of="s:${s.id}" role="link" tabindex="0">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
   const weaponRows = S.weapons.map(w => { const sk = R.skillOfWeapon(w), v = sk ? S.skill[sk] : 0; return `<div><b>${esc(w.name)}</b> <span class="e">${esc(w.damage || '')}${w.range ? ' · ' + esc(w.range) : ''}</span> <button class="die sm" data-act="roll" data-pc="${pc.id}" data-target="${v}" data-label="${esc(w.name)}">⚄ ${esc(R.SK[sk]?.name || 'skill')} ${v}%</button></div>`; }).join('');
   const tok = portraitOf(pc, S);
   box.innerHTML = `
@@ -1067,7 +1174,39 @@ function stepper(pc, path, v, min, max, lab) {
   return `<div class="stepper"><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="-1" data-min="${min}" data-max="${max}" ${v <= min ? 'disabled' : ''} aria-label="Lower ${lab}">−</button><output>${v}</output><button data-act="inc" data-pc="${pc.id}" data-path="${path}" data-d="1" data-min="${min}" data-max="${max}" ${v >= max ? 'disabled' : ''} aria-label="Raise ${lab}">+</button></div>`;
 }
 function builderInner(pc, S) {
-  return BCOLS.map((col, i) => `<div class="bcol" style="left:${30 + i * (BIW + BGAP)}px;width:${BIW}px">${col.map(k => stepHtml(pc, S, k)).join('')}</div>`).join('');
+  if (typeof BAREA === 'undefined')
+    return BCOLS.map((col, i) => `<div class="bcol" style="left:${30 + i * (BIW + BGAP)}px;width:${BIW}px">${col.map(k => stepHtml(pc, S, k)).join('')}</div>`).join('');
+  // golden cells (E2 at the builder's scale): the steps, in Tab order, split into cells near the golden ratio, each cell
+  // sized by how much its step holds. The cells never move; a step's contents are scaled and reflowed to fill its own cell.
+  return builderCells().map(c => stepHtml(pc, S, c.i.k).replace(/^<div class="bstep"([^>]*)>/, `<div class="bstep cell"$1 style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><div class="bfit">`) + '</div>').join('');
+}
+let _bcells = null;
+function builderCells() {
+  if (_bcells) return _bcells; const G = 34;
+  _bcells = goldenSplit(ORDER.map(k => ({ k, area: BAREA[k] || 1 })), G / 2, G / 2, BINNER.w - G, BINNER.h - G).cells.map(c => ({ ...c, x: c.x + G / 2, y: c.y + G / 2, w: c.w - G, h: c.h - G }));
+  return _bcells;
+}
+// fill one builder cell: try 1–6 columns for its lists and keep the count that lets the contents be largest (E6, E7)
+// step + item count → { N, z }: shared by every sheet, so a click re-checks instead of re-searching. A fit is in world units
+// (independent of the screen), so it is kept across visits too.
+const CELLFIT_KEY = 'turnip-almanac-cellfit:' + (C.id || 'ssr') + ':' + (typeof BAREA === 'undefined' ? '' : Object.values(BAREA).join(','));
+const cellFit = new Map((() => { try { return JSON.parse(localStorage.getItem(CELLFIT_KEY) || '[]'); } catch { return []; } })());
+let cellFitSave = 0; const saveCellFit = () => { clearTimeout(cellFitSave); cellFitSave = setTimeout(() => { try { localStorage.setItem(CELLFIT_KEY, JSON.stringify([...cellFit])); } catch {} }, 800); };
+function fitCell(cell) {
+  const f = cell.querySelector(':scope > .bfit'); if (!f) return; const box = cell.getBoundingClientRect(); if (!box.height) return;
+  const W = cell.clientWidth, lists = [...f.querySelectorAll('.opts, .rows')], n = lists.reduce((t, l) => t + l.children.length, 0);
+  const key = cell.dataset.id.split('-').pop() + ':' + n;
+  const wide = () => [...f.querySelectorAll('.opt, .row, .q, .stepper')].some(e => e.scrollWidth > e.clientWidth + 1);
+  const set = (N, z) => { lists.forEach(l => l.style.setProperty('--cols', N)); f.style.zoom = z; f.style.width = (W / z) + 'px'; f.style.minHeight = ''; };
+  const fits = () => f.getBoundingClientRect().height <= box.height * 0.985 && !wide();
+  const zoomFor = (N, lo = 0.2, hi = 2.4, it = 8) => { for (let i = 0; i < it; i++) { const m = (lo + hi) / 2; set(N, m); if (fits()) lo = m; else hi = m; } return lo; };
+  const finish = (N, z) => { set(N, z); f.style.minHeight = (box.height / box.width * W / z) + 'px'; f.dataset.z = z.toFixed(2); f.dataset.cols = N; cellFit.set(key, { N, z }); saveCellFit(); };
+  const c = cellFit.get(key);
+  if (c) { set(c.N, c.z); if (fits() && f.getBoundingClientRect().height >= box.height * 0.93 || c.z >= 2.39 && fits()) return finish(c.N, c.z);
+    return finish(c.N, zoomFor(c.N, c.z * 0.7, Math.min(2.4, c.z * 1.3), 6)); }
+  let best = 0, N = 1, drops = 0; const maxN = lists.length ? Math.min(6, Math.max(...lists.map(l => l.children.length))) : 1;
+  for (let k = 1; k <= maxN; k++) { const z = zoomFor(k); if (z > best * 1.03) { best = z; N = k; drops = 0; } else if (++drops >= 2) break; }
+  finish(N, best);
 }
 // portraits: an uploaded image, else the Turnip Works runner token that best fits the build
 // summons: one at a time; a tiny sheet inside the summoner's sheet (rules p.2)
@@ -1080,6 +1219,7 @@ function fitInto(box, inner, max = 3) {
 const isToken = src => /assets\/tokens\//.test(src || '');
 // fill every section: scale its contents (CSS zoom) until they exactly fill the box, so no sheet carries dead space
 function fitSections(box) {
+  box.querySelectorAll('.bstep.cell').forEach(fitCell);
   box.querySelectorAll('.main > section:not(.sP):not(.sS)').forEach(sec => {
     let f = sec.querySelector(':scope > .fit');
     if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
@@ -1516,9 +1656,11 @@ function drawThreads() {
     const ca = [A.x + A.w / 2, A.y + A.h / 2], cb = [B.x + B.w / 2, B.y + B.h / 2];
     const [x0, y0] = nearPt(A, cb), [x1, y1] = nearPt(B, ca);
     const len = Math.hypot(x1 - x0, y1 - y0), lift = Math.min(900, 60 + len * 0.12), mx = (x0 + x1) / 2, my = Math.min(y0, y1) - lift;
-    const w = Math.max(3, Math.min(14, len / 300));
+    const w = Math.max(2, Math.min(6, len * cam.s / 300)) / cam.s;   // stroke and dots sized on screen, so a close view is not covered by them
     d += `<path class="${cls}" style="stroke-width:${w}px" d="M${x0},${y0} Q${mx},${my} ${x1},${y1}"/><circle class="${cls}" cx="${x0}" cy="${y0}" r="${w * 2.2}"/><circle class="${cls} far" ${goB ? `data-go="${goB}"` : ''} cx="${x1}" cy="${y1}" r="${w * 2.6}"><title>Fly there</title></circle>`;
+    if (goB) ends.push({ id: goB, x0, y0, x1, y1, B, cls });
   };
+  const ends = [];
   if (threadSrc) {
     const box = sheetEls[threadSrc.pcId], vEl = box?.querySelector(`.main [data-prov="${threadSrc.key}"]`);
     if (vEl) (box._prov[threadSrc.key] || []).forEach(id => { const n = nodes[id]; if (n?.el) link(vEl, n.el, id); });
@@ -1530,7 +1672,35 @@ function drawThreads() {
     link(stepEl, box?.querySelector('.main ' + STEP_SHEET[key]), pc, 'build');
   }
   if (d !== wsvg._d) { wsvg.innerHTML = d; wsvg._d = d; }
-  threadsSvg.innerHTML = ''; tends.innerHTML = '';
+  threadsSvg.innerHTML = '';
+  // quick-follow: one small button per thread end, never on top of what the thread starts from (H, 14 Nov). An end on
+  // screen gets its button just outside the far thing, on the side the thread arrives from; an end off screen gets it
+  // on the screen's edge, where the straight line towards it leaves the screen.
+  const vw = W(), vh = H(), top = 64, m = 14, used = [], tag = e => { const n = nodes[e.id]; if (!n) return '';
+    if (n.kind === 'rule') return `p.${printIndex[e.id]?.page ?? ''} · ${n.title}`; if (n.kind === 'step') return n.title.replace(/^.*· builder: /, 'Builder · ');
+    if (n.kind === 'character') return 'The sheet'; return n.title || ''; };
+  let html = '';
+  ends.forEach(e => {
+    const sx0 = (e.x0 - cam.x) * cam.s, sy0 = (e.y0 - cam.y) * cam.s, sx1 = (e.x1 - cam.x) * cam.s, sy1 = (e.y1 - cam.y) * cam.s;
+    let x, y, cls = '';
+    if (sx1 > m && sx1 < vw - m && sy1 > top && sy1 < vh - m) {
+      const bx0 = (e.B.x - cam.x) * cam.s, by0 = (e.B.y - cam.y) * cam.s, bx1 = bx0 + e.B.w * cam.s, by1 = by0 + e.B.h * cam.s;
+      // above the far thing when there is room, else below it; centred on the thread's end
+      x = sx1; y = by0 - 18 > top ? by0 - 18 : by1 + 18; if (by1 - by0 > vh * 0.7) { y = sy1; x = sx1 < (bx0 + bx1) / 2 ? bx0 - 12 : bx1 + 12; cls = sx1 < (bx0 + bx1) / 2 ? ' left' : ' right'; }
+    } else {
+      const dx = sx1 - sx0, dy = sy1 - sy0; let t = 1;
+      if (dx) t = Math.min(t, dx > 0 ? (vw - m - sx0) / dx : (m - sx0) / dx); if (dy) t = Math.min(t, dy > 0 ? (vh - m - sy0) / dy : (top - sy0) / dy);
+      x = sx0 + dx * Math.max(0, t); y = sy0 + dy * Math.max(0, t); cls = ' edge';
+    }
+    x = Math.max(m + 60, Math.min(vw - m - 60, x)); y = Math.max(top + 12, Math.min(vh - m - 12, y));
+    while (used.some(u => Math.abs(u.x - x) < 150 && Math.abs(u.y - y) < 30)) y += 32;
+    used.push({ x, y });
+    const ang = Math.atan2(sy1 - y, sx1 - x) * 180 / Math.PI;
+    html += `<button class="tend${e.cls ? ' ' + e.cls : ''}${cls}" data-go="${e.id}" style="left:${x}px;top:${y}px" title="Fly there"><span>${esc(tag(e))}</span><i style="transform:rotate(${ang.toFixed(0)}deg)">➜</i></button>`;
+  });
+  if (tends._h !== html) { tends.innerHTML = html; tends._h = html;
+    // keep each button wholly on screen (its width is known only once drawn)
+    tends.querySelectorAll('.tend').forEach(b => { const r = b.getBoundingClientRect(), dx = r.left < m ? m - r.left : r.right > vw - m ? vw - m - r.right : 0; if (dx) b.style.left = (parseFloat(b.style.left) + dx) + 'px'; }); }
 }
 
 // ---- portraits and art: drop an image, upload one, or take a Turnip Works token
@@ -1736,8 +1906,9 @@ function flyToBuilder(id) {
   const sb = nodes[pcId].box, bx = sb.x + BREG.x, by = sb.y + BREG.y;
   if (id.startsWith('builder-')) { flash(id); flyToView(viewFor({ x: bx, y: by, w: BREG.w, h: BREG.h }, 1.06)); return; }
   const e = sheetEls[pcId].querySelector(`[data-id="${id}"]`); if (!e) return;
-  const col = e.parentElement, x = bx + col.offsetLeft * BK_K, y = by + (col.offsetTop + e.offsetTop) * BK_K, w = BIW * BK_K;
-  const h = Math.min(e.offsetHeight * BK_K, w * H() / W() * 1.3);
+  let x, y, w, h;
+  if (e.classList.contains('cell')) { x = bx + e.offsetLeft * BK_K; y = by + e.offsetTop * BK_K; w = e.offsetWidth * BK_K; h = e.offsetHeight * BK_K; }
+  else { const col = e.parentElement; x = bx + col.offsetLeft * BK_K; y = by + (col.offsetTop + e.offsetTop) * BK_K; w = BIW * BK_K; h = Math.min(e.offsetHeight * BK_K, w * H() / W() * 1.3); }
   setBuild(pcId, id.split('-').pop());
   flash(id); flyToView(viewFor({ x, y, w, h }, 1.08));
 }
@@ -1806,8 +1977,13 @@ const threadsSvg = $('#threads'), tends = $('#tends');
 let threadSrc = null;       // { pcId, key, pinned }
 // ------------------------------------------------------------------ frame loop
 function labelPass() {
+  const vw = W();
   for (const l of labels) { const f = l.size * cam.s; const lo = l.over ? 40 : 70, hi = l.over ? 110 : 260; const end = l.over ? 0 : 0.05;
-    const o = f <= lo ? 0.9 : f >= hi ? end : 0.9 - (f - lo) / (hi - lo) * (0.9 - end); if (l._o !== o) { l.e.style.opacity = o.toFixed(2); l.e.style.visibility = o < 0.01 ? 'hidden' : ''; l._o = o; } }
+    let o = f <= lo ? 0.9 : f >= hi ? end : 0.9 - (f - lo) / (hi - lo) * (0.9 - end);
+    // a headline over content also fades once the thing it names fills most of the screen: by then you are inside it
+    if (l.over && o > 0) { if (l.ww == null && l.e.isConnected) l.ww = l.e.getBoundingClientRect().width / cam.s || 0; const sw = (l.ww || 0) * cam.s;
+      if (sw > 0.5 * vw) o *= Math.max(0, 1 - (sw - 0.5 * vw) / (0.3 * vw)); }
+    if (l._o !== o) { l.e.style.opacity = o.toFixed(2); l.e.style.visibility = o < 0.01 ? 'hidden' : ''; l._o = o; } }
 }
 function frame() {
   if (dirty) { dirty = false; labelPass(); edgeArrows(); drawThreads(); pagesPass(); }
@@ -1816,26 +1992,79 @@ function frame() {
 
 // ------------------------------------------------------------------ input
 let pan = null, pinch = null; const ptrs = new Map();
-const interactive = t => t.closest('button, input, select, textarea, label, a, [contenteditable], .chip, .tend, .arrow, [data-go], .opt, [data-act], [data-tok], .portrait');
+const interactive = t => t.closest('button, input, select, textarea, label, a, [contenteditable], .chip, .tend, .arrow, [data-go], .opt, [data-act], [data-tok], .portrait, [data-rule-of]');
+const typing = t => t.closest('input, select, textarea, [contenteditable]');
+// Touch (H, 14 Nov, on a phone): the canvas is covered in buttons, so a finger pans from anywhere; a drag that moved is a
+// pan, never a press. Two fingers pinch; lifting one hands the pan to the other. A flick coasts. Double-tap zooms into
+// the thing (or in, on empty canvas); a long press on empty canvas makes a note. The page itself never zooms.
+let suppressClickUntil = 0, fling = null, lastTap = null, press = null;
+const stopFling = () => { if (fling) { cancelAnimationFrame(fling.raf); fling = null; } };
+function startPan(ev) { pan = { sx: ev.clientX, sy: ev.clientY, cx: cam.x, cy: cam.y, moved: false, touch: ev.pointerType !== 'mouse', hist: [{ t: performance.now(), x: ev.clientX, y: ev.clientY }],
+  scrolly: ev.pointerType !== 'mouse' ? ev.target.closest?.('.scrolly') : null, st: 0 }; if (pan.scrolly) pan.st = pan.scrolly.scrollTop; }
 vp.addEventListener('pointerdown', ev => {
+  stopFling();
   ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
-  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }; pan = null; return; }
-  if (dragNote || interactive(ev.target)) return;
-  pan = { sx: ev.clientX, sy: ev.clientY, cx: cam.x, cy: cam.y, moved: false };
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }; pan = null; clearTimeout(press?.t); press = null;
+    if (anim) { cancelAnimationFrame(anim.raf); anim = null; } return; }
+  if (ptrs.size > 2) return;
+  if (dragNote) return;
+  const touch = ev.pointerType !== 'mouse';
+  if (touch ? typing(ev.target) : interactive(ev.target)) return;
+  startPan(ev);
+  if (touch && !interactive(ev.target) && !ev.target.closest('[data-id]:not([data-id="map"])')) {
+    press = { x: ev.clientX, y: ev.clientY, t: setTimeout(() => { if (pan && !pan.moved) { pan = null; suppressClickUntil = performance.now() + 500; newNoteAt(press.x, press.y); } press = null; }, 550) };
+  }
 });
 window.addEventListener('pointermove', ev => {
   if (ptrs.has(ev.pointerId)) ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
   if (pinch && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
-    cam.x -= (cx - pinch.cx) / cam.s; cam.y -= (cy - pinch.cy) / cam.s; zoomAt(cx, cy, d / pinch.d); pinch = { d, cx, cy }; return; }
+    cam.x -= (cx - pinch.cx) / cam.s; cam.y -= (cy - pinch.cy) / cam.s; zoomAt(cx, cy, d / pinch.d); pinch = { d, cx, cy }; suppressClickUntil = performance.now() + 400; return; }
   if (dragNote) { const n = dragNote; n.nt.x = n.ox + (ev.clientX - n.sx) / cam.s; n.nt.y = n.oy + (ev.clientY - n.sy) / cam.s; place(n.e, n.nt.x, n.nt.y); nodes[n.nt.id].box = { ...nodes[n.nt.id].box, x: n.nt.x, y: n.nt.y }; return; }
   if (!pan) return;
   const dx = ev.clientX - pan.sx, dy = ev.clientY - pan.sy;
-  if (!pan.moved && Math.hypot(dx, dy) < 4) return;
-  if (!pan.moved) { pan.moved = true; vp.classList.add('panning'); if (anim) { cancelAnimationFrame(anim.raf); anim = null; } }
+  if (!pan.moved && Math.hypot(dx, dy) < (pan.touch ? 9 : 4)) return;
+  if (!pan.moved) { pan.moved = true; clearTimeout(press?.t); press = null; vp.classList.add('panning'); if (anim) { cancelAnimationFrame(anim.raf); anim = null; } }
+  // a list that can scroll takes vertical drags first
+  if (pan.scrolly && pan.scrolly.scrollHeight > pan.scrolly.clientHeight + 2) { const k = pan.scrolly.getBoundingClientRect().height / pan.scrolly.offsetHeight || 1;
+    const want = pan.st - dy / k, clamped = Math.max(0, Math.min(pan.scrolly.scrollHeight - pan.scrolly.clientHeight, want)); pan.scrolly.scrollTop = clamped;
+    if (clamped === want || Math.abs(dx) < Math.abs(dy)) return; }
   cam.x = pan.cx - dx / cam.s; cam.y = pan.cy - dy / cam.s; apply();
+  pan.hist.push({ t: performance.now(), x: ev.clientX, y: ev.clientY }); if (pan.hist.length > 6) pan.hist.shift();
 });
-const up = ev => { ptrs.delete(ev.pointerId); if (ptrs.size < 2) pinch = null; if (dragNote) { dragNote = null; persist(); } pan = null; vp.classList.remove('panning'); };
+const up = ev => {
+  const wasPinch = !!pinch; ptrs.delete(ev.pointerId); clearTimeout(press?.t); press = null;
+  if (ptrs.size < 2) pinch = null;
+  if (dragNote) { dragNote = null; persist(); }
+  if (wasPinch && ptrs.size === 1) { const [id, p] = [...ptrs.entries()][0]; startPan({ clientX: p.x, clientY: p.y, pointerType: 'touch', target: document.body }); pan.moved = true; return; }
+  if (pan?.moved) {
+    suppressClickUntil = performance.now() + 350;
+    if (pan.touch) { const h = pan.hist, a = h[0], z = h.at(-1), dt = z.t - a.t;
+      if (dt > 0 && performance.now() - z.t < 80) { let vx = (z.x - a.x) / dt, vy = (z.y - a.y) / dt;   // px per ms
+        if (Math.hypot(vx, vy) > 0.25) { let last = performance.now();
+          const step = now => { const t = now - last; last = now; cam.x -= vx * t / cam.s; cam.y -= vy * t / cam.s; apply(); const f = Math.pow(0.94, t / 16); vx *= f; vy *= f;
+            fling = Math.hypot(vx, vy) > 0.02 ? { raf: requestAnimationFrame(step) } : null; };
+          fling = { raf: requestAnimationFrame(step) }; } } }
+  } else if (pan?.touch && ptrs.size === 0) {
+    // a tap: two within 320 ms and 30 px make a double-tap
+    const now = performance.now(), x = ev.clientX, y = ev.clientY;
+    if (lastTap && now - lastTap.t < 320 && Math.hypot(x - lastTap.x, y - lastTap.y) < 30) { lastTap = null; suppressClickUntil = now + 350; doubleTapAt(ev.target, x, y); }
+    else lastTap = { t: now, x, y };
+  }
+  pan = null; vp.classList.remove('panning');
+};
 window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+// a drag or pinch that moved must not also press whatever it started on
+document.addEventListener('click', ev => { if (performance.now() < suppressClickUntil) { ev.preventDefault(); ev.stopPropagation(); } }, true);
+// the page never zooms (iOS Safari gesture events); only the canvas does
+['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches.length > 1 || !typing(e.target)) e.preventDefault(); }, { passive: false });
+function doubleTapAt(target, x, y) {
+  const hit = target.closest?.('[data-id]'), id = hit?.dataset.id;
+  if (id && nodes[id] && nodes[id].kind !== 'zone' && id !== 'map' && !hit.dataset.band) { const b = target.closest('.builder'); flyTo(b ? b.dataset.id : id); return; }
+  const f = 2.2, s0 = cam.s, x0 = cam.x, y0 = cam.y, t0 = performance.now(), wx = x0 + x / s0, wy = y0 + y / s0;
+  const step = now => { const t = Math.min(1, (now - t0) / 260), e = 1 - Math.pow(1 - t, 3), s = s0 * Math.pow(f, e); cam.s = Math.min(MAX_S, s); cam.x = wx - x / cam.s; cam.y = wy - y / cam.s; apply(); if (t < 1) anim = { raf: requestAnimationFrame(step) }; else anim = null; };
+  anim = { raf: requestAnimationFrame(step) };
+}
 vp.addEventListener('wheel', ev => {
   { const sc = ev.target.closest?.('.scrolly'); if (sc && !ev.ctrlKey && !ev.metaKey && sc.scrollHeight > sc.clientHeight + 2) { ev.preventDefault(); sc.scrollTop += ev.deltaY / cam.s; return; } }
   ev.preventDefault(); if (anim) { cancelAnimationFrame(anim.raf); anim = null; }
@@ -1845,22 +2074,31 @@ vp.addEventListener('wheel', ev => {
   else { cam.x += (ev.shiftKey && !ev.deltaX ? ev.deltaY : ev.deltaX) / cam.s; cam.y += (ev.shiftKey && !ev.deltaX ? 0 : ev.deltaY) / cam.s; apply(); }
 }, { passive: false });
 vp.addEventListener('dblclick', ev => {
-  if (interactive(ev.target)) return;
+  if (interactive(ev.target) || performance.now() < suppressClickUntil) return;
   const hit = ev.target.closest('[data-id]');
   const id = hit?.dataset.id;
   if (id && nodes[id] && !['zone'].includes(nodes[id].kind) && !hit.dataset.band) {
     // the deepest meaningful thing: a builder region on a sheet, else the node
     const b = ev.target.closest('.builder'); flyTo(b ? b.dataset.id : id); return;
   }
-  const wx = cam.x + ev.clientX / cam.s, wy = cam.y + ev.clientY / cam.s;
+  newNoteAt(ev.clientX, ev.clientY);
+});
+function newNoteAt(sx, sy) {
+  const wx = cam.x + sx / cam.s, wy = cam.y + sy / cam.s;
   const k = Math.max(0.05, Math.min(60, 0.85 / cam.s)); const nt = { id: 'n-' + Date.now().toString(36), x: wx - 110 * k, y: wy - 20 * k, k, text: '' };
   state.notes.push(nt); const e = makeNote(nt); persist();
   e.querySelector('.body').focus({ preventScroll: true });
-});
+}
 document.addEventListener('click', ev => {
   const go = ev.target.closest('[data-go]');
   if (go && !ev.target.closest('.opt:not(.sel)')) { ev.preventDefault(); ev.stopPropagation(); flyTo(go.dataset.go); return; }
   const act = ev.target.closest('[data-act]'); if (act && act.tagName === 'BUTTON' && !act.disabled) { doAct(act); return; }
+  // a skill's (or any stat's) name goes to its rule, with the thread drawn; its number shows where the number came from
+  const nm = ev.target.closest('.main [data-rule-of]');
+  if (nm && !pan?.moved) { const pcId = nm.closest('.sheet[data-id]')?.dataset.id || nm.closest('[data-id]').dataset.id, key = nm.dataset.ruleOf, box = sheetEls[pcId];
+    const rule = (box?._prov?.[key] || []).find(id => printIndex[id]); document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned'));
+    const pv = box?.querySelector(`.main .pv[data-prov="${key}"]`); threadSrc = { pcId, key, pinned: true }; pv?.classList.add('pinned'); dirty = true;
+    if (rule) flyTo(rule); return; }
   const v = ev.target.closest('.main .pv[data-prov]');
   if (v) { const pcId = v.closest('[data-id]').dataset.id; const same = threadSrc && threadSrc.pinned && threadSrc.pcId === pcId && threadSrc.key === v.dataset.prov;
     document.querySelectorAll('.pv.pinned').forEach(x => x.classList.remove('pinned'));
@@ -1947,7 +2185,10 @@ window.addEventListener('resize', apply);
 
 // ------------------------------------------------------------------ start: the whole cluster
 setView(viewFor(BOUNDS, 1.02));
-window.almanac = { cam, flyTo, nodes, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
+const qinEl = document.getElementById('qin');
+function qHint() { if (!qinEl) return; const long = WORDS.quickHint || 'Jump or do: a name, a skill, roll, round order…'; qinEl.placeholder = innerWidth < 640 ? 'Jump or do…' : long; }
+qHint(); addEventListener('resize', qHint);
+window.almanac = { cam, flyTo, nodes, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
 requestAnimationFrame(frame);
 })();
 </script>

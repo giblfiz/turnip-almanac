@@ -1,6 +1,6 @@
 // Simplified Shadowrun 2e: the rule-specific half of the app (builder steps, sheet, rolls, summons, round order,
 // dice tray, quickbar vocabulary). Inserted by build.sh at /*@RIG-UI@*/ inside the app's scope.
-const WORDS = { char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
+const WORDS = { quickHint: 'Jump or do: tusk guns, roll 6 tn 4, new runner, round order…', char: 'runner', Char: 'Runner', party: 'The party', helpCommands: '<i>tusk guns</i>, <i>roll 6 tn 4</i>, <i>damage tusk 2</i>, <i>heal tusk</i>, <i>new runner</i>' };
 // an advancement entry (karma spent) as text for the session cards
 function advanceText(k) { return (k.buy || []).map(b => b.skill ? `${R.SK_NAME[b.skill]} → ${b.to}` : `Spell: ${R.SPELL_BY_ID[b.spell].name}`).join(', '); }
 const RIG_NO_UNDO = new Set(['roll', 'sroll', 'sum-open', 'sum-cancel']);
@@ -9,7 +9,9 @@ const BCOLS = [['name', 'meta', 'attr', 'life', 'deck'], ['skills', 'magic'], ['
 const ORDER = ['name', 'meta', 'attr', 'skills', 'magic', 'cyber', 'gear', 'veh', 'deck', 'circles', 'life', 'done'];
 const STEP_RULE = { name: 'p-sheet', meta: 'p-meta', attr: 'p-attr', skills: 'p-skillcost', magic: 'p-trad', cyber: 'p-cyber', gear: 'p-gear', veh: 'p-veh', deck: 'p-decks', circles: 'p-circles', life: 'p-life', done: 'p-start' };
 const STEP_SHEET = { name: '.nm', meta: '.who', attr: '.grid4', skills: '.grid4', magic: '.l-magic', cyber: '.l-cyber', gear: '.l-gear', veh: '.l-veh', deck: '.l-veh', circles: '.l-circles', life: '.l-life', done: '.budget' };
-const BIW = 880, BGAP = 40, BINNER = { w: 30 + 4 * BIW + 3 * BGAP + 30, h: 2860 }, BREG = { x: 30, y: 950, w: 440, h: 320 };
+const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
+// how much each step holds (measured at one column's width); the engine splits the builder into golden cells by these
+const BAREA = { name: 0.45, meta: 0.9, attr: 0.5, skills: 1.15, magic: 1.0, cyber: 1.2, gear: 1.4, veh: 1.05, deck: 0.75, circles: 0.9, life: 0.45, done: 0.5 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -173,7 +175,7 @@ function renderSheet(pc) {
     return `<button data-act="asof" data-pc="${pc.id}" data-v="${val}" class="${on ? 'on' : ''}${has.has(i) ? ' has' : ''}" aria-pressed="${on}">${lab}</button>`; }).join('');
   const P = R.P, chip = (id, lab) => `<span class="chip" data-go="${id}">${lab || 'p.' + printIndex[id].page}</span>`;
   const cols = R.ATTRS.map(a => `<div class="acol"><div class="ahead"><span class="an">${R.ATTR_NAME[a]}</span><span>${pv('a:' + a, S.attr[a], 'mid')} <span class="tn">TN ${Math.max(0, 6 - S.attr[a])}</span></span></div>
-      ${R.SKILLS[a].map(s => `<div class="sk${S.skill[s] ? '' : ' zero'}"><span class="k">${R.SK_NAME[s]}</span>${pv('s:' + s, S.skill[s], 'mid')}<button class="die" data-act="roll" data-pc="${pc.id}" data-skill="${s}" title="Roll ${R.SK_NAME[s]}: ${S.skill[s]}d6 at TN ${S.tn(s) + W8.tn}" aria-label="Roll ${R.SK_NAME[s]}">⚄</button></div>`).join('')}</div>`).join('');
+      ${R.SKILLS[a].map(s => `<div class="sk${S.skill[s] ? '' : ' zero'}"><span class="k" data-rule-of="s:${s}" role="link" tabindex="0">${R.SK_NAME[s]}</span>${pv('s:' + s, S.skill[s], 'mid')}<button class="die" data-act="roll" data-pc="${pc.id}" data-skill="${s}" title="Roll ${R.SK_NAME[s]}: ${S.skill[s]}d6 at TN ${S.tn(s) + W8.tn}" aria-label="Roll ${R.SK_NAME[s]}">⚄</button></div>`).join('')}</div>`).join('');
   const track = Array.from({ length: S.health }, (_, i) => `<button class="${live.dmg[i] || ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Damage box ${i + 1}">${live.dmg[i] || ''}</button>`).join('');
   const listOr = (arr, f) => arr.length ? arr.map(f).join('') : '<div class="none">None</div>';
   const kLeft = S.karma.earned - S.karma.spent;

@@ -16,6 +16,12 @@ rejected designs. The implementation is replaceable; these contracts are not.
 - E3 **The map is the anchor.** It is huge; the party sits on its right edge and fits that edge exactly.
 - E4 **Collections grow without pushing their neighbours.** Each collection ends in a dashed ghost card in the
   slot where its next item will go ("+ S7", "+ Person", "+ Thread", empty seats). Adding = clicking that slot.
+- E2a **Big books are chapter blocks** (H, 14 Nov): the book is a cluster of chapters (an ordered golden treemap), each
+  block an index column beside its pages, scaled as a whole to fill its cell. The whole book is at most ~40% of the map's
+  area, so the map stays the anchor. Each chapter carries a big headline that fades as you go in (E1).
+- E2b **Builder steps are golden cells** (H, 14 Nov: "verticals that squirt down"): the builder is split into cells near
+  the golden ratio, sized by how much each step holds; inside its cell a step picks its column count and scale to fill it.
+  Cells never move when a choice is made. Long lists show one slice at a time (weapons by era; powers by system).
 - E5 **Flights orient.** A link flies with a deep pull-back (van Wijk–Nuij, ρ = 2), out fast and in slow with an
   ease to rest (u = 1 − (1 − t)³; widest at ~20% of the flight). Back is always available (‹ in the quickbar,
   ⌘[ / ⌘], Alt ←/→).
@@ -36,12 +42,20 @@ rejected designs. The implementation is replaceable; these contracts are not.
 - E11 **Sticky notes** are made at the zoom you are at (same on-screen size), are free rectangles (width and
   height drag independently) and their text always fills them.
 - E12 **Portraits are close-ups** (head and shoulders), never whole tokens.
+- E13a **Phones** (H, 14 Nov): a finger pans from anywhere, including from buttons (a drag that moved never presses);
+  two fingers pinch, and lifting one hands the pan to the other; a flick coasts; double-tap zooms into the thing (or in,
+  on empty canvas); a long press on empty canvas makes a note; the page itself never zooms; the quickbar hint shortens.
 - E13 **Keys follow convention**: ⌘[ ⌘] back/forward, ⌘Z ⇧⌘Z undo/redo, ⌘C copy what is under the pointer,
   ⌘V paste (image → portrait/art/pocket, text → note/pocket), Tab/⇧Tab between builder steps, Esc closes.
 
 **Rules made visible**
 - E14 **Every number traces to its rule.** Hover a number: threads drawn *on the canvas* (translucent, no labels)
   run to the rule's region on the real page, the builder step, and the karma entry; the far dot flies there.
+- E14a **Words go to rules; numbers show where they came from** (H, 14 Nov: "that seems backwards"). A stat's name is a
+  link to its rule (it flies there and draws the thread); its number pins the threads to everything that made it.
+- E14b **Every thread end has a quick-follow button**: a small keycap beside the far end when it is on screen, on the
+  screen's edge where the line leaves when it is not; never on top of what the thread starts from. Lines and dots are
+  sized on screen, so a close view is not covered by them.
 - E15 **Build mode**: a live two-ended thread joins the current builder step to its rule and to the part of the
   sheet it writes; an "All done" step says legal/illegal and points left.
 - E16 **Tools roll their skill**: weapons, cyberware weapons, kits, decks, rides, spells, circles and lifestyles
@@ -82,6 +96,8 @@ summons, notes, snotes (session notes), smeta, npcx/threadx, pockets, sessx/prep
 - `tests/scan_layout.py [url]` — E6/E7 (run on `index.html` and `brp.html`): no section overflow, no cut or abbreviated label, no roll button outside its
   column, in Chromium and Firefox.
 - `tests/builds.js` — the four 11-06 sample builds cost 99/100/100/100 under 2.1.
+- `tests/phone.py [url]` — E13a on an emulated iPhone with raw touch events (pan from a button, tap, pinch + handoff,
+  flick, double-tap, long-press note, page never zooms).
 - Perceptual: Gemini blind reads (agy-run, isolated folder). Useful for "does this read as X"; ~half its defect
   claims were false on measurement, so layout claims are settled by the DOM scan, not the vision read.
 

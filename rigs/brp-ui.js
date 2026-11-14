@@ -2,7 +2,7 @@
 // Contract (what the engine calls): WORDS, RIG_NO_UNDO, advanceText, STEP_NAME, BCOLS, ORDER, STEP_RULE, STEP_SHEET,
 // BIW, BINNER, BREG, BK_K, stepHtml, renderSheet, rollHtml, portraitOf, initiative, renderTable, freeRoll, qdice2,
 // trayStep, trayRoll, rigCommands, rigAct, box_who.
-const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
+const WORDS = { char: 'investigator', Char: 'Investigator', party: 'The investigators', quickHint: 'Jump or do: ada dodge, roll 45, resist 12 10, new investigator…', helpCommands: '<i>ada dodge</i>, <i>roll 45</i>, <i>resist 12 10</i>, <i>damage ada 3</i>, <i>heal ada</i>, <i>new investigator</i>' };
 const RIG_NO_UNDO = new Set(['roll', 'croll']);
 const P = R.P;
 function advanceText(k) { return (k.gain || []).map(g => `${R.SK[g.skill]?.name || g.skill} +${g.n}`).join(', '); }
@@ -11,7 +11,9 @@ const ORDER = ['name', 'power', 'chars', 'prof', 'profskills', 'personal', 'powe
 const BCOLS = [['name', 'power', 'chars', 'prof'], ['profskills', 'armor', 'done'], ['personal'], ['powers', 'weapons']];
 const STEP_RULE = { name: 'brp-step-1', power: 'brp-power-level', chars: 'brp-step-1', prof: 'brp-professions', profskills: 'brp-step-7', personal: 'brp-step-7', powers: 'brp-how-do-characters-get-powers', weapons: 'brp-weapons', armor: 'brp-armor', done: 'brp-step-7' };
 const STEP_SHEET = { name: '.nm', power: '.who', chars: '.chgrid', prof: '.who', profskills: '.skgrid', personal: '.skgrid', powers: '.l-powers', weapons: '.l-weapons', armor: '.l-armor', done: '.budget' };
-const BIW = 880, BGAP = 40, BINNER = { w: 30 + 4 * BIW + 3 * BGAP + 30, h: 5200 }, BREG = { x: 30, y: 950, w: 440, h: 320 };
+const BIW = 880, BGAP = 40, BREG = { x: 30, y: 950, w: 440, h: 320 }, BINNER = { w: 5500, h: 5500 * 320 / 440 };
+// how much each step holds (its share of the builder); the engine splits the builder into golden cells by these
+const BAREA = { name: 0.45, power: 0.5, chars: 1.1, prof: 2.4, profskills: 1.2, personal: 2.8, powers: 1.7, weapons: 2.5, armor: 1.2, done: 0.55 };
 const BK_K = Math.min(BREG.w / BINNER.w, BREG.h / BINNER.h);
 
 function stepHead(S, key, no, title, rule) {
@@ -44,7 +46,7 @@ function stepHtml(pc, S, key) {
   if (key === 'profskills') {
     h += `${stepHead(S, 'profskills', '4', 'Professional skills', STEP_RULE.profskills)}<div class="hint">Spend ${S.profPool} points on your profession's skills, 5 at a time. No skill above ${S.cap}% at creation.</div>`;
     const prof = S.prof;
-    if (!prof) h += `<div class="crease" style="height:600px">Choose a profession first</div>`;
+    if (!prof) h += `<div class="crease">Choose a profession first</div>`;
     else { h += `<div class="rows one">`; const seen = new Set();
       prof.skills.forEach(x => { if (!x.skill || seen.has(x.skill)) return; seen.add(x.skill); const s = R.SK[x.skill]; if (!s) return; const v = ch.profAlloc[x.skill] || 0, base = R.baseOf(s, S.char, ch);
         h += row(v > 0, `${esc(x.text || s.name)} → ${S.skill[s.id]}%`, `base ${base}%`, `+${v}`, step5('profAlloc.' + s.id, v, 0, Math.max(0, S.cap - base - (ch.persAlloc[s.id] || 0)), s.name)); });
@@ -56,21 +58,22 @@ function stepHtml(pc, S, key) {
     h += `</div>`;
   }
   if (key === 'powers') {
-    h += `${stepHead(S, 'powers', '6', 'Powers', STEP_RULE.powers)}<div class="hint">Most Normal-level games have none. Choose a system to open its list.</div><div class="opts three">`;
-    h += opt('psys', '', ch.psys || '', 'None', 'No powers'); R.POWERS.forEach(k => h += opt('psys', k, ch.psys || '', R.D.powers[k].name || k, ''));
-    h += `</div><div style="height:1500px;margin-top:14px">`;
-    if (ch.psys) { h += `<div class="grouph"><span>${esc(R.D.powers[ch.psys].name || ch.psys)}${S.powerNote ? ' · ' + S.powerNote : ''}</span></div><div class="opts three">`;
-      R.powerList(ch.psys).forEach(pw => { const on = (ch.powers || []).includes(pw.name); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="powers" data-v="${esc(pw.name)}" aria-pressed="${on}"><b style="font-size:19px">${esc(pw.name)}</b><span style="font-size:15px">${esc(pw.cost || '')} · ${esc((pw.effect || '').slice(0, 70))}</span></button>`; });
+    h += `${stepHead(S, 'powers', '6', 'Powers', STEP_RULE.powers)}<div class="hint">Most Normal-level games have none. Choose a system to open its list.</div><div class="seg era">`;
+    h += [['', 'None'], ...R.POWERS.map(k => [k, R.D.powers[k].name || k])].map(([k, n]) => `<button class="${(ch.psys || '') === k ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="psys" data-v="${k}" aria-pressed="${(ch.psys || '') === k}">${esc(n)}</button>`).join('') + `</div>`;
+    if (ch.psys) { h += `<div class="grouph"><span>${esc(R.D.powers[ch.psys].name || ch.psys)}${S.powerNote ? ' · ' + S.powerNote : ''}</span></div><div class="opts">`;
+      R.powerList(ch.psys).forEach(pw => { const on = (ch.powers || []).includes(pw.name); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 10px" data-act="toggle" data-pc="${pc.id}" data-path="powers" data-v="${esc(pw.name)}" aria-pressed="${on}"><b style="font-size:19px">${esc(pw.name)}</b><span style="font-size:15px">${esc(pw.cost || '')}</span></button>`; });
       h += `</div>`; }
-    else h += `<div class="crease" style="height:1500px">A power system's list opens here</div>`;
-    h += `</div>`;
+    else { h += `<div class="opts">` + R.POWERS.map(k => { const P2 = R.D.powers[k]; return `<button class="opt" data-act="set" data-pc="${pc.id}" data-path="psys" data-v="${k}"><b>${esc(P2.name || k)}<em>p.${esc(String(P2.page || ''))}</em></b><span>${R.powerList(k).length} to choose from · ${esc(String(P2.resource?.type || '').replace(/\s*\(.*$/, ''))}</span></button>`; }).join('') + `</div>`; }
   }
   if (key === 'weapons') {
-    h += `${stepHead(S, 'weapons', '7', 'Weapons', STEP_RULE.weapons)}<div class="hint">Pick what they carry. Each weapon rolls its own skill.</div>`;
-    const cats = [...new Set(R.WEAPONS.map(w => w.category))];
-    cats.forEach(cat => { h += `<div class="grouph"><span>${esc(cat)}</span></div><div class="opts four">`;
-      R.WEAPONS.filter(w => w.category === cat).forEach(w => { const on = (ch.weapons || []).includes(w.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:6px 8px" data-act="toggle" data-pc="${pc.id}" data-path="weapons" data-v="${w.id}" aria-pressed="${on}"><b style="font-size:17px">${esc(w.name)}</b><span style="font-size:14px">${esc(w.damage || '')}</span></button>`; });
-      h += `</div>`; });
+    // one era at a time (the book's eras); what they carry stays listed whatever era is open
+    const ERAS = [['Primitive', /Primitive|Ancient/], ['Historic', /^Historic/], ['Modern', /Modern/], ['Advanced', /Advanced/]];
+    const era = ch.wEra || 'Modern', re = (ERAS.find(e => e[0] === era) || ERAS[2])[1];
+    const carried = (ch.weapons || []).map(id => R.W_BY[id]).filter(Boolean);
+    h += `${stepHead(S, 'weapons', '7', 'Weapons', STEP_RULE.weapons)}<div class="hint">Pick what they carry. Each weapon rolls its own skill.${carried.length ? ' Carrying: ' + carried.map(w => esc(w.name)).join(', ') + '.' : ''}</div><div class="seg era">`;
+    h += ERAS.map(([e]) => `<button class="${e === era ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="wEra" data-v="${e}" aria-pressed="${e === era}">${e}</button>`).join('') + `</div><div class="opts">`;
+    R.WEAPONS.filter(w => re.test(w.era || '') || re.test(w.category || '')).forEach(w => { const on = (ch.weapons || []).includes(w.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:6px 8px" data-act="toggle" data-pc="${pc.id}" data-path="weapons" data-v="${w.id}" aria-pressed="${on}"><b style="font-size:17px">${esc(w.name)}</b><span style="font-size:14px">${esc((w.category || '').replace(/ Weapons$/, '').replace(/^\S+ /, ''))} · ${esc(w.damage || '')}</span></button>`; });
+    h += `</div>`;
   }
   if (key === 'armor') {
     h += `${stepHead(S, 'armor', '8', 'Armour', STEP_RULE.armor)}<div class="hint">One suit. Modern and future armour stops the most.</div><div class="opts three">`;
@@ -123,7 +126,7 @@ function renderSheet(pc) {
   const hpBoxes = Array.from({ length: S.der.hp }, (_, i) => `<button class="${live.dmg[i] ? 'L' : ''}" data-act="dmg" data-pc="${pc.id}" data-i="${i}" aria-label="Hit point ${i + 1}">${live.dmg[i] ? '×' : ''}</button>`).join('');
   const hurt = live.dmg.filter(Boolean).length;
   const cats = [...new Set(R.SKILLS.map(s => s.category || 'Other'))];
-  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
+  const skillCols = cats.map(cat => `<div class="skcat"><div class="ahead"><span class="an">${esc(cat)}</span></div>${R.SKILLS.filter(s => (s.category || 'Other') === cat).map(s => `<div class="sk${S.skill[s.id] ? '' : ' zero'}"><span class="k" data-rule-of="s:${s.id}" role="link" tabindex="0">${esc(s.name)}</span>${pv('s:' + s.id, S.skill[s.id], 'mid', '%')}${die(S.skill[s.id], s.name)}</div>`).join('')}</div>`).join('');
   const weaponRows = S.weapons.map(w => { const sk = R.skillOfWeapon(w), v = sk ? S.skill[sk] : 0; return `<div><b>${esc(w.name)}</b> <span class="e">${esc(w.damage || '')}${w.range ? ' · ' + esc(w.range) : ''}</span> <button class="die sm" data-act="roll" data-pc="${pc.id}" data-target="${v}" data-label="${esc(w.name)}">⚄ ${esc(R.SK[sk]?.name || 'skill')} ${v}%</button></div>`; }).join('');
   const tok = portraitOf(pc, S);
   box.innerHTML = `
