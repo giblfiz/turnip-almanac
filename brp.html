@@ -868,8 +868,8 @@ const PX = MW + 160;                                        // party column x, o
 
 // ------------------------------------------------------------------ the map: the anchor
 const mapEl = add(world, 'map', 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="${esc(MAP.alt || 'Street map of central Seattle')}" draggable="false" ${MAP.src ? '' : 'hidden'}>${MAP_ART ? `<div class="mapwait">The map comes from your copy of the book.<br>Open it on the book above.</div>` : ''}`);
-reg('map', { el: mapEl, title: 'Campaign map · Seattle', kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
-label(mapEl, 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
+reg('map', { el: mapEl, title: `Campaign map · ${C.mapTitle || 'Seattle'}`, kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
+label(mapEl, C.mapTitle || 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
 add(mapEl, 'attrib', MW - 1500, MH - 110, 1440, 80, esc(MAP.attribution || 'Map data © OpenStreetMap contributors, ODbL'));
 C.places.forEach(p => {
   const pt = p.fx != null ? { fx: p.fx, fy: p.fy } : (MAP.points || {})[p.key] || { fx: p.x / 1400, fy: p.y / 1000 };
@@ -2320,7 +2320,7 @@ function getPath(o, path) { return path.split('.').reduce((a, k) => a == null ? 
 function setPath(o, path, v) { const ks = path.split('.'), last = ks.pop(); const t = ks.reduce((a, k) => (a[k] = a[k] ?? {}), o); if (v === null || v === '' || (v === 0 && ks.length)) delete t[last]; else t[last] = v; }
 function doAct(a) {
   if (a.dataset.act === 'finish') { endBuild(true); return; }
-  if (a.dataset.act === 'newpc') { const id = newRunner(a.dataset.slot); if (id) setTimeout(() => flyTo(`b-${id}-name`), 60); return; }
+  if (a.dataset.act === 'newpc') { const id = newRunner(a.dataset.slot); if (id) { setTimeout(() => flyTo(`b-${id}-name`), 60); setTimeout(() => sheetEls[id]?.querySelector('input[data-act="name"]')?.focus({ preventScroll: true }), 2700); } return; }
   const pc = pcById[a.dataset.pc]; if (!pc) return;
   if (!['roll', 'rollchars', 'croll'].includes(a.dataset.act)) historyNote(`${choicesOf(pc).name || `A new ${WORDS.char}`}: ${(a.getAttribute('aria-label') || a.dataset.label || a.querySelector('b')?.textContent || a.textContent || a.dataset.act).trim().replace(/\s+/g, ' ').slice(0, 60)}`);
   const ch = choicesOf(pc), act = a.dataset.act, path = a.dataset.path;
@@ -2385,7 +2385,7 @@ async function loadPdf(buf) {
 const bookArt = {};
 async function cutArt() {
   for (const a of (C.print || []).filter(p => p.kind === 'art')) {
-    try { const page = await pdfDoc.getPage(a.page), [x, y, w, h] = a.rect, k = Math.min(4, 2400 / w), v = page.getViewport({ scale: k });
+    try { const page = await pdfDoc.getPage(a.page), [x, y, w, h] = a.rect, k = a.use === 'map' ? Math.min(8, 4200 / w) : Math.min(4, 2400 / w), v = page.getViewport({ scale: k });   // the map is zoomed into: cut it finer
       const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height); await page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
       const o = document.createElement('canvas'); o.width = Math.round(w * k); o.height = Math.round(h * k); o.getContext('2d').drawImage(c, -x * k, -y * k);
       bookArt[a.id] = o.toDataURL('image/jpeg', 0.9); placeArt(a); } catch (e) { console.warn('art', a.id, e.message); }

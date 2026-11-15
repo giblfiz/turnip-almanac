@@ -11,5 +11,9 @@ window.BOOK_PRINTS = {
  "ssr2-v2.2.pdf": {
   "sha256": "33792758019e6c925e507eb7c104064102cd67baad76dc1166fc4fbafd1984ea",
   "size": 58238
+ },
+ "lb.pdf": {
+  "sha256": "9cc19519748ae6db2900ba9427eece47cb9129ebe46cfe370843147a65caccc1",
+  "size": 5066574
  }
 };
