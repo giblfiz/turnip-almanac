@@ -1,5 +1,5 @@
-// Turnip Almanac rig: Simplified Shadowrun 2e, version 2.1 (Harry Pottash, 6 Nov 2026).
-// Tables are transcribed from books/ssr2-v2.1.pdf; every row points at the section of the book it came from
+// Turnip Almanac rig: Simplified Shadowrun 2e, version 2.2 (Harry Pottash, 15 Nov 2026).
+// Tables are transcribed from books/ssr2-v2.2.pdf; every row points at the section of the book it came from
 // (the "print" ids below, which the shelf draws as regions on the real page).
 // Interpretations the PDF leaves open are marked INTERP and listed in RIG.interpretations.
 window.RIG = (() => {
@@ -87,9 +87,9 @@ window.RIG = (() => {
     [['p1a2ma', 'P1a2ma', 23], ['th3rm1t', '7h3rm1t', 15], ['r3g3x', 'R3g3x', 11], ['p0wn3r', 'P0wn3r', 12]] ];
   const CHIP_BY_ID = {}; CHIPS.forEach((row, t) => row.forEach((c, k) => { if (c) CHIP_BY_ID[c[0]] = { id: c[0], name: c[1], pts: c[2], tier: CHIP_TIERS[t], kind: CHIP_KINDS[k] }; }));
   const TRAD = {
-    shaman: { name: 'Shaman', pts: 30, text: 'Buy spells; summoning free; pays for astral projection.', freeSpells: 0, projection: false, summoning: true },
-    hermetic: { name: 'Hermetic', pts: 30, text: 'Buy spells; astral projection free; pays for summoning; 3 spells free.', freeSpells: 3, projection: true, summoning: false },
-    adept: { name: 'Physical Adept', pts: 30, text: 'Ignores wound penalties. Spells target self only. Downtime casting lasts and ignores wards.', freeSpells: 0, projection: false, summoning: false, selfOnly: true },
+    shaman: { name: 'Shaman', pts: 30, text: 'Buy spells; astral projection and spirit summoning free.', freeSpells: 0, projection: true, summoning: true },
+    hermetic: { name: 'Hermetic', pts: 30, text: 'Buy spells; 3 spells free; astral projection free; pays for summoning.', freeSpells: 3, projection: true, summoning: false },
+    adept: { name: 'Physical Adept', pts: 30, text: 'Ignores wound penalties. Spells target self only; 3 spells free. Downtime casting lasts and ignores wards.', freeSpells: 3, projection: false, summoning: false, selfOnly: true },
   };
   const EXTRAS = { projection: { name: 'Astral Projection', pts: 10 }, summoning: { name: 'Summoning', pts: 10 } };
   const SPELLS = [
@@ -146,7 +146,7 @@ window.RIG = (() => {
     combat: 'p-combat', soak: 'p-soak', karma: 'p-karma', turns: 'p-turns' };
 
   const interpretations = [
-    'A Hermetic’s 3 free spells are the first 3 spells picked.',
+    'A Hermetic’s or Physical Adept’s 3 free spells are the first 3 spells picked.',
     'Shamans summon spirits; Hermetics summon elementals (Harry, 13 Nov).',
     'A summon rolls its rating in dice at TN 4 (6 − its Mental 2); its spells use Magic, its attacks Unarmed (INTERP).',
     'Grenades are thrown with Athletics (the book names no skill for them).',
@@ -262,5 +262,5 @@ window.RIG = (() => {
 
   return { ATTRS, ATTR_NAME, SKILLS, SK_NAME, SKILL_ATTR, ALL_SKILLS, stepCost, skillCost, ATTR_COST, BUDGET, ESSENCE, START_CAP, KARMA_CAP, META, HUMAN_BONUS_PTS, HUMAN_BONUS_MAX,
     CYBER, GEAR, VEH, DECKS, CHIPS, CHIP_TIERS, CHIP_KINDS, CHIP_BY_ID, TRAD, EXTRAS, SPELLS, SPELL_BY_ID, CIRCLES, CIRCLE_LV, FREE_CONTACTS, LIFE, TOOL_SKILL, SUMMONS, SUMMON_SHARED, canSummon, summon, summonKind, summonSpecials, CY, GE, VE, DE, P,
-    interpretations, blank, compute, roll, name: 'Simplified Shadowrun 2e · v2.1' };
+    interpretations, blank, compute, roll, name: 'Simplified Shadowrun 2e · v2.2' };
 })();
