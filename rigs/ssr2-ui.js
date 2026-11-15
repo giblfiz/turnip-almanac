@@ -62,6 +62,9 @@ function stepHtml(pc, S, key) {
       h += `</div><div class="grouph"><span>Spells · 3 pts${T.freeSpells ? ` · first ${T.freeSpells} free` : ''}${T.selfOnly ? ' · self only' : ''}</span><span>${(ch.spells || []).length} chosen <span class="chip" data-go="${P.spells}">p.2</span></span></div><div class="opts three">`;
       R.SPELLS.forEach(sp => { const on = (ch.spells || []).includes(sp.id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:10px 12px" data-act="toggle" data-pc="${pc.id}" data-path="spells" data-v="${sp.id}" aria-pressed="${on}"><b style="font-size:21px">${sp.name}</b><span style="font-size:16px">${sp.eff}</span></button>`; });
       h += `</div>`;
+      if ((ch.spells || []).length) { h += `<div class="grouph" style="margin-top:14px"><span>Spell Focus · ${R.FOCUS_PTS} pts · +1 Magic past the cap · max 1 per spell</span><span class="chip" data-go="${P.gear}">p.1</span></div><div class="opts three">`;
+        (ch.spells || []).forEach(id => { const sp = R.SPELL_BY_ID[id], on = (ch.foci || []).includes(id); h += `<button class="opt${on ? ' sel' : ''}" style="padding:8px 12px" data-act="toggle" data-pc="${pc.id}" data-path="foci" data-v="${id}" aria-pressed="${on}"><b style="font-size:19px">${sp.name} focus</b></button>`; });
+        h += `</div>`; }
     } else h += `<div class="crease" style="height:860px">Spells, astral projection and summoning · open when you choose a tradition</div>`;
     h += `</div>`;
   }
@@ -121,8 +124,8 @@ function stepHtml(pc, S, key) {
   }
   return h + '</div>';
 }
-function toolRolls(pc, S, key, toolLabel) {
-  return (R.TOOL_SKILL[key] || []).map(sk => `<button class="die sm" data-act="roll" data-pc="${pc.id}" data-skill="${sk}" data-tool="${esc(toolLabel)}" title="Roll ${R.SK_NAME[sk]} with ${esc(toolLabel)}: ${S.skill[sk]}d6">⚄ ${R.SK_NAME[sk]} ${S.skill[sk]}</button>`).join('');
+function toolRolls(pc, S, key, toolLabel, bonus = 0) {
+  return (R.TOOL_SKILL[key] || []).map(sk => `<button class="die sm" data-act="roll" data-pc="${pc.id}" data-skill="${sk}"${bonus ? ` data-bonus="${bonus}"` : ''} data-tool="${esc(toolLabel)}" title="Roll ${R.SK_NAME[sk]} with ${esc(toolLabel)}: ${S.skill[sk] + bonus}d6">⚄ ${R.SK_NAME[sk]} ${S.skill[sk] + bonus}</button>`).join('');
 }
 function rollHtml(r) {
   const dice = r.dice.map(d => `<i class="${d.ok ? 'ok' : ''}">${d.chain.join('+')}</i>`).join('');
@@ -237,7 +240,7 @@ function renderSheet(pc) {
       <div class="cols2">
         <div class="l-cyber"><div class="sec">Cyberware ${chip(P.cyber)}</div><div class="list">${listOr(S.cyber, c => `<div><b>${esc(c.name)}${c.n > 1 ? ' ×' + c.n : ''}</b> <span class="e">${esc(c.eff)}${c.id === 'skillwires' && ch.wire ? ` (${R.SK_NAME[ch.wire]})` : ''}</span> ${toolRolls(pc, S, c.id, c.name)}</div>`)}</div></div>
         <div class="l-gear"><div class="sec">Weapons & gear ${chip(P.gear)}</div><div class="list">${listOr(S.gear, g => `<div><b>${esc(g.name)}${g.n > 1 ? ' ×' + g.n : ''}</b> <span class="e">${esc(g.eff)}</span> ${toolRolls(pc, S, g.id, g.name + (g.eff.match(/\[[^\]]+\]/) ? ' ' + g.eff.match(/\[[^\]]+\]/)[0] : ''))}</div>`)}${S.trollDmg ? '<div class="e">Troll: +1 damage, melee and unarmed.</div>' : ''}</div></div>
-        <div class="l-magic"><div class="sec">Magic ${chip(P.magic)}</div><div class="list">${S.trad ? `<div><b>${esc(S.trad.name)}</b></div>` + S.spells.map(sp => `<div><b>${esc(sp.name)}</b> <span class="e">[${esc(sp.eff)}]${sp.free ? ' · free' : ''}${sp.karma ? ` · ${chip(sp.karma, 'karma')}` : ''}</span> ${toolRolls(pc, S, 'spell', sp.name)}</div>`).join('') : '<div class="none">No tradition</div>'}</div></div>
+        <div class="l-magic"><div class="sec">Magic ${chip(P.magic)}</div><div class="list">${S.trad ? `<div><b>${esc(S.trad.name)}</b></div>` + S.spells.map(sp => `<div><b>${esc(sp.name)}</b> <span class="e">[${esc(sp.eff)}]${sp.free ? ' · free' : ''}${sp.focus ? ' · focus +1' : ''}${sp.karma ? ` · ${chip(sp.karma, 'karma')}` : ''}</span> ${toolRolls(pc, S, 'spell', sp.name, sp.focus ? 1 : 0)}</div>`).join('') : '<div class="none">No tradition</div>'}</div></div>
         <div class="l-veh"><div class="sec">Vehicles, deck & chips ${chip(P.veh)}</div><div class="list">${listOr([...S.veh.map(v => `<div><b>${esc(v.name)}${v.n > 1 ? ' ×' + v.n : ''}</b> <span class="e">HP ${v.hp}, armor ${v.armor}</span> ${toolRolls(pc, S, 'veh', v.name)}</div>`), ...(S.deck ? [`<div><b>${esc(S.deck.name)}</b> <span class="e">Actions ${S.deck.actions}</span> ${toolRolls(pc, S, 'deck', S.deck.name)}</div>`] : []), ...S.chips.map(c => `<div><b>${esc(c.name)}</b> <span class="e">${c.kind} ${c.tier[1]}</span></div>`)], x => x)}</div></div>
         <div class="l-circles"><div class="sec">Social circles ${chip(P.circles)}</div><div class="list">${circleRows.join('') || '<div class="none">None</div>'}</div></div>
         <div class="l-life"><div class="sec">Lifestyle</div><div class="list">${S.life ? `<div><b>${esc(S.life.name)}</b> <span class="e">${S.life.tool} · ¥${S.life.cash.toLocaleString()}</span> ${toolRolls(pc, S, 'life', `${S.life.name} lifestyle ${S.life.tool}`)}</div>` : '<div class="none">None</div>'}</div></div>
@@ -284,7 +287,7 @@ function freeRoll(pool, tn, label = 'Free roll', at) {
 function skillWord(w) { w = w.toLowerCase(); return R.ALL_SKILLS.find(s => s === w || R.SK_NAME[s].toLowerCase().startsWith(w)); }
 function rollFor(pc, skill, soak, srcEl) {
   const S = sheetOf(pc), w = woundOf(pc, S);
-  const r = R.roll(S.skill[skill], S.tn(skill) + w.tn);
+  const r = R.roll(S.skill[skill] + (+srcEl?.dataset?.bonus || 0), S.tn(skill) + w.tn);
   r.label = `${choicesOf(pc).name || 'Runner'} · ${srcEl?.dataset?.tool ? srcEl.dataset.tool + ' · ' : ''}${soak ? 'Soak' : R.SK_NAME[skill]}`;
   if (soak && r.succ) r.verdict = `Soak ${1 + r.bonuses} damage`;
   const rec = { label: r.label, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };

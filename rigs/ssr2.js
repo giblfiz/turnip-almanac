@@ -60,8 +60,7 @@ window.RIG = (() => {
     { id: 'respirator', name: 'Respirator', eff: 'Poison armor 10 vs inhaled toxins; obvious.', pts: 1, max: 1 },
     { id: 'vest', name: 'Bulletproof Vest', eff: 'Armor +5; obvious when worn.', pts: 2, max: 1, outfit: 5 },
     { id: 'pca', name: 'Powered Combat Armor', eff: 'Armor +8; intimidating.', pts: 8, max: 1, outfit: 8 },
-    { id: 'drainfocus', name: 'Drain Focus [Magic]', eff: 'Absorb 1 Drain; refresh in downtime.', pts: 3, max: 2 },
-    { id: 'spellfocus', name: 'Spell Focus [Magic]', eff: '+1 Magic for the spell named on purchase.', pts: 2, max: 3 },
+    { id: 'drainfocus', name: 'Drain Focus [Magic]', eff: 'Absorb 1 Drain; refills at the end of each downtime. Max 1.', pts: 3, max: 1 },
     { id: 'grenades', name: 'Grenades ×3', eff: 'Regular [7M], flashbang, or gas [9S] bashing.', pts: 1, max: 4 },
     { id: 'apammo', name: 'AP Ammunition', eff: '+3 penetration; one weapon / run; illegal.', pts: 3, max: 2 },
     { id: 'medkit', name: 'Medkit', eff: 'Allows medical treatment (Tools).', pts: 2, max: 1 },
@@ -91,6 +90,7 @@ window.RIG = (() => {
     hermetic: { name: 'Hermetic', pts: 30, text: 'Buy spells; 3 spells free; astral projection free; pays for summoning.', freeSpells: 3, projection: true, summoning: false },
     adept: { name: 'Physical Adept', pts: 30, text: 'Ignores wound penalties. Spells target self only; 3 spells free. Downtime casting lasts and ignores wards.', freeSpells: 3, projection: false, summoning: false, selfOnly: true },
   };
+  const FOCUS_PTS = 2;   // Spell Focus (p.1 gear): +1 Magic past the Essence cap for one named spell; max 1 per spell (Harry, 15 Nov)
   const EXTRAS = { projection: { name: 'Astral Projection', pts: 10 }, summoning: { name: 'Summoning', pts: 10 } };
   const SPELLS = [
     ['forceblast', 'Force Blast', '12S, LoS, inanimate targets only'], ['mindspike', 'Mind Spike', '9M, LoS, ignores armor, bashing'], ['fireball', 'Fireball', '7M, LoS, 15 ft radius'],
@@ -155,7 +155,7 @@ window.RIG = (() => {
 
   function blank(name = '') {
     return { name, meta: null, human: [], attr: { body: 0, coord: 0, mental: 0, social: 0 }, skills: {}, cyber: {}, wire: null, gear: { knife: 1 }, veh: {}, deck: null, chips: {},
-      trad: null, extras: {}, spells: [], circles: {}, life: null };
+      trad: null, extras: {}, spells: [], foci: [], circles: {}, life: null };
   }
 
   // ---- the sheet is computed: chargen choices, then karma spends from sessions up to `asOf`
@@ -206,6 +206,7 @@ window.RIG = (() => {
     Object.keys(ch.extras || {}).forEach(e => { if (ch.extras[e] && T && EXTRAS[e] && !(e === 'projection' && T.projection) && !(e === 'summoning' && T.summoning)) add(EXTRAS[e].name, EXTRAS[e].pts, B('magic'), P.magic); });
     if (T) (ch.spells || []).forEach(id => { const sp = SPELL_BY_ID[id]; const free = freeLeft > 0; if (free) freeLeft--; else add(`Spell: ${sp.name}`, sp.pts, B('magic'), P.spells); spells.push({ ...sp, free }); });
     kl.forEach(k => (k.buy || []).forEach(b => { if (b.spell) spells.push({ ...SPELL_BY_ID[b.spell], karma: k.id }); }));
+    if (T) spells.forEach(sp => { if ((ch.foci || []).includes(sp.id)) { sp.focus = true; add(`Spell Focus: ${sp.name}`, FOCUS_PTS, B('magic'), P.gear); } });
     // gear, vehicles, decks, chips
     const gearList = [], vehList = [], chipList = [];
     let outfit = 0, outfitSrc = null;
@@ -240,6 +241,7 @@ window.RIG = (() => {
     if (karma.spent > karma.earned) warn.push(`Karma overspent by ${karma.spent - karma.earned}.`);
     ALL_SKILLS.forEach(s => { if (skillBuy[s] > KARMA_CAP) warn.push(`${SK_NAME[s]} above the karma cap of 12.`); });
     const tn = s => Math.max(0, 6 - attr[SKILL_ATTR[s]]);
+    spells.forEach(sp => { sp.magic = skill.magic + (sp.focus ? 1 : 0); });
     return { attr, skill, tn, essence, magicCap, actions, rig, armor, outfit: outfitSrc, health, cash, pts, left: BUDGET - pts, spend, karma,
       meta: M, trad: T, spells, cyber: cyberList, gear: gearList, veh: vehList, deck, chips: chipList, circles: circleList, life, warn, prov, adept: ch.trad === 'adept',
       trollDmg: ch.meta === 'troll' };
@@ -262,5 +264,5 @@ window.RIG = (() => {
 
   return { ATTRS, ATTR_NAME, SKILLS, SK_NAME, SKILL_ATTR, ALL_SKILLS, stepCost, skillCost, ATTR_COST, BUDGET, ESSENCE, START_CAP, KARMA_CAP, META, HUMAN_BONUS_PTS, HUMAN_BONUS_MAX,
     CYBER, GEAR, VEH, DECKS, CHIPS, CHIP_TIERS, CHIP_KINDS, CHIP_BY_ID, TRAD, EXTRAS, SPELLS, SPELL_BY_ID, CIRCLES, CIRCLE_LV, FREE_CONTACTS, LIFE, TOOL_SKILL, SUMMONS, SUMMON_SHARED, canSummon, summon, summonKind, summonSpecials, CY, GE, VE, DE, P,
-    interpretations, blank, compute, roll, name: 'Simplified Shadowrun 2e · v2.2' };
+    FOCUS_PTS, interpretations, blank, compute, roll, name: 'Simplified Shadowrun 2e · v2.2' };
 })();
