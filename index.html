@@ -882,8 +882,10 @@ const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
 // The book is a cluster of chapter blocks (a squarified treemap in a golden box), each block an index column beside its
 // pages, scaled as a whole to fill its cell (E2, E6). The whole book is sized against the map so the map stays the
 // anchor (H, 14 Nov: "why is this thing 5 times bigger than the map?"): pages shrink, chapters get fading headlines (E1).
-const parts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: BK.pages }]).map(pt => ({ ...pt,
+const allParts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: BK.pages }]).map(pt => ({ ...pt,
   n: pt.to - pt.from + 1, entries: C.print.filter(p => p.page >= pt.from && p.page <= pt.to && p.kind !== 'art') }));
+// reference parts cluster with the book (golden); adventure parts run in play order as a strip below the map (H, 14–15 Nov)
+const parts = allParts.filter(pt => pt.kind !== 'adventure'), advParts = allParts.filter(pt => pt.kind === 'adventure');
 const ICW = 316, IRH = 150, IGAP = 10, HEADH = 120, PPAD = 30;
 function partNatural(n, m, c, ic) {   // natural size (u = 1) of a chapter block with c page columns and ic index columns
   const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;
@@ -986,6 +988,31 @@ cells.forEach(cell => {
   // the chapter's headline: big over the block, fading as its pages become readable (E1)
   if (parts.length > 1) { const size = Math.min(chh * 0.32, cw * 1.7 / Math.max(6, pt.title.length)); label(world, pt.title, BX + cx, BY + cy + chh / 2 - size * 0.55, size, { over: true, w: cw, align: 'center', cls: 'chaplbl' }); }
 });
+// the adventure strip: below the map and the party, left to right in the book's order, at the book's own page scale
+let ADV_BOTTOM = 0;
+if (advParts.length) {
+  const SWID = PX + SW, ay0 = MH + 700, u = U0, gap = 120; let x = 0, y = ay0, rowH = 0;
+  label(world, 'The adventure', 0, ay0 - 640, 420);
+  advParts.forEach(pt => {
+    const m = pt.entries.length, ic = m ? Math.max(1, Math.ceil(m * IRH / (PH + PG))) : 0, d = partNatural(pt.n, m, pt.n, ic), w = d.w * u, h = d.h * u;
+    if (x > 0 && x + w > SWID) { x = 0; y += rowH + gap; rowH = 0; }
+    const blk = add(world, 'chapblk advblk', x, y, d.w, d.h, `<div class="chaphead"><b>${esc(pt.title)}</b> <span>pages ${pt.from}–${pt.to}</span></div>`);
+    blk.style.transformOrigin = '0 0'; blk.style.transform = `scale(${u})`;
+    reg('part-' + pt.from, { el: blk, title: pt.title, kind: 'chapter', box: { x, y, w, h } });
+    const W = (px, py, pw, ph) => ({ x: x + px * u, y: y + py * u, w: pw * u, h: ph * u }), x0 = PPAD;
+    pt.entries.forEach((p, i) => { const per = Math.ceil(m / ic), cx = x0 + Math.floor(i / per) * (ICW + IGAP), cy = HEADH + (i % per) * IRH;
+      const ce = add(blk, 'entry card', cx, cy, ICW, IRH - IGAP, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+      reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: W(cx, cy, ICW, IRH - IGAP) }); });
+    const px0 = x0 + (ic ? ic * (ICW + IGAP) + 40 : 0);
+    for (let n = pt.from; n <= pt.to; n++) { const px = px0 + (n - pt.from) * (PW + PG), py = HEADH;
+      const pf = add(blk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
+      label(pf, String(n), PW - 170, 20, 200, { cls: 'pnumlbl', over: true, k: u });
+      pageFrames.push(reg('page-' + n, { el: pf, title: `${BK.title} · page ${n}`, kind: 'page', box: W(px, py, PW, PH), n })); }
+    const size = Math.min(h * 0.3, w * 1.7 / Math.max(6, pt.title.length)); label(world, pt.title, x, y + h / 2 - size * 0.55, size, { over: true, w, align: 'center', cls: 'chaplbl' });
+    x += w + gap; rowH = Math.max(rowH, h);
+  });
+  ADV_BOTTOM = y + rowH;
+}
 C.print.forEach(p => {
   const k = PW / BK.pw, [x, y, w, h] = p.rect, pf = nodes['page-' + p.page]; if (!pf) return;
   const u = pf.box.w / PW;
@@ -1691,7 +1718,7 @@ function layoutPeople() {
   ghostT = add(world, 'ghost', PCX + (PCW + SGAP) / 2, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newthread="1"><span class="plus">+</span><span>Thread</span></button>`);
   py = y + 360; refreshBacks(); updateBounds();
 }
-function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy) - top + 120 }); }
+function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy, ADV_BOTTOM) - top + 120 }); }
 const BOUNDS = {};
 // editing a person's or thread's name and words
 document.addEventListener('focusout', () => {}, true);
