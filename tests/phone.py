@@ -1,10 +1,12 @@
 """Phone checks (E18): touch pan from anywhere, tap presses, pinch + handoff, fling, double-tap, long-press note.
-Usage: tests/phone.py [url] [pc]   (iPhone 13 emulation; raw CDP touch events)"""
+Usage: tests/phone.py [url] [pc] [step path]   (iPhone 13 emulation; raw CDP touch events)"""
 import sys, json
 from playwright.sync_api import sync_playwright
 url = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8471/brp.html'
 PC = sys.argv[2] if len(sys.argv) > 2 else ('pc-tusk' if 'brp' not in url else 'pc-sol')
-STEP, PATH = ('meta', 'meta') if 'brp' not in url else ('prof', 'prof')
+# the builder step whose .opt a tap presses, and the choices path it changes: per page, or argv[3] argv[4]
+STEP, PATH = ('prof', 'prof') if 'brp' in url else ('cond', 'cond') if 'lb' in url else ('meta', 'meta')
+if len(sys.argv) > 4: STEP, PATH = sys.argv[3], sys.argv[4]
 fails = []
 def check(name, ok, info=''):
     print(('PASS ' if ok else 'FAIL ') + name, info); ok or fails.append(name)

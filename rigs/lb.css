@@ -1,0 +1,41 @@
+/* Lady Blackbird rig: only this rig's own classes (lb*) */
+.lbt { display: inline-block; font: 600 17px var(--f-body); padding: 5px 11px; margin: 0 6px 6px 0; border-radius: 9px; cursor: pointer; white-space: nowrap;
+  background: var(--btn-face); border: 2px solid var(--ochre); box-shadow: 0 3px 0 var(--ledge); color: var(--ink); transition: transform .06s, box-shadow .06s; }
+.lbt:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--ledge); }
+.lbt:active, .lbt.sel { transform: translateY(3px); box-shadow: 0 0 0 var(--ledge); }
+.lbt.sel { background: var(--ochre); color: var(--paper); }
+.lbt.new:not(.sel) { border-style: double; border-width: 4px; }
+.lbt.lk { background: transparent; border: 2px dashed var(--rule); box-shadow: none; color: var(--ink-3); font-weight: 500; transform: none; }
+span.lbt.lk { cursor: default; }
+.lbt.big { font: 700 24px var(--f-display); padding: 6px 14px; }
+.lbtags { display: flex; flex-wrap: wrap; margin-top: 6px; }
+.lbtraits { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+.lbtrait { border-radius: 14px; padding: 8px 10px; background: var(--band); min-width: 0; }
+.lbtrait.on { background: var(--ochre-soft); }
+.lbth { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lbth .k, .lbkh .k, .lbsec .k, .lbrow .k { font-size: 15px; color: var(--ink-2); }
+.lbth .pv { margin-left: auto; font-size: 24px; }
+.lbkeys { display: flex; flex-direction: column; gap: 12px; }
+.lbkey { border-radius: 14px; padding: 10px 12px; background: var(--band); }
+.lbkh { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lbkh .k { font: 700 26px var(--f-display); color: var(--ink); }
+.lbkh .pv { margin-left: auto; font-size: 26px; }
+.lbkey .e, .lbsec .e { font-size: 16px; color: var(--ink-2); line-height: 1.35; }
+.lbkey .e.off { color: var(--ink-3); }
+.lbhits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.lbhits .cnt { margin-left: 6px; color: var(--ochre); }
+.lbsecs { display: flex; flex-direction: column; gap: 10px; }
+.lbsec { border-radius: 12px; padding: 8px 10px; background: var(--band); }
+.lbsec .k { font: 700 20px var(--f-display); color: var(--ink); margin-right: 8px; }
+.lbsec .lbt { margin: 4px 0; }
+.lbplan { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 22px; }
+.lbplan b { font: 700 28px var(--f-display); }
+.lbrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.lbrow .seg { flex-wrap: wrap; }
+.lbact { display: flex; flex-wrap: wrap; gap: 8px; }
+.bstep .lbtrow { grid-template-columns: 1fr auto; }
+.bstep .lbtrow .lbtags { margin-top: 8px; }
+.bstep .lbhits .opt { padding: 8px 12px; }
+.tablecard .init li.out { opacity: .45; }
+.tablecard .init li .tb { grid-area: d; }
+.lbtraits.few { grid-template-columns: 1fr; }
