@@ -51,7 +51,9 @@ function linkify(text, fromId) {
 
 // ------------------------------------------------------------------ geometry (world units)
 // Tight clusters at every scale, about the golden ratio: the whole canvas, each sheet (2100 × 1300), the builder block.
-const MAP = window.MAPMETA || { width: 9000, height: 8000 };
+const MAP_ART = C.mapArt ? (C.print || []).find(p => p.id === C.mapArt) : null;
+// the campaign map: the book's own map art (cut from the reader's copy once it is open), else the street map
+const MAP = MAP_ART ? { width: MAP_ART.rect[2], height: MAP_ART.rect[3], src: '', attribution: `Map: ${C.book.fullTitle || C.book.title}, cut from your copy`, alt: 'The map from the book' } : (window.MAPMETA || { width: 9000, height: 8000 });
 const HISTW = 1300;   // the history card's width (it lives far left of the map)
 const SW = 2100, SH = 1300, RH = SH + 60, SLOTS = 6;       // party: six seats down the map's right edge
 const rowsTop = 40;
@@ -61,12 +63,12 @@ const MW = Math.round(MH * (MAP.width / MAP.height));
 const PX = MW + 160;                                        // party column x, on the map's right edge
 
 // ------------------------------------------------------------------ the map: the anchor
-const mapEl = add(world, 'map', 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="Street map of central Seattle" draggable="false" ${MAP.src ? '' : 'hidden'}>`);
+const mapEl = add(world, 'map', 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="${esc(MAP.alt || 'Street map of central Seattle')}" draggable="false" ${MAP.src ? '' : 'hidden'}>${MAP_ART ? `<div class="mapwait">The map comes from your copy of the book.<br>Open it on the book above.</div>` : ''}`);
 reg('map', { el: mapEl, title: 'Campaign map · Seattle', kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
 label(mapEl, 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
 add(mapEl, 'attrib', MW - 1500, MH - 110, 1440, 80, esc(MAP.attribution || 'Map data © OpenStreetMap contributors, ODbL'));
 C.places.forEach(p => {
-  const pt = (MAP.points || {})[p.key] || { fx: p.x / 1400, fy: p.y / 1000 };
+  const pt = p.fx != null ? { fx: p.fx, fy: p.fy } : (MAP.points || {})[p.key] || { fx: p.x / 1400, fy: p.y / 1000 };
   const x = pt.fx * MW, y = pt.fy * MH;
   const e = add(mapEl, 'place', x - 220, y - 220, 440, null, `<img class="pi" src="${p.icon}" alt=""><div class="pn">${esc(p.name)}</div><div class="pnote">${esc(p.note)}</div><a class="tw" href="https://turnipworks.net/" target="_blank" rel="noopener">Open table in Turnip Works ↗</a><div class="backs"></div>`);
   reg(p.id, { el: e, title: p.name, kind: 'place', icon: p.icon, box: { x: x - 220, y: y - 220, w: 440, h: 640 } });
@@ -78,7 +80,7 @@ const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
 // pages, scaled as a whole to fill its cell (E2, E6). The whole book is sized against the map so the map stays the
 // anchor (H, 14 Nov: "why is this thing 5 times bigger than the map?"): pages shrink, chapters get fading headlines (E1).
 const parts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: BK.pages }]).map(pt => ({ ...pt,
-  n: pt.to - pt.from + 1, entries: C.print.filter(p => p.page >= pt.from && p.page <= pt.to) }));
+  n: pt.to - pt.from + 1, entries: C.print.filter(p => p.page >= pt.from && p.page <= pt.to && p.kind !== 'art') }));
 const ICW = 316, IRH = 150, IGAP = 10, HEADH = 120, PPAD = 30;
 function partNatural(n, m, c, ic) {   // natural size (u = 1) of a chapter block with c page columns and ic index columns
   const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;
@@ -1258,14 +1260,79 @@ document.addEventListener('change', ev => { const s = ev.target.closest('select[
 
 // ---- the book's pages: every page is always drawn; pdf.js sharpens a page once you are close
 let pdfDoc = null, pdfFailed = false;
+// ---- the stencil (H, 15 Nov): the book is the reader's own copy. They download it from its maker, open it here, and it
+// stays in this browser (IndexedDB); nothing about the book reaches a server. A stencil is made for one exact file: the
+// copy is recognised by its SHA-256 (books/fingerprints.js, written by build.sh), and any other file is refused.
+const BOOKFILE = (C.book.file || '').split('/').pop(), PRINT = (window.BOOK_PRINTS || {})[BOOKFILE] || null;
+const bookStore = (() => { let db = null; const open = () => db || (db = new Promise(res => { try { const r = indexedDB.open('turnip-almanac-books', 1); r.onupgradeneeded = () => r.result.createObjectStore('files');
+  r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch { res(null); } }));
+  const tx = async (mode, fn) => { const d = await open(); if (!d) return null; return new Promise(res => { const q = fn(d.transaction('files', mode).objectStore('files')); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); };
+  return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)), del: k => tx('readwrite', st => st.delete(k)) }; })();
+const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+let copyState = PRINT ? 'none' : 'local';   // none · checking · open · wrong · local (no stencil: the developer's file)
+let copyNote = '';
+function renderCopyPanel() {
+  const el = bk.querySelector('.copy') || bk.appendChild(Object.assign(document.createElement('div'), { className: 'copy' }));
+  const get = C.book.get ? `<a class="keyb" href="${esc(C.book.get.url)}" target="_blank" rel="noopener">1 · ${esc(C.book.get.label || 'Get the book')} ↗</a>` : '';
+  const pick = `<label class="keyb primary">${get ? '2 · ' : ''}Open your copy<input type="file" accept="application/pdf,.pdf" hidden data-opencopy></label>`;
+  el.innerHTML = copyState === 'open' ? `<span class="ok">✓ Your copy is open in this browser.</span><button class="keyb" data-forgetcopy>Forget it here</button>`
+    : copyState === 'checking' ? `<span>Checking your copy…</span>`
+    : copyState === 'local' ? '' : `<span>${copyState === 'wrong' ? `<b class="bad">${esc(copyNote)}</b>` : 'This table runs on <b>your own copy</b> of the book. It stays in your browser.'}</span>${get}${pick}`;
+  bk.classList.toggle('needcopy', copyState !== 'open' && copyState !== 'local');
+  if (copyState !== 'open' && copyState !== 'local') pageFrames.forEach(o => { if (!o._thumb) o.el.querySelector('.ph').innerHTML = `${o.n}<small>Open your copy<br>to see this page</small>`; });
+}
+async function openCopy(file) {
+  if (!file) return; copyState = 'checking'; renderCopyPanel();
+  const buf = await file.arrayBuffer(), h = hex(await crypto.subtle.digest('SHA-256', buf));
+  if (PRINT && h !== PRINT.sha256) {
+    copyState = 'wrong'; copyNote = `That file isn't the copy this table was made for (${file.name}, ${buf.byteLength.toLocaleString()} bytes; it needs ${BOOKFILE}, ${PRINT.size.toLocaleString()} bytes). A different printing needs its own stencil.`;
+    renderCopyPanel(); return false; }
+  await bookStore.put(PRINT ? PRINT.sha256 : h, new Blob([buf], { type: 'application/pdf' }));
+  await loadPdf(buf); historyNote(`Opened your copy of ${C.book.title}`); return true;
+}
+async function loadPdf(buf) {
+  if (!window.pdfjsLib) { pdfFailed = true; return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise; copyState = 'open';
+  pageFrames.forEach(o => { o._thumb = null; o._res = 0; o.el.querySelector('.ph').textContent = o.n; });
+  renderCopyPanel(); dirty = true; cutArt();
+}
+// the art: the stencil marks each illustration (page + rect); it is cut from the reader's own copy, here, at runtime
+const bookArt = {};
+async function cutArt() {
+  for (const a of (C.print || []).filter(p => p.kind === 'art')) {
+    try { const page = await pdfDoc.getPage(a.page), [x, y, w, h] = a.rect, k = Math.min(4, 2400 / w), v = page.getViewport({ scale: k });
+      const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height); await page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
+      const o = document.createElement('canvas'); o.width = Math.round(w * k); o.height = Math.round(h * k); o.getContext('2d').drawImage(c, -x * k, -y * k);
+      bookArt[a.id] = o.toDataURL('image/jpeg', 0.9); placeArt(a); } catch (e) { console.warn('art', a.id, e.message); }
+  }
+}
+const artCards = {}; let artY = null;
+function placeArt(a) {
+  const src = bookArt[a.id];
+  if (a.use === 'map' && a.id === C.mapArt) { const im = mapEl.querySelector('.mapimg'); im.src = src; im.hidden = false; mapEl.querySelector('.mapwait')?.remove(); return; }
+  // scenes and pictures: in a strip west of the book (the quiet side), packed tight, each its own size
+  if (artCards[a.id]) { artCards[a.id].querySelector('img').src = src; return; }
+  const w = 1300, h = Math.round(w * a.rect[3] / a.rect[2]); if (artY == null) artY = BY;
+  const e = add(world, 'card artcard bookart', -w - 160, artY, w, h + 70, `<img src="${src}" alt="${esc(a.title || 'Art from the book')}" draggable="false"><div class="cap">${esc(a.title || '')} <span>· p.${a.page}, from your copy</span></div>`);
+  artCards[a.id] = e; reg(a.id + '-card', { el: e, title: `${a.title || 'Art'} · from the book`, kind: 'art', box: { x: -w - 160, y: artY, w, h: h + 70 } }); artY += h + 70 + 60;
+}
 (async () => {
   try {
     if (!window.pdfjsLib) throw new Error('pdf.js did not load');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    pdfDoc = await pdfjsLib.getDocument(C.book.file).promise; dirty = true;
-  } catch (e) { pdfFailed = true; console.warn('Book pages unavailable:', e.message);
-    pageFrames.forEach(o => { o.el.querySelector('.ph').innerHTML = `${o.n}<small style="display:block;font-size:30px">The page could not be drawn here.</small>`; }); }
+    if (!PRINT) { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfDoc = await pdfjsLib.getDocument(C.book.file).promise; dirty = true; cutArt(); return; }   // no stencil: the developer's own file
+    const blob = await bookStore.get(PRINT.sha256);
+    if (blob) { copyState = 'checking'; renderCopyPanel(); await loadPdf(await blob.arrayBuffer()); } else renderCopyPanel();
+  } catch (e) { pdfFailed = true; console.warn('Book pages unavailable:', e.message); renderCopyPanel(); }
 })();
+document.addEventListener('change', ev => { const i = ev.target.closest?.('[data-opencopy]'); if (i) openCopy(i.files?.[0]); });
+document.addEventListener('click', ev => { if (ev.target.closest?.('[data-forgetcopy]')) { bookStore.del(PRINT.sha256).then(() => location.reload()); return; }
+  // a blank page asks for the copy: click it to open one
+  const pf = ev.target.closest?.('.pagef'); if (pf && copyState !== 'open' && copyState !== 'local' && !pan?.moved) bk.querySelector('[data-opencopy]')?.click(); });
+// drop a PDF anywhere: it is checked against this table's stencil
+addEventListener('dragover', ev => { if ([...(ev.dataTransfer?.items || [])].some(i => i.type === 'application/pdf')) ev.preventDefault(); });
+addEventListener('drop', ev => { const f = [...(ev.dataTransfer?.files || [])].find(f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name)); if (!f) return; ev.preventDefault(); openCopy(f); flyTo(BK.id); });
 // every page is always there (E1): a thumbnail first, sharpened only when it is big on screen; a few sharp pages at a time
 let pagesBusy = 0;
 const SHARP_MAX = matchMedia('(pointer: coarse)').matches ? 6 : 14;
@@ -1393,6 +1460,6 @@ document.addEventListener('click', ev => {
   const rm = ev.target.closest?.('[data-rmpc]'); if (rm) { removePc(rm.dataset.rmpc); return; }
   const h = ev.target.closest?.('[data-hist]'); if (h) histGoBack(+h.dataset.hist);
 });
-window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed }) };   // for tests
+window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();
