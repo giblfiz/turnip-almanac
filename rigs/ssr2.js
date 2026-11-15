@@ -121,7 +121,7 @@ window.RIG = (() => {
   // a summon's specials, each with the skill it is rolled with (spells: Magic; attacks: Unarmed; the machine spirit's deck: Computer)
   const summonSpecials = t => t.special === '—' ? [] : t.special.split(/;\s*|,\s*/).filter(Boolean).map(text => ({ text,
     skill: SPELL_NAMES.some(n => text.startsWith(n)) ? 'magic' : /deck/.test(text) ? 'computer' : /\[\d+[LMSD]\]/.test(text) ? 'unarmed' : null }));
-  const canSummon = ch => !!ch.trad && (TRAD[ch.trad]?.summoning || !!ch.extras?.summoning);
+  const canSummon = (ch, S) => { const t = ch.trad || S?.tradId; return !!t && (TRAD[t]?.summoning || !!ch.extras?.summoning || !!S?.kExtras?.summoning); };
   // a summoning roll: Magic vs TN 6 − Mental; spirit rating = successes, elemental = successes + 2 (0 successes: nothing comes)
   function summon(type, S, woundTN = 0, rnd) {
     const t = SUMMONS.find(x => x.id === type), r = roll(S.skill.magic, Math.max(0, 6 - S.attr.mental) + woundTN, rnd);
@@ -167,21 +167,28 @@ window.RIG = (() => {
     const add = (label, pts, ...src) => { if (pts) spend.push({ label, pts, src }); };
     if (M) add(M.name, M.pts, B('meta'), P.meta);
     if (ch.meta === 'human') (ch.human || []).forEach(s => add(`Racial +1 ${SK_NAME[s]}`, HUMAN_BONUS_PTS, B('meta'), P.meta));
-    const attr = {}; ATTRS.forEach(a => { const buy = ch.attr[a] || 0; attr[a] = 1 + buy; pv('a:' + a, P.start); if (buy) { add(`${ATTR_NAME[a]} +${buy}`, ATTR_COST[buy], B('attr'), P.attr); pv('a:' + a, B('attr'), P.attr); } });
+    const attr = {}, attrBuy = {}; ATTRS.forEach(a => { const buy = ch.attr[a] || 0; attrBuy[a] = buy; attr[a] = 1 + buy; pv('a:' + a, P.start); if (buy) { add(`${ATTR_NAME[a]} +${buy}`, ATTR_COST[buy], B('attr'), P.attr); pv('a:' + a, B('attr'), P.attr); } });
     // karma spends (after chargen, in session order)
     const kl = karmaLog.filter(k => k.s <= asOf);
+    // karma buys anything at creation prices except race, circles, gear and cyberware; Essence 1 karma per point (v2.2)
+    let essBack = 0, kTrad = null; const kExtras = {};
+    let kFree = ch.trad ? Math.max(0, TRAD[ch.trad].freeSpells - (ch.spells || []).length) : 0;
     const karma = { earned: 0, spent: 0 };
     kl.forEach(k => { karma.earned += k.award || 0; });
     const skillBuy = {}; ALL_SKILLS.forEach(s => skillBuy[s] = Math.max(1, ch.skills[s] || 1));
     ALL_SKILLS.forEach(s => { pv('s:' + s, P.start); if (skillBuy[s] > 1) { add(`${SK_NAME[s]} ${skillBuy[s]}`, skillCost(1, skillBuy[s]), B('skills'), P.skillcost); pv('s:' + s, B('skills'), P.skillcost); } });
     kl.forEach(k => (k.buy || []).forEach(b => {
       if (b.skill) { const from = skillBuy[b.skill]; skillBuy[b.skill] = b.to; const c = skillCost(from, b.to); karma.spent += c; pv('s:' + b.skill, k.id, P.karma); }
-      if (b.spell) { karma.spent += 3; }
+      if (b.spell) { if (kFree > 0) { kFree--; b._free = true; } else karma.spent += 3; }
+      if (b.attr) { const from = attrBuy[b.attr], to = Math.min(2, from + 1); karma.spent += ATTR_COST[to] - ATTR_COST[from]; attr[b.attr] += to - from; attrBuy[b.attr] = to; pv('a:' + b.attr, k.id, P.karma); }
+      if (b.essence) { karma.spent += b.essence; essBack += b.essence; pv('essence', k.id, P.karma); }
+      if (b.trad && !ch.trad && !kTrad) { karma.spent += TRAD[b.trad].pts; kTrad = b.trad; kFree = TRAD[b.trad].freeSpells; }
+      if (b.extra) { karma.spent += EXTRAS[b.extra].pts; kExtras[b.extra] = true; }
     }));
     // essence first (Magic cap depends on it)
     let essSpent = 0; const cyberList = [];
     CYBER.forEach(c => { const n = ch.cyber[c.id] || 0; if (!n) return; essSpent += c.ess * n; add(`${c.name}${n > 1 ? ' ×' + n : ''}`, c.pts * n, B('cyber'), P.cyber); cyberList.push({ ...c, n }); pv('essence', B('cyber'), P.cyber); });
-    const essence = ESSENCE - essSpent; pv('essence', P.start);
+    const essence = Math.min(ESSENCE, ESSENCE - essSpent + essBack); pv('essence', P.start);
     const magicCap = Math.max(0, Math.floor(essence / 10)); pv('magiccap', 'essence', P.skillcost);
     // effective attributes
     if (M) Object.entries(M.attr).forEach(([a, v]) => { attr[a] += v; pv('a:' + a, B('meta'), P.meta); });
@@ -201,11 +208,11 @@ window.RIG = (() => {
       skill[s] = Math.max(0, r);
     });
     // magic
-    const T = ch.trad ? TRAD[ch.trad] : null; let freeLeft = T ? T.freeSpells : 0; const spells = [];
-    if (T) add(T.name, T.pts, B('magic'), P.magic);
+    const tradId = ch.trad || kTrad, T = tradId ? TRAD[tradId] : null; let freeLeft = ch.trad ? T.freeSpells : 0; const spells = [];
+    if (T && ch.trad) add(T.name, T.pts, B('magic'), P.magic);
     Object.keys(ch.extras || {}).forEach(e => { if (ch.extras[e] && T && EXTRAS[e] && !(e === 'projection' && T.projection) && !(e === 'summoning' && T.summoning)) add(EXTRAS[e].name, EXTRAS[e].pts, B('magic'), P.magic); });
     if (T) (ch.spells || []).forEach(id => { const sp = SPELL_BY_ID[id]; const free = freeLeft > 0; if (free) freeLeft--; else add(`Spell: ${sp.name}`, sp.pts, B('magic'), P.spells); spells.push({ ...sp, free }); });
-    kl.forEach(k => (k.buy || []).forEach(b => { if (b.spell) spells.push({ ...SPELL_BY_ID[b.spell], karma: k.id }); }));
+    kl.forEach(k => (k.buy || []).forEach(b => { if (b.spell) spells.push({ ...SPELL_BY_ID[b.spell], karma: k.id, free: !!b._free }); }));
     if (T) spells.forEach(sp => { if ((ch.foci || []).includes(sp.id)) { sp.focus = true; add(`Spell Focus: ${sp.name}`, FOCUS_PTS, B('magic'), P.gear); } });
     // gear, vehicles, decks, chips
     const gearList = [], vehList = [], chipList = [];
@@ -242,7 +249,7 @@ window.RIG = (() => {
     ALL_SKILLS.forEach(s => { if (skillBuy[s] > KARMA_CAP) warn.push(`${SK_NAME[s]} above the karma cap of 12.`); });
     const tn = s => Math.max(0, 6 - attr[SKILL_ATTR[s]]);
     spells.forEach(sp => { sp.magic = skill.magic + (sp.focus ? 1 : 0); });
-    return { attr, skill, tn, essence, magicCap, actions, rig, armor, outfit: outfitSrc, health, cash, pts, left: BUDGET - pts, spend, karma,
+    return { attrBuy, essLost: essSpent - essBack, tradId, kExtras, attr, skill, tn, essence, magicCap, actions, rig, armor, outfit: outfitSrc, health, cash, pts, left: BUDGET - pts, spend, karma,
       meta: M, trad: T, spells, cyber: cyberList, gear: gearList, veh: vehList, deck, chips: chipList, circles: circleList, life, warn, prov, adept: ch.trad === 'adept',
       trollDmg: ch.meta === 'troll' };
   }
