@@ -743,17 +743,17 @@
     "x": 402.0,
     "top": 223.80099999999993,
     "width": 366.0,
-    "height": 24.442,
+    "height": 36.663,
     "label": "ICE has health, armor, Computer skill and a Destroy chip. <b>White ICE</b> boots the user "
   },
   {
     "page": 4,
     "kind": "paragraph",
     "x": 402.0,
-    "top": 195.35899999999992,
+    "top": 183.13799999999992,
     "width": 366.0,
-    "height": 24.442,
-    "label": "Other deckers may be present. Attack them using white, grey or black methods, or attempt t"
+    "height": 12.221,
+    "label": "Other deckers may be present. Attack them as ICE would, or Search, Read or Edit their deck"
   },
   {
     "page": 4,
