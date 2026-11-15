@@ -2431,7 +2431,8 @@ let copyState = PRINT ? 'none' : 'local';   // none · checking · open · wrong
 let copyNote = '';
 function renderCopyPanel() {
   const el = bk.querySelector('.copy') || bk.appendChild(Object.assign(document.createElement('div'), { className: 'copy' }));
-  const get = C.book.get ? `<a class="keyb" href="${esc(C.book.get.url)}" target="_blank" rel="noopener">1 · ${esc(C.book.get.label || 'Get the book')} ↗</a>` : '';
+  const getUrl = C.book.get?.url === '@self' ? `downloads/${BOOKFILE}` : C.book.get?.url;   // '@self': we host it (our own book), named as the stencil's exact file
+  const get = C.book.get ? `<a class="keyb" href="${esc(getUrl)}" target="_blank" rel="noopener">1 · ${esc(C.book.get.label || 'Get the book')} ↗</a>` : '';
   const pick = `<label class="keyb primary">${get ? '2 · ' : ''}Open your copy<input type="file" accept="application/pdf,.pdf" hidden data-opencopy></label>`;
   el.innerHTML = copyState === 'open' ? `<span class="ok">✓ Your copy is open in this browser.</span><button class="keyb" data-forgetcopy>Forget it here</button>`
     : copyState === 'checking' ? `<span>Checking your copy…</span>`
@@ -2443,7 +2444,7 @@ async function openCopy(file) {
   if (!file) return; copyState = 'checking'; renderCopyPanel();
   const buf = await file.arrayBuffer(), h = hex(await crypto.subtle.digest('SHA-256', buf));
   if (PRINT && h !== PRINT.sha256) {
-    copyState = 'wrong'; copyNote = `That file isn't the copy this table was made for (${file.name}, ${buf.byteLength.toLocaleString()} bytes; it needs ${BOOKFILE}, ${PRINT.size.toLocaleString()} bytes). A different printing needs its own stencil.`;
+    copyState = 'wrong'; copyNote = `That file isn't the copy this table was made for (${file.name}, ${buf.byteLength.toLocaleString()} bytes; it needs ${C.book.get?.file || BOOKFILE}, ${PRINT.size.toLocaleString()} bytes). A different printing needs its own stencil.`;
     renderCopyPanel(); return false; }
   await bookStore.put(PRINT ? PRINT.sha256 : h, new Blob([buf], { type: 'application/pdf' }));
   await loadPdf(buf); historyNote(`Opened your copy of ${C.book.title}`); return true;

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turnip Almanac</title>
+<meta name="description" content="The desk side of Turnip Works: rules, characters, campaign and sessions on one zoomable canvas. Working in public.">
+<style>
+:root { --paper: #fbf8f1; --ink: #1d1a15; --ink-2: #5a5348; --ink-3: #8b8273; --rule: #e2dccf; --ochre: #a8770f; --ochre-soft: #f6ecd6; --card: #fffdf8; }
+@media (prefers-color-scheme: dark) { :root { --paper: #17150f; --ink: #f1ece2; --ink-2: #c4bbab; --ink-3: #8f8676; --rule: #3a352b; --ochre: #e0a63a; --ochre-soft: #2b2416; --card: #1e1b14; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 56px 20px 80px; }
+h1 { font: 800 clamp(40px, 8vw, 68px)/1 Georgia, "Times New Roman", serif; letter-spacing: -0.02em; margin: 0 0 14px; }
+.lede { font-size: 20px; color: var(--ink-2); margin: 0 0 8px; max-width: 40em; }
+.wip { display: inline-block; font: 600 13px system-ui; letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); border: 1.5px solid var(--ochre); border-radius: 6px; padding: 2px 8px; margin: 10px 0 34px; }
+.tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 46px; }
+.table { display: block; text-decoration: none; color: inherit; background: var(--card); border: 1.5px solid var(--rule); border-radius: 16px; padding: 20px 20px 18px; box-shadow: 0 4px 0 var(--rule); transition: transform .08s, box-shadow .08s, border-color .15s; }
+.table:hover { border-color: var(--ochre); }
+.table:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rule); }
+.table h2 { font: 700 24px/1.15 Georgia, serif; margin: 0 0 6px; }
+.table p { margin: 0 0 12px; color: var(--ink-2); font-size: 15.5px; }
+.table .book { font-size: 13.5px; color: var(--ink-3); }
+.table .go { display: inline-block; margin-top: 12px; font-weight: 700; color: var(--ochre); }
+h3 { font: 700 20px Georgia, serif; margin: 34px 0 8px; }
+ol { padding-left: 1.3em; margin: 0; } li { margin: 4px 0; }
+.notes { margin-top: 46px; border-top: 1px solid var(--rule); padding-top: 18px; font-size: 13.5px; color: var(--ink-3); }
+.notes p { margin: 6px 0; }
+a { color: var(--ochre); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Turnip Almanac</h1>
+  <p class="lede">The desk side of <a href="https://turnipworks.net">Turnip Works</a>: the rules, the characters, the campaign and its sessions, on one zoomable canvas.</p>
+  <span class="wip">Working in public · early</span>
+
+  <div class="tables">
+    <a class="table" href="/shadowrun/">
+      <h2>Simplified Shadowrun</h2>
+      <p>A sample table of runners in the sprawl, with a character builder that costs every choice.</p>
+      <div class="book">Rules: Simplified Shadowrun 2e, a four-page homebrew (free download on the table).</div>
+      <span class="go">Open the table →</span>
+    </a>
+    <a class="table" href="/brp/">
+      <h2>Basic Roleplaying</h2>
+      <p>Four investigators, percentile skills, experience checks, and a 303-page rulebook laid out by chapter.</p>
+      <div class="book">Rules: Chaosium's Basic Roleplaying ORC Content Document (free from Chaosium).</div>
+      <span class="go">Open the table →</span>
+    </a>
+    <!--@MORE-TABLES@-->
+  </div>
+
+  <h3>Your own copy of the book</h3>
+  <p>Each table runs on a rulebook you bring. The pages, and any art from the book, are drawn from your own copy, in your browser; the book never touches our server.</p>
+  <ol>
+    <li>On the table, follow the link to download the book from its maker.</li>
+    <li>Open that file on the table (or drop it on the page). The table checks that it is the exact file it was made for.</li>
+    <li>It stays in this browser, so next time it is already there.</li>
+  </ol>
+
+  <h3>What is saved</h3>
+  <p>Your table (characters, notes, rolls and every change) is kept in this browser. There are no accounts and nothing is shared yet.</p>
+
+  <div class="notes">
+    <p><b>Basic Roleplaying</b>: rules from the Basic Roleplaying: Universal Game Engine ORC Content Document, © 2023 Chaosium Inc., used under the ORC License. Powered by BRP. Basic Roleplaying is a trademark of Chaosium Inc. Not affiliated with or endorsed by Chaosium.</p>
+    <!--@MORE-NOTES@-->
+    <p>Street map data © OpenStreetMap contributors, ODbL. Source: <a href="https://github.com/giblfiz/turnip-almanac">github.com/giblfiz/turnip-almanac</a>. An <a href="https://implausible.enterprises">Implausible Enterprises</a> project.</p>
+  </div>
+</main>
+</body>
+</html>
