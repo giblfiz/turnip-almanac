@@ -170,7 +170,7 @@ window.RIG = (() => {
     const attr = {}, attrBuy = {}; ATTRS.forEach(a => { const buy = ch.attr[a] || 0; attrBuy[a] = buy; attr[a] = 1 + buy; pv('a:' + a, P.start); if (buy) { add(`${ATTR_NAME[a]} +${buy}`, ATTR_COST[buy], B('attr'), P.attr); pv('a:' + a, B('attr'), P.attr); } });
     // karma spends (after chargen, in session order)
     const kl = karmaLog.filter(k => k.s <= asOf);
-    // karma buys anything at creation prices except race, circles, gear and cyberware; Essence 1 karma per point (v2.2)
+    // karma buys anything at creation prices except race, circles, lifestyle, gear and cyberware; Essence 1 karma per point (v2.2)
     let essBack = 0, kTrad = null; const kExtras = {};
     let kFree = ch.trad ? Math.max(0, TRAD[ch.trad].freeSpells - (ch.spells || []).length) : 0;
     const karma = { earned: 0, spent: 0 };
@@ -188,7 +188,7 @@ window.RIG = (() => {
     // essence first (Magic cap depends on it)
     let essSpent = 0; const cyberList = [];
     CYBER.forEach(c => { const n = ch.cyber[c.id] || 0; if (!n) return; essSpent += c.ess * n; add(`${c.name}${n > 1 ? ' ×' + n : ''}`, c.pts * n, B('cyber'), P.cyber); cyberList.push({ ...c, n }); pv('essence', B('cyber'), P.cyber); });
-    const essence = Math.min(ESSENCE, ESSENCE - essSpent + essBack); pv('essence', P.start);
+    const essence = ESSENCE - essSpent + essBack;   // karma Essence is uncapped (Harry, 15 Nov): Essence 70 → Magic cap 7 pv('essence', P.start);
     const magicCap = Math.max(0, Math.floor(essence / 10)); pv('magiccap', 'essence', P.skillcost);
     // effective attributes
     if (M) Object.entries(M.attr).forEach(([a, v]) => { attr[a] += v; pv('a:' + a, B('meta'), P.meta); });
