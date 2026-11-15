@@ -1091,13 +1091,20 @@ function stepHtml(pc, S, key) {
     // creation; a spell costs 3; skills stop at the karma cap)
     const n = advSession(), mine = (state.adv[pc.id] || []).find(x => x.s === n) || {}, left = S.karma.earned - S.karma.spent;
     const rated = sk => { let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; })); return r; };
-    h += `${stepHead(S, 'adv', '★', 'Advancement', STEP_RULE.adv)}<div class="hint">Karma for S${n} (the latest session), then spend it. A skill's next point costs what it would at creation; a spell costs 3; skills stop at ${R.KARMA_CAP}.</div>
+    h += `${stepHead(S, 'adv', '★', 'Advancement', STEP_RULE.adv)}<div class="hint">Karma for S${n} (the latest session), then spend it. Everything costs what it would at creation, except race, circles, gear and cyberware, which karma cannot buy; Essence is 1 per point; skills stop at ${R.KARMA_CAP}.</div>
       <div class="karmabar"><span>Karma for S${n}</span><div class="stepper"><button data-act="kaward" data-pc="${pc.id}" data-d="-1" ${(mine.award || 0) <= 0 ? 'disabled' : ''} aria-label="Less karma">−</button><output>${mine.award || 0}</output><button data-act="kaward" data-pc="${pc.id}" data-d="1" aria-label="More karma">+</button></div>
       <b>${left} to spend</b> <span class="e">${S.karma.earned} earned in all</span>${(mine.buy || []).length ? ` <button class="opt kundo" data-act="kundo" data-pc="${pc.id}"><b>Take back the last spend</b></button>` : ''}</div><div class="opts">`;
     R.ALL_SKILLS.forEach(sk => { const r = rated(sk), c = r >= R.KARMA_CAP ? null : R.skillCost(r, r + 1), ok = c != null && c <= left;
       h += `<button class="opt" data-act="kbuy" data-pc="${pc.id}" data-skill="${sk}" ${ok ? '' : 'disabled'}><b>${esc(R.SK_NAME[sk])} ${r} → ${r + 1}${c != null ? `<em>${c}</em>` : ''}</b><span>${c == null ? 'at the cap' : ok ? 'karma' : 'not enough karma'}</span></button>`; });
+    h += `</div><div class="grouph"><span>Attributes · creation prices (+1 = ${R.ATTR_COST[1]}, the second +1 = ${R.ATTR_COST[2] - R.ATTR_COST[1]})</span></div><div class="opts">`;
+    R.ATTRS.forEach(at => { const bb = S.attrBuy[at], c = bb >= 2 ? null : R.ATTR_COST[bb + 1] - R.ATTR_COST[bb], ok = c != null && c <= left;
+      h += `<button class="opt" data-act="kattr" data-pc="${pc.id}" data-attr="${at}" ${ok ? '' : 'disabled'}><b>${esc(R.ATTR_NAME[at])} ${S.attr[at]} → ${S.attr[at] + 1}${c != null ? `<em>${c}</em>` : ''}</b><span>${c == null ? 'bought +2 already' : ok ? 'karma' : 'not enough karma'}</span></button>`; });
     h += `</div>`;
-    if (S.trad && ch.trad !== 'adept') { const known = new Set([...(ch.spells || []), ...karmaOf(pc).flatMap(k => (k.buy || []).filter(b => b.spell).map(b => b.spell))]);
+    if (S.essLost > 0) h += `<div class="grouph"><span>Essence · 1 karma per point · ${S.essence} of ${R.ESSENCE}</span></div><div class="opts"><button class="opt" data-act="kess" data-pc="${pc.id}" ${left >= 1 ? '' : 'disabled'}><b>Essence ${S.essence} → ${S.essence + 1}<em>1</em></b><span>raises the Magic cap at each 10</span></button></div>`;
+    if (!S.trad) h += `<div class="grouph"><span>Awaken · a tradition at creation price</span></div><div class="opts">` + Object.entries(R.TRAD).map(([k, t]) => `<button class="opt" data-act="ktrad" data-pc="${pc.id}" data-trad="${k}" ${left >= t.pts ? '' : 'disabled'}><b>${esc(t.name)}<em>${t.pts}</em></b><span>${esc(t.text)}</span></button>`).join('') + `</div>`;
+    if (S.trad) { const tr = S.trad, ex = Object.entries(R.EXTRAS).filter(([k]) => !(k === 'projection' && tr.projection) && !(k === 'summoning' && tr.summoning) && !ch.extras?.[k] && !S.kExtras[k]);
+      if (ex.length) h += `<div class="grouph"><span>Magic extras</span></div><div class="opts">` + ex.map(([k, x]) => `<button class="opt" data-act="kextra" data-pc="${pc.id}" data-extra="${k}" ${left >= x.pts ? '' : 'disabled'}><b>${esc(x.name)}<em>${x.pts}</em></b><span>karma</span></button>`).join('') + `</div>`; }
+    if (S.trad) { const known = new Set([...(ch.spells || []), ...karmaOf(pc).flatMap(k => (k.buy || []).filter(b => b.spell).map(b => b.spell))]);
       h += `<div class="grouph"><span>Learn a spell · 3 karma</span></div><div class="opts">` + R.SPELLS.filter(sp => !known.has(sp.id)).map(sp => `<button class="opt" data-act="kspell" data-pc="${pc.id}" data-spell="${sp.id}" ${left >= 3 ? '' : 'disabled'}><b>${esc(sp.name)}<em>3</em></b><span>${esc(sp.eff || '')}</span></button>`).join('') + `</div>`; }
   }
   if (key === 'done') {
@@ -1141,7 +1148,7 @@ function portraitOf(pc, S) {
 function summonOf(pc) { if (!(pc.id in state.summons) && pc.summon) state.summons[pc.id] = { ...pc.summon }; return state.summons[pc.id] || null; }
 function summonsHtml(pc, ch, S, W8) {
   const head = `<div class="sec">Summons <span class="chip" data-go="p-summons">p.2</span> <span class="chip" data-go="p-spirits">types</span></div>`;
-  if (!R.canSummon(ch)) return head + `<div class="none">Summoning needs a Shaman, or a tradition that bought Summoning.</div>`;
+  if (!R.canSummon(ch, S)) return head + `<div class="none">Summoning needs a Shaman, or a tradition that bought Summoning.</div>`;
   const kind = R.summonKind(ch), sm = summonOf(pc);
   if (sm) {
     const t = R.SUMMONS.find(x => x.id === sm.type), skills = [...new Set([...R.SUMMON_SHARED, ...t.extra])];
@@ -1225,7 +1232,7 @@ function renderSheet(pc) {
     <section class="sL">
       <div class="sec">Where the points went</div><div class="ledger">${S.spend.map(x => `<div><span>${esc(x.label)}</span><span>${x.pts}</span></div>`).join('') || '<div><span>Nothing bought yet</span><span>0</span></div>'}</div>
     </section>
-    <section class="sC${R.canSummon(ch) ? '' : ' tall'}">
+    <section class="sC${R.canSummon(ch, S) ? '' : ' tall'}">
       <h4>Gear, ware & magic</h4>
       <div class="cols2">
         <div class="l-cyber"><div class="sec">Cyberware ${chip(P.cyber)}</div><div class="list">${listOr(S.cyber, c => `<div><b>${esc(c.name)}${c.n > 1 ? ' ×' + c.n : ''}</b> <span class="e">${esc(c.eff)}${c.id === 'skillwires' && ch.wire ? ` (${R.SK_NAME[ch.wire]})` : ''}</span> ${toolRolls(pc, S, c.id, c.name)}</div>`)}</div></div>
@@ -1236,7 +1243,7 @@ function renderSheet(pc) {
         <div class="l-life"><div class="sec">Lifestyle</div><div class="list">${S.life ? `<div><b>${esc(S.life.name)}</b> <span class="e">${S.life.tool} · ¥${S.life.cash.toLocaleString()}</span> ${toolRolls(pc, S, 'life', `${S.life.name} lifestyle ${S.life.tool}`)}</div>` : '<div class="none">None</div>'}</div></div>
       </div>
     </section>
-    ${R.canSummon(ch) ? `<section class="sS">${summonsHtml(pc, ch, S, W8)}</section>` : ''}
+    ${R.canSummon(ch, S) ? `<section class="sS">${summonsHtml(pc, ch, S, W8)}</section>` : ''}
     </div>
     <div class="builder${state.build?.pc === pc.id ? ' active' : ''}" data-id="builder-${pc.id}" style="left:${BREG.x}px;top:${BREG.y}px;width:${BREG.w}px;height:${BREG.h}px">
       <div class="binner" style="width:${BINNER.w}px;height:${BINNER.h}px;transform:scale(${BK_K})">${builderInner(pc, S)}</div>
@@ -1301,13 +1308,17 @@ function rigCommands(q, ws, nums, pcw) {
   return out;
 }
 function rigAct(act, a, pc, ch) {
-  if (act === 'kaward' || act === 'kbuy' || act === 'kspell' || act === 'kundo') {
+  if (['kaward', 'kbuy', 'kspell', 'kundo', 'kattr', 'kess', 'ktrad', 'kextra'].includes(act)) {
     const n = advSession(), e = advEntry(pc, n), nm = ch.name || 'A runner';
     if (act === 'kaward') { e.award = Math.max(0, (e.award || 0) + +a.dataset.d); historyNote(`${nm}: karma for S${n} now ${e.award}`); }
     if (act === 'kbuy') { const sk = a.dataset.skill; let r = Math.max(1, ch.skills[sk] || 1); karmaOf(pc).forEach(k => (k.buy || []).forEach(b => { if (b.skill === sk) r = b.to; }));
       (e.buy = e.buy || []).push({ skill: sk, to: r + 1 }); historyNote(`${nm}: ${R.SK_NAME[sk]} ${r} → ${r + 1} with karma`); }
     if (act === 'kspell') { (e.buy = e.buy || []).push({ spell: a.dataset.spell }); historyNote(`${nm} learned ${R.SPELL_BY_ID[a.dataset.spell].name} with karma`); }
-    if (act === 'kundo') { const b = (e.buy || []).pop(); if (b) historyNote(`${nm}: took back ${b.skill ? R.SK_NAME[b.skill] + ' → ' + b.to : R.SPELL_BY_ID[b.spell].name}`); }
+    if (act === 'kattr') { (e.buy = e.buy || []).push({ attr: a.dataset.attr }); historyNote(`${nm}: ${R.ATTR_NAME[a.dataset.attr]} +1 with karma`); }
+    if (act === 'kess') { (e.buy = e.buy || []).push({ essence: 1 }); historyNote(`${nm}: bought back 1 Essence with karma`); }
+    if (act === 'ktrad') { (e.buy = e.buy || []).push({ trad: a.dataset.trad }); historyNote(`${nm} awakened as ${R.TRAD[a.dataset.trad].name} with karma`); }
+    if (act === 'kextra') { (e.buy = e.buy || []).push({ extra: a.dataset.extra }); historyNote(`${nm}: ${R.EXTRAS[a.dataset.extra].name} with karma`); }
+    if (act === 'kundo') { const b = (e.buy || []).pop(); if (b) historyNote(`${nm}: took back ${b.skill ? R.SK_NAME[b.skill] + ' → ' + b.to : b.spell ? R.SPELL_BY_ID[b.spell].name : b.attr ? R.ATTR_NAME[b.attr] + ' +1' : b.essence ? '1 Essence' : b.trad ? R.TRAD[b.trad].name : R.EXTRAS[b.extra].name}`); }
     refreshAdv(pc, n); return true; }
   if (act === 'sroll') { const sm = summonOf(pc); if (!sm) return true; const t = R.SUMMONS.find(x => x.id === sm.type), r = R.roll(sm.rating, 4);
     const rec = { label: `${choicesOf(pc).name || 'Runner'} · ${t.name} · ${a.dataset.tool}`, pool: r.pool, tn: r.tn, dice: r.dice, succ: r.succ, verdict: r.verdict };
