@@ -2,6 +2,7 @@
 # Build a page from src/ and one rules system: the engine (src/app.js) with the rig's UI inserted at /*@RIG-UI@*/.
 #   ./build.sh                       → index.html  (Simplified Shadowrun 2e sample: src/scripts.html + rigs/ssr2-ui.js)
 #   ./build.sh brp                   → brp.html    (Basic Roleplaying sample: src/scripts-brp.html + rigs/brp-ui.js)
+#   ./build.sh <sys>                 → <sys>.html  (src/scripts-<sys>.html + rigs/<sys>-ui.js, plus rigs/<sys>.css if present)
 set -euo pipefail
 cd "$(dirname "$0")"
 sys="${1:-ssr2}"
@@ -12,6 +13,8 @@ scripts, ui, out = sys.argv[1:4]
 r = lambda p: open(p).read()
 app = r('src/app.js'); assert '/*@RIG-UI@*/' in app
 app = app.replace('/*@RIG-UI@*/', r(ui), 1)
-page = '<!doctype html>\n' + r('src/head.html') + '<style>' + r('src/style.css') + '</style>' + r('src/body.html') + r(scripts) + '<script>\n' + app + '</script>\n'
+import os
+css = r('src/style.css') + (r(ui.replace('-ui.js', '.css')) if os.path.exists(ui.replace('-ui.js', '.css')) else '')
+page = '<!doctype html>\n' + r('src/head.html') + '<style>' + css + '</style>' + r('src/body.html') + r(scripts) + '<script>\n' + app + '</script>\n'
 open(out, 'w').write(page); print(f'built {out} ({len(page)} bytes) with {ui}')
 PY
