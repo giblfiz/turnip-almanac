@@ -38,7 +38,7 @@ window.RIG = (() => {
     { id: 'muscle', name: 'Synthetic Muscle', eff: '+1 Body.', ess: 10, pts: 10, max: 1, fx: { attr: { body: 1 } } },
     { id: 'smartlink', name: 'Smartlink', eff: '+1 Guns, +1 Artillery.', ess: 5, pts: 2, max: 1, fx: { skill: { guns: 1, artillery: 1 } } },
     { id: 'skillwires', name: 'Skillwires', eff: 'Set any one skill to 5 during downtime.', ess: 7, pts: 5, max: 1 },
-    { id: 'datajack', name: 'Datajack', eff: 'Cyberdeck interface; laptops need no implant.', ess: 2, pts: 1, max: 1 },
+    { id: 'datajack', name: 'Datajack', eff: 'Cyberdeck interface; laptops need no implant.', ess: 6, pts: 1, max: 1 },
     { id: 'radio', name: 'Radio Comms', eff: 'Radio and phone calls mentally.', ess: 2, pts: 1, max: 1 },
     { id: 'eyes', name: 'Cyber Eyes', eff: 'Infrared, low-light, 10× mag, recording, flare damping.', ess: 5, pts: 4, max: 1 },
     { id: 'ears', name: 'Cyber Ears', eff: 'Better hearing, ultrasonic, recording, damping.', ess: 3, pts: 4, max: 1 },

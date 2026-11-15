@@ -131,14 +131,14 @@
     "x": 282,
     "top": 314.533,
     "width": 108,
-    "height": 127.17,
+    "height": 137.7,
     "label": "['<b>Decks</b>', '<b>Pts</b>']"
   },
   {
     "page": 2,
     "kind": "table",
     "x": 24,
-    "top": 176.363,
+    "top": 165.83300000000003,
     "width": 366.0,
     "height": 104.262,
     "label": "['<b>Summons</b>']"
