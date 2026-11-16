@@ -1165,9 +1165,10 @@ const allParts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: B
 // reference parts cluster with the book (golden); adventure parts run in play order as a strip below the map (H, 14–15 Nov)
 const parts = allParts.filter(pt => pt.kind !== 'adventure'), advParts = allParts.filter(pt => pt.kind === 'adventure');
 const ICW = 316, IRH = 150, IGAP = 10, HEADH = 120, PPAD = 30;
-function partNatural(n, m, c, ic) {   // natural size (u = 1) of a chapter block with c page columns and ic index columns
-  const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;
-  return { w: PPAD * 2 + (ic ? ic * (ICW + IGAP) + 40 : 0) + c * (PW + PG) - PG, h: HEADH + Math.max(rows * (PH + PG) - PG, ih - IGAP) + PPAD, rows };
+function partNatural(n, m, c, ic, stack = false) {   // natural size (u = 1) of a chapter block: c page columns, ic index columns,
+  const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;   // the index beside the pages, or stacked below them
+  if (stack) return { w: PPAD * 2 + Math.max(c * (PW + PG) - PG, ic * (ICW + IGAP) - IGAP), h: HEADH + rows * (PH + PG) - PG + (ic ? 40 + ih - IGAP : 0) + PPAD, rows, stack };
+  return { w: PPAD * 2 + (ic ? ic * (ICW + IGAP) + 40 : 0) + c * (PW + PG) - PG, h: HEADH + Math.max(rows * (PH + PG) - PG, ih - IGAP) + PPAD, rows, stack };
 }
 const natArea = pt => { let best = 1e18; for (let c = 1; c <= pt.n; c++) { const ic = pt.entries.length ? Math.max(1, Math.ceil(pt.entries.length * IRH / ((Math.ceil(pt.n / c)) * (PH + PG)))) : 0; const d = partNatural(pt.n, pt.entries.length, c, ic); best = Math.min(best, d.w * d.h); } return best; };
 parts.forEach(pt => pt.area = natArea(pt));
@@ -1239,31 +1240,34 @@ cells.forEach(cell => {
   let best = null; const m = pt.entries.length;
   // the index wraps into as many columns as it needs to stay no taller than the pages beside it (H, 16 Nov: a long
   // index next to one page left a tall strip of nothing); among those, the layout that fills the cell at the largest scale
-  for (const strict of [true, false]) {
-    for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 12) : 0); ic++) {
-      const d = partNatural(pt.n, m, c, ic), pagesH = d.rows * (PH + PG) - PG, idxH = ic ? Math.ceil(m / ic) * IRH - IGAP : 0;
-      if (strict && idxH > pagesH * 1.2) continue;
-      const u = Math.min(cw / d.w, chh / d.h, 1);
-      if (!best || u > best.u + 1e-9) best = { c, ic, u, d };
-    }
-    if (best) break;
+  // Two arrangements: the index beside the pages (wide cells) or stacked below them (tall cells); the block may also
+  // grow (to 2.5×) as well as shrink, and the one that fills the most of its cell wins (H, 16 Nov: a tall cell held a
+  // small page and a few slips in a sea of paper).
+  // scored by the area the pages and slips actually cover, so a long index beside short pages (or the reverse) loses
+  const content = pt.n * PW * PH + m * ICW * (IRH - IGAP);
+  for (const stack of [false, true]) for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 16) : 0); ic++) {
+    const d = partNatural(pt.n, m, c, ic, stack), u = Math.min(cw / d.w, chh / d.h, 2.5), fill = u * u * content / (cw * chh);
+    if (!best || fill > best.fill + 1e-6) best = { c, ic, u, d, fill };
   }
-  const { c, ic, u, d } = best;
+  const { c, ic, u, d } = best, stack = d.stack;
   // justify: spread what is left of the cell into the gaps, so the block fills its cell (no dead margin, E6)
-  const ex = cw / u - d.w, ey = chh / u - d.h, gx = c > 1 || ic ? ex / ((c - 1) + (ic ? 1 : 0) + 2) : ex / 2, gy = d.rows > 1 ? ey / (d.rows + 1) : ey / 2;
+  const ex = cw / u - d.w, ey = chh / u - d.h;
+  const gx = stack ? ex / (c + 1) : c > 1 || ic ? ex / ((c - 1) + (ic ? 1 : 0) + 2) : ex / 2, gy = stack ? ey / (d.rows + (ic ? 2 : 1)) : d.rows > 1 ? ey / (d.rows + 1) : ey / 2;
   const blk = add(bk, 'chapblk', cx, cy, cw / u, chh / u, `<div class="chaphead"><b>${esc(pt.title)}</b> <span>pages ${pt.from}–${pt.to}</span></div>`);
   blk.style.transformOrigin = '0 0'; blk.style.transform = `scale(${u})`;
   pt.box = { x: BX + cx, y: BY + cy, w: cw, h: chh };
   reg('part-' + pt.from, { el: blk, title: pt.title, kind: 'chapter', box: pt.box });
   const W = (x, y, w, h) => ({ x: BX + cx + x * u, y: BY + cy + y * u, w: w * u, h: h * u });
-  const x0 = PPAD + gx, y0 = HEADH;
+  const x0 = PPAD + gx, y0 = HEADH, pagesBottom = y0 + gy + d.rows * (PH + PG + gy) - PG;
+  const ixW = ic * (ICW + IGAP) - IGAP, ix0 = stack ? (cw / u - ixW) / 2 : x0, iy0 = stack ? pagesBottom + 40 + gy * 0.5 : y0;
   pt.entries.forEach((p, i) => {
-    const col = Math.floor(i / Math.ceil(m / ic)), row = i % Math.ceil(m / ic);
-    const x = x0 + col * (ICW + IGAP), y = y0 + row * IRH;
+    // beside: fill columns top to bottom; stacked: fill rows left to right
+    const per = Math.ceil(m / ic), col = stack ? i % ic : Math.floor(i / per), row = stack ? Math.floor(i / ic) : i % per;
+    const x = ix0 + col * (ICW + IGAP), y = iy0 + row * IRH;
     const ce = add(blk, 'entry card', x, y, ICW, IRH - IGAP, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
     reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: W(x, y, ICW, IRH - IGAP) });
   });
-  const px0 = x0 + (ic ? ic * (ICW + IGAP) + 40 + gx : 0);
+  const px0 = stack ? PPAD + gx : x0 + (ic ? ic * (ICW + IGAP) + 40 + gx : 0);
   for (let n = pt.from; n <= pt.to; n++) {
     const k = n - pt.from, px = px0 + (k % c) * (PW + PG + gx), py = y0 + gy + Math.floor(k / c) * (PH + PG + gy);
     const pf = add(blk, 'pagef', px, py, PW, PH, `<div class="ph">${n}</div><div class="cv"></div>`);
