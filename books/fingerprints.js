@@ -15,5 +15,9 @@ window.BOOK_PRINTS = {
  "lb.pdf": {
   "sha256": "9cc19519748ae6db2900ba9427eece47cb9129ebe46cfe370843147a65caccc1",
   "size": 5066574
+ },
+ "srd-5.2.1.pdf": {
+  "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87",
+  "size": 6031375
  }
 };
