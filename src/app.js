@@ -15,11 +15,11 @@ const store = {
   set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks, mapImg: state.mapImg });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -53,7 +53,7 @@ function linkify(text, fromId) {
 // Tight clusters at every scale, about the golden ratio: the whole canvas, each sheet (2100 × 1300), the builder block.
 const MAP_ART = C.mapArt ? (C.print || []).find(p => p.id === C.mapArt) : null;
 // the campaign map: the book's own map art (cut from the reader's copy once it is open), else the street map
-const MAP = MAP_ART ? { width: MAP_ART.rect[2], height: MAP_ART.rect[3], src: '', attribution: `Map: ${C.book.fullTitle || C.book.title}, cut from your copy`, alt: 'The map from the book' } : (window.MAPMETA || { width: 9000, height: 8000 });
+const MAP = C.mapBlank ? { width: 9000, height: 8000, src: state.mapImg || '', attribution: 'Your own map, kept in this browser', alt: 'Your world map' } : MAP_ART ? { width: MAP_ART.rect[2], height: MAP_ART.rect[3], src: '', attribution: `Map: ${C.book.fullTitle || C.book.title}, cut from your copy`, alt: 'The map from the book' } : (window.MAPMETA || { width: 9000, height: 8000 });
 const HISTW = 1300;   // the history card's width (it lives far left of the map)
 const SW = 2100, SH = 1300, RH = SH + 60, SLOTS = 6;       // party: six seats down the map's right edge
 const rowsTop = 40;
@@ -63,7 +63,7 @@ const MW = Math.round(MH * (MAP.width / MAP.height));
 const PX = MW + 160;                                        // party column x, on the map's right edge
 
 // ------------------------------------------------------------------ the map: the anchor
-const mapEl = add(world, 'map', 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="${esc(MAP.alt || 'Street map of central Seattle')}" draggable="false" ${MAP.src ? '' : 'hidden'}>${MAP_ART ? `<div class="mapwait">The map comes from your copy of the book.<br>Open it on the book above.</div>` : ''}`);
+const mapEl = add(world, 'map' + (C.mapBlank ? ' blankmap' : ''), 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="${esc(MAP.alt || 'Street map of central Seattle')}" draggable="false" ${MAP.src ? '' : 'hidden'}>${MAP_ART ? `<div class="mapwait">The map comes from your copy of the book.<br>Open it on the book above.</div>` : C.mapBlank && !state.mapImg ? `<div class="mapwait">Your world map goes here.<br>Drop a picture of it on this spot.</div>` : ''}`);
 reg('map', { el: mapEl, title: `Campaign map · ${C.mapTitle || 'Seattle'}`, kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
 label(mapEl, C.mapTitle || 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
 add(mapEl, 'attrib', MW - 1500, MH - 110, 1440, 80, esc(MAP.attribution || 'Map data © OpenStreetMap contributors, ODbL'));
@@ -846,12 +846,12 @@ function drawThreads() {
 }
 
 // ---- portraits and art: drop an image, upload one, or take a Turnip Works token
-function shrinkImage(file) {
+function shrinkImage(file, max = 720) {
   return new Promise((res, rej) => {
     if (!file || !/^image\//.test(file.type)) return rej(new Error('not an image'));
     const fr = new FileReader();
     fr.onload = () => { const im = new Image(); im.onload = () => {
-      const k = Math.min(1, 720 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
       c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
       res({ src: c.toDataURL('image/jpeg', 0.84), w: c.width, h: c.height }); }; im.onerror = rej; im.src = fr.result; };
     fr.onerror = rej; fr.readAsDataURL(file);
@@ -875,6 +875,11 @@ document.addEventListener('dragleave', ev => ev.target.closest?.('[data-portrait
 document.addEventListener('drop', async ev => {
   const file = ev.dataTransfer?.files?.[0]; if (!file) return; ev.preventDefault();
   document.querySelectorAll('.dropping').forEach(x => x.classList.remove('dropping'));
+  // a table with no street map (C.mapBlank): a picture dropped on the map becomes the map, kept in this browser
+  if (C.mapBlank && ev.target.closest?.('.map') && !ev.target.closest?.('[data-pocket], .place')) {
+    let big; try { big = await shrinkImage(file, 2600); } catch { return; }
+    state.mapImg = big.src; const im = mapEl.querySelector('.mapimg'); im.src = big.src; im.hidden = false; mapEl.querySelector('.mapwait')?.remove();
+    historyNote('Put in a world map'); persist(); return; }
   let img; try { img = await shrinkImage(file); } catch { return; }
   const pk = ev.target.closest?.('[data-pocket]'); if (pk) { addScrap(pk.dataset.pocket, { kind: 'img', src: img.src }); return; }
   const slot = ev.target.closest?.('[data-portrait]');

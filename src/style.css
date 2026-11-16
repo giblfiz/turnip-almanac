@@ -778,3 +778,6 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .bookart img { width: 100%; display: block; border-radius: 10px 10px 0 0; }
 .bookart .cap { padding: 14px 20px; font: 600 26px var(--f-body); color: var(--ink); }
 .bookart .cap span { color: var(--ink-3); font-weight: 500; }
+/* a table with no street map: parchment until a world map is dropped on it */
+.map.blankmap { background: radial-gradient(ellipse at 50% 45%, #f3e7c9 0%, #e8d7ae 60%, #d9c393 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map.blankmap { background: radial-gradient(ellipse at 50% 45%, #3a3222 0%, #2c261a 70%, #221d14 100%); } }

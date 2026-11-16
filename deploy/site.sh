@@ -10,6 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 TABLES=("ssr2:shadowrun" "brp:brp")
 [ -f src/scripts-lb.html ] && TABLES+=("lb:lady-blackbird")
+[ -f src/scripts-srd.html ] && TABLES+=("srd:fifth-edition")
 OWN_BOOKS=(books/ssr2-v2.2.pdf)            # Harry's own rules: fine to host (H, 13 Nov)
 D=deploy/dist; rm -rf "$D"; mkdir -p "$D/downloads" "$D/books"
 for t in "${TABLES[@]}"; do sys=${t%%:*}; slug=${t##*:}; ./build.sh "$sys" >/dev/null; done
@@ -28,7 +29,7 @@ for t in tables:
     html = open(src).read()
     html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">', 1)
     assert '<base href="/">' in html, 'no place for <base>'
-    names = {'ssr2': 'Simplified Shadowrun', 'brp': 'Basic Roleplaying', 'lb': 'Lady Blackbird'}
+    names = {'ssr2': 'Simplified Shadowrun', 'brp': 'Basic Roleplaying', 'lb': 'Lady Blackbird', 'srd': 'Fifth-edition SRD'}
     html = html.replace('<title>Turnip Almanac</title>', f'<title>Turnip Almanac · {names.get(sys_, slug)}</title>', 1)
     def bust(m):
         v = ver(m.group(2)); return f'{m.group(1)}{m.group(2)}?v={v}"' if v else m.group(0)
@@ -43,6 +44,14 @@ if any(t.startswith('lb:') for t in tables):
       <div class="book">Rules: Lady Blackbird by John Harper (free from itch.io).</div>
       <span class="go">Open the table →</span>
     </a>''').replace('<!--@MORE-NOTES@-->', '<p><b>Lady Blackbird</b> by John Harper, © One Seven Design, under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/us/">CC BY-NC-SA 3.0 US</a>; get it free at <a href="https://johnharper.itch.io/lady-blackbird">johnharper.itch.io/lady-blackbird</a>. Not affiliated.</p>')
+if any(t.startswith('srd:') for t in tables):
+    landing = landing.replace('<!--@MORE-TABLES@-->', '''<a class="table" href="/fifth-edition/">
+      <h2>Fifth-edition SRD</h2>
+      <p>Four adventurers at levels 1, 3, 5 and 11; levelling up session by session, and a wizard's whole spellbook on one sheet.</p>
+      <div class="book">Rules: System Reference Document 5.2.1 (free from Wizards of the Coast).</div>
+      <span class="go">Open the table →</span>
+    </a>
+    <!--@MORE-TABLES@-->''', 1).replace('<!--@MORE-NOTES@-->', '<p><b>Fifth-edition SRD</b>: This work includes material from the System Reference Document 5.2.1 (“SRD 5.2.1”) by Wizards of the Coast LLC, available at <a href="https://www.dndbeyond.com/srd">https://www.dndbeyond.com/srd</a>. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at <a href="https://creativecommons.org/licenses/by/4.0/legalcode">https://creativecommons.org/licenses/by/4.0/legalcode</a>. Not affiliated with or endorsed by Wizards of the Coast.</p>\n    <!--@MORE-NOTES@-->', 1)
 open(os.path.join(D, 'index.html'), 'w').write(landing)
 print('tables:', ', '.join(t.split(':')[1] for t in tables))
 PY
