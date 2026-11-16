@@ -285,7 +285,8 @@ function fitSections(box) {
     if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
     const sr = sec.getBoundingClientRect(); if (!sr.height) return;
     const W = sec.clientWidth;
-    let lo = 0.45, hi = 2.6;
+    // a 'dense' section (a long spell list, say) may shrink much further: it is read by zooming in, like any detail (H, 16 Nov)
+    let lo = sec.classList.contains('dense') ? 0.04 : 0.45, hi = 2.6;
     const wide = () => [...f.querySelectorAll('.acol, .sk, .ahead, .budget > div, .der > div, .list > div, .track, .asof, .roll, .grid4, .der, .budget')].some(e => e.scrollWidth > e.clientWidth + 1) || [...f.querySelectorAll('.sk .k, .ahead .an')].some(k => { const r = k.getBoundingClientRect(), p2 = k.closest('.sk, .ahead').getBoundingClientRect(); return r.right > p2.right + 0.5; });
     for (let i = 0; i < 11; i++) { const mid = (lo + hi) / 2; f.style.zoom = mid; f.style.width = (W / mid) + 'px';
       if (f.getBoundingClientRect().height <= sr.height * 0.98 && !wide()) lo = mid; else hi = mid; }
