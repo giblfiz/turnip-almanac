@@ -1003,6 +1003,9 @@ function W() { return vp.clientWidth; } function H() { return vp.clientHeight; }
 // while the canvas moves, the worn-paper filters rest (they are costly to redraw at every zoom step) and come back after
 let movingT = 0;
 function apply() {
+  // close in, the filters would be computed over pictures tens of thousands of pixels wide and the browser runs out of
+  // graphics memory (H, 16 Nov: "zoomed in a bunch and it crashed"); past this scale only texture and shading remain
+  vp.classList.toggle('close', cam.s * Math.min(3, devicePixelRatio || 1) > 1.3);   // in device pixels: a phone's 3× screen gets there sooner
   if (!vp.classList.contains('moving')) vp.classList.add('moving'); clearTimeout(movingT); movingT = setTimeout(() => vp.classList.remove('moving'), 220);
   world.style.transform = `translate(${-cam.x * cam.s}px, ${-cam.y * cam.s}px) scale(${cam.s})`;
   let step = 40; while (step * cam.s < 18) step *= 5; while (step * cam.s > 90) step /= 5;

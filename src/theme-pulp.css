@@ -120,6 +120,10 @@
 :root[data-style="pulp"] .pagef, :root[data-style="pulp"] .map { border-radius: 10px; }
 #vp.moving :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before,
 #vp.moving .bk::after, #vp.moving :is(.lbl, h3) { filter: none !important; }
+#vp.close :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before,
+#vp.close .bk::after, #vp.close :is(.lbl, .nm, .shead h2, .bhead h2) { filter: none !important; }
+/* the book and the big chapter blocks are too large to chew safely at any zoom */
+:root[data-style="pulp"] .bk::before, :root[data-style="pulp"] .bk::after, :root[data-style="pulp"] .chapblk::before { filter: none !important; }
 
 /* ink: a little letterpress roughness in the printed display type */
 :root[data-style="pulp"] :is(.lbl:not(.pnumlbl), .nm, .shead h2, .bhead h2) { filter: url(#ink); }
