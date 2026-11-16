@@ -797,6 +797,17 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #optsmenu .nmseg button { border: 1.5px solid var(--ochre); background: var(--btn-face); box-shadow: 0 2px 0 var(--ledge); border-radius: 10px; padding: 7px 12px; font: 600 14px var(--f-body); color: var(--ink); cursor: pointer; }
 #optsmenu .nmseg button.sel { background: var(--ochre); color: var(--paper); box-shadow: none; transform: translateY(2px); }
 #optsmenu .nmfoot { font-size: 12px; color: var(--ink-3); }
+/* the look tuner: a temporary panel while tuning */
+#tuner { position: fixed; z-index: 30; right: 12px; top: 64px; width: min(340px, calc(100vw - 24px)); max-height: calc(100vh - 80px); display: flex; flex-direction: column; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 14px; box-shadow: 0 8px 30px #0006; font: 13px var(--f-body, system-ui); }
+#tuner .th { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+#tuner .th b { font-size: 15px; } #tuner .th span { color: var(--ink-3); flex: 1; } #tuner .th button { border: 0; background: transparent; cursor: pointer; color: var(--ink-2); font-size: 15px; }
+#tuner .tbody { overflow: auto; padding: 8px 12px; display: grid; gap: 6px; }
+#tuner label { display: grid; grid-template-columns: 116px 1fr 44px; align-items: center; gap: 8px; }
+#tuner input[type=range] { width: 100%; accent-color: var(--ochre); }
+#tuner output { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2); }
+#tuner .tf { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--rule); }
+#tuner .tf button, #optsmenu .tunebtn { border: 1.5px solid var(--ochre); background: var(--btn-face, var(--paper)); border-radius: 10px; padding: 7px 12px; font: 600 13px var(--f-body, system-ui); color: var(--ink); cursor: pointer; }
+#tuner .tf textarea { width: 100%; height: 60px; font: 11px monospace; }
 /* ---- Theme: Pulp catalogue (Harry, 16 Nov: "grab the look and feel from the pulp catalog option").
    From the generated study 15-pulp-catalogue, read by Gemini: newsprint cards on a dark desk, crimson and mustard,
    slab display type, condensed caps labels, ink-ruled boxes with hard offset shadows, bevelled red keys,
@@ -816,7 +827,7 @@ html, body { touch-action: none; overscroll-behavior: none; }
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .17 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   color-scheme: light;
 }
-:root[data-style="pulp"] body { background: var(--grain), radial-gradient(ellipse at 50% 40%, #3b2c20 0%, #261b12 55%, #160f0a 100%) fixed; background-color: var(--ground); }
+:root[data-style="pulp"] body { background: radial-gradient(ellipse at 50% 40%, #3b2c2000 0%, #160f0a99 70%, #0d0906dd 100%) fixed, url(assets/textures/desk.webp) 0 0 / 760px fixed; background-color: var(--ground); }
 
 /* paper: ink-ruled newsprint with a hard offset shadow and a little grain */
 :root[data-style="pulp"] :is(.card, .sheet, .bk, .scard, .tablecard, .pcard, .inbox, .pockettab, .ghost, .seat, .helpcard, .histcard, .interpcard, .artcard, .chapblk) {
@@ -862,7 +873,6 @@ html, body { touch-action: none; overscroll-behavior: none; }
 
 /* the builder: a dashed coupon with scissors */
 :root[data-style="pulp"] .builder { border: 2px dashed #1c181599 !important; border-radius: var(--corner) !important; background: #efe3c8 !important; box-shadow: none; overflow: visible; }
-:root[data-style="pulp"] .builder::before { content: '✂'; position: absolute; right: 14px; top: -0.62em; font-size: 26px; line-height: 1; color: var(--ink); background: #efe3c8; padding: 0 4px; z-index: 2; }
 :root[data-style="pulp"] .builder.active { box-shadow: 0 0 0 6px #dda22c88; border-style: dashed !important; }
 :root[data-style="pulp"] .bstep { background: var(--paper); border: 1px solid #1c181530; border-radius: 5px; }
 
@@ -894,6 +904,55 @@ html, body { touch-action: none; overscroll-behavior: none; }
 :root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox) { box-shadow: var(--shadow), inset 0 0 38px #8a5a2022 !important; }
 :root[data-style="pulp"] .sheet { box-shadow: 3px 5px 12px #0b080680, 0 1px 2px #0b080655, inset 0 0 50px #8a5a2026 !important; }
 :root[data-style="pulp"] .chip { border-radius: 4px; padding: 0 7px; }
+
+/* ==== worn paper (H, 16 Nov: "not generic computer squares … texture on the print and the paper, edges and corners that
+   feel used and alive"). Each paper thing draws its paper as a layer BEHIND its content (::before), and only that layer's
+   edge is chewed by an SVG noise filter (#chew1-3, three seeds so neighbours wear differently); text stays crisp.
+   Dials: --corner, --chew (in the paper's own units), --tex (the paper texture), --edge-c. While the canvas moves the
+   filters switch off (#vp.moving) and come back when it settles. */
+:root[data-style="pulp"] { --corner: 26px; --chew-in: 7px; --edge-c: #3b2a1f55; --tex: url(assets/textures/paper.webp); --tex-size: 900px; --burn: #8a5a2033; }
+:root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep) {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; isolation: isolate; border-radius: var(--corner) !important; }
+:root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before {
+  content: ''; position: absolute; inset: calc(var(--chew-in) * -0.2); z-index: -1; pointer-events: none;
+  background-color: var(--paper-c, var(--paper)); background-image: linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex); background-size: auto, var(--tex-size);
+  border-radius: calc(var(--corner) * var(--ck, 1)); filter: url(#chew1);
+  box-shadow: inset 0 0 0 1.5px var(--edge-c), inset 0 0 calc(var(--corner) * 1.6 + 10px) var(--burn), var(--sh-x, 3px) var(--sh-y, 5px) var(--sh-blur, 12px) #0b080670; }
+:root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+1)::before { filter: url(#chew2); --ck: 1.25; }
+:root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+2)::before { filter: url(#chew3); --ck: .8; }
+:root[data-style="pulp"] .sheet::before { box-shadow: inset 0 0 0 1.5px var(--edge-c), inset 0 0 70px var(--burn), 5px 8px 18px #0b080690; --ck: 1.1; }
+:root[data-style="pulp"] .chapblk { --paper-c: #e6d6b6; }
+:root[data-style="pulp"] .bk { --paper-c: #eedfc2; }
+:root[data-style="pulp"] .bk::after { content: ''; position: absolute; left: 0; top: 6%; bottom: 6%; width: 14px; background: var(--ochre); opacity: .75; border-radius: 0 8px 8px 0; z-index: -1; filter: url(#chew2); }
+:root[data-style="pulp"] .loose { --paper-c: #f0d488; }
+:root[data-style="pulp"] .loose .grip { background: transparent; border-bottom: 1px dashed #3b2a1f44; }
+:root[data-style="pulp"] .bstep { --paper-c: #f3e8d0; --corner: 18px; }
+:root[data-style="pulp"] .pagef, :root[data-style="pulp"] .map { border-radius: 10px; }
+#vp.moving :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before,
+#vp.moving .bk::after, #vp.moving :is(.lbl, h3) { filter: none !important; }
+
+/* ink: a little letterpress roughness in the printed display type */
+:root[data-style="pulp"] :is(.lbl:not(.pnumlbl), .nm, .shead h2, .bhead h2) { filter: url(#ink); }
+
+/* buttons: raised paper tokens you can press — mustard card stock, a lit top edge, a deep ledge, round, ink text;
+   red is ink here (the border), never a fill under text */
+:root[data-style="pulp"] :is(.btn, .die, .stepper button, .asof button, .tokens button, .tokens .upl, .opt, .seg button, .chipgrid button, .tb, .track button, .launchbtn, .seatbtn, .donebtn, .qskills button, .keyb, .rmpc) {
+  background: linear-gradient(180deg, #f6dfa2 0%, var(--btn-c, #e2b763) 55%, #cf9f4a 100%) !important; color: #2a1d12 !important;
+  border: 1.6px solid var(--btn-edge, #8f3a2e) !important; border-radius: var(--btn-corner, 16px) !important;
+  box-shadow: inset 0 2px 0 #fff6d8cc, inset 0 -2px 0 #0000001f, 0 5px 0 var(--btn-ledge, #7a4a1c), 0 7px 9px #0b080666 !important; }
+:root[data-style="pulp"] .opt span, :root[data-style="pulp"] .opt b em { color: #5a3a1e !important; }
+:root[data-style="pulp"] :is(.opt.sel, .seg button.sel, .chipgrid button.sel, .asof button.on, .tokens button.sel) {
+  background: #c99146 !important; color: #1c1209 !important; transform: translateY(5px);
+  box-shadow: inset 0 3px 6px #3b2a1f88, 0 0 0 2.5px var(--ochre) !important; }
+:root[data-style="pulp"] :is(.opt.sel span, .opt.sel b em) { color: #3a230f !important; }
+:root[data-style="pulp"] :is(.btn, .die, .opt, .tb, .keyb, .seg button):active { transform: translateY(5px); box-shadow: inset 0 3px 6px #3b2a1f88 !important; }
+:root[data-style="pulp"] .launchbtn { border-radius: 40px !important; box-shadow: inset 0 3px 0 #fff6d8cc, 0 14px 0 #7a4a1c, 0 18px 18px #0b080677 !important; }
+:root[data-style="pulp"] .launchbtn small, :root[data-style="pulp"] .launchbtn .plus { color: #5a3a1e !important; }
+:root[data-style="pulp"] .chip { background: #f0d488; color: #7a2a1f; border: 1px solid #8f3a2e88; border-radius: 6px; box-shadow: 0 2px 0 #a07a2c; }
+:root[data-style="pulp"] #qback, :root[data-style="pulp"] #qopts { background: linear-gradient(180deg, #f6dfa2, #e2b763); color: #2a1d12; border: 1.2px solid #8f3a2e; border-radius: 10px; }
+:root[data-style="pulp"] :is(.budget > div, .der > div, .acol, .row) { border-radius: 10px; }
+/* the log's say-line and selects: paper fields, not browser defaults */
+:root[data-style="pulp"] :is(.loginput, .logwho, .karmabar select, .bstep input, .bstep select) { background: #f7eedb; border: 1.4px solid #8f3a2e88 !important; border-radius: 12px; color: var(--ink); font-family: var(--f-body); box-shadow: inset 0 2px 4px #3b2a1f22; }
 /* Lady Blackbird rig: only this rig's own classes (lb*) */
 .lbt { display: inline-block; font: 600 17px var(--f-body); padding: 5px 11px; margin: 0 6px 6px 0; border-radius: 9px; cursor: pointer; white-space: nowrap;
   background: var(--btn-face); border: 2px solid var(--ochre); box-shadow: 0 3px 0 var(--ledge); color: var(--ink); transition: transform .06s, box-shadow .06s; }
@@ -2225,7 +2284,10 @@ document.addEventListener('input', ev => { const n = ev.target.closest?.('.loose
 const cam = { x: 0, y: 0, s: 0.2 };
 const MIN_S = 0.02, MAX_S = 14;
 function W() { return vp.clientWidth; } function H() { return vp.clientHeight; }
+// while the canvas moves, the worn-paper filters rest (they are costly to redraw at every zoom step) and come back after
+let movingT = 0;
 function apply() {
+  if (!vp.classList.contains('moving')) vp.classList.add('moving'); clearTimeout(movingT); movingT = setTimeout(() => vp.classList.remove('moving'), 220);
   world.style.transform = `translate(${-cam.x * cam.s}px, ${-cam.y * cam.s}px) scale(${cam.s})`;
   let step = 40; while (step * cam.s < 18) step *= 5; while (step * cam.s > 90) step /= 5;
   const g = step * cam.s; vp.style.backgroundSize = `${g}px ${g}px`; vp.style.backgroundPosition = `${-cam.x * cam.s % g}px ${-cam.y * cam.s % g}px`;
@@ -2723,7 +2785,7 @@ document.addEventListener('click', ev => {
 // ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
 // option is the look. Kept per browser.
 const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
-function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {}
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply();
   document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
 (() => {
   const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
@@ -2734,11 +2796,52 @@ function setLook(k) { document.documentElement.dataset.style = k; try { localSto
   b.addEventListener('click', ev => { ev.stopPropagation(); if (m) return close();
     m = document.createElement('div'); m.id = 'optsmenu'; m.setAttribute('role', 'menu');
     const cur = STYLE();
-    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
+    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><button class="tunebtn" data-tune="1">Tune the look…</button><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
     document.body.appendChild(m); const r = qb.getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.right - m.offsetWidth)) + 'px';
-    m.addEventListener('click', e2 => { const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
+    m.addEventListener('click', e2 => { if (e2.target.closest('[data-tune]')) { close(); openTuner(); return; } const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
   document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
 })();
+// the filters the looks use: chewed paper edges (three seeds) and letterpress ink. Scales are in each element's own units.
+document.body.insertAdjacentHTML('beforeend', `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  ${[1, 2, 3].map(k => `<filter id="chew${k}" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="${[0.045, 0.03, 0.06][k - 1]}" numOctaves="3" seed="${k * 11}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${[11, 14, 9][k - 1]}" xChannelSelector="R" yChannelSelector="G"/></filter>`).join('')}
+  <filter id="ink" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>`);
+// ---- the look tuner (H, 16 Nov: "we are going to need a hand tuner"): sliders over the live canvas for the dials of the
+// worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
+const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
+const DIALS = [
+  ['corner', 'Corner roundness', 0, 70, 1, 26], ['chew', 'Edge chew', 0, 3, 0.05, 1], ['edge', 'Edge ink', 0, 1, 0.01, 0.33],
+  ['tex', 'Paper texture', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 200, 2400, 20, 900], ['burn', 'Burned edges', 0, 0.6, 0.01, 0.2],
+  ['shy', 'Shadow depth', 0, 24, 0.5, 5], ['shblur', 'Shadow softness', 0, 40, 0.5, 12],
+  ['redh', 'Red hue', 340, 400, 1, 368], ['reds', 'Red strength', 0, 90, 1, 38], ['redl', 'Red lightness', 20, 60, 1, 48],
+  ['btnh', 'Button hue', 20, 60, 1, 39], ['btns', 'Button strength', 0, 90, 1, 68], ['btnl', 'Button lightness', 40, 85, 1, 64], ['btnr', 'Button rounding', 0, 40, 1, 16],
+  ['paperl', 'Paper lightness', 70, 98, 0.5, 85], ['ink', 'Ink roughness', 0, 4, 0.05, 1]];
+function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
+function tuneApply(t = tuneGet()) {
+  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--veil', '--tex-size', '--burn', '--sh-x', '--sh-y', '--sh-blur', '--ochre', '--ochre-soft', '--btn-c', '--btn-corner', '--paper'];
+  if (STYLE() !== 'pulp') { props.forEach(k => r.removeProperty(k)); return; }   // the dials belong to the worn-paper look
+  const v = k => t[k] ?? DIALS.find(d => d[0] === k)[5];
+  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--veil', `hsla(40, 45%, ${v('paperl')}%, ${1 - v('tex')})`);
+  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px');
+  r.setProperty('--ochre', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}% / .13)`);
+  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-corner', v('btnr') + 'px'); r.setProperty('--paper', `hsl(40 45% ${v('paperl')}%)`);
+  [11, 14, 9].forEach((base, i) => document.querySelector(`#chew${i + 1} feDisplacementMap`)?.setAttribute('scale', (base * v('chew')).toFixed(2)));
+  document.querySelector('#ink feDisplacementMap')?.setAttribute('scale', (2.2 * v('ink')).toFixed(2));
+}
+function openTuner() {
+  document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';
+  p.innerHTML = `<div class="th"><b>Tune the look</b><span>${esc(LOOKS.find(l => l[0] === STYLE())?.[1] || '')}</span><button data-tx="close" aria-label="Close">✕</button></div>
+    <div class="tbody">${DIALS.map(([k, n, lo, hi, st, def]) => `<label><span>${n}</span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${t[k] ?? def}" data-dial="${k}"><output>${t[k] ?? def}</output></label>`).join('')}</div>
+    <div class="tf"><button data-tx="copy">Copy settings</button><button data-tx="reset">Reset</button></div>`;
+  document.body.appendChild(p);
+  p.addEventListener('input', ev => { const i = ev.target.closest('[data-dial]'); if (!i) return; const t2 = tuneGet(); t2[i.dataset.dial] = +i.value; i.nextElementSibling.textContent = i.value;
+    try { localStorage.setItem(TUNE_KEY, JSON.stringify(t2)); } catch {} tuneApply(t2); });
+  p.addEventListener('click', ev => { const b = ev.target.closest('[data-tx]'); if (!b) return;
+    if (b.dataset.tx === 'close') p.remove();
+    if (b.dataset.tx === 'reset') { try { localStorage.removeItem(TUNE_KEY); } catch {} tuneApply({}); openTuner(); }
+    if (b.dataset.tx === 'copy') { const txt = JSON.stringify({ look: STYLE(), ...tuneGet() }); navigator.clipboard?.writeText(txt).then(() => { b.textContent = 'Copied'; }, () => { b.textContent = 'Select and copy below'; p.querySelector('.tf').insertAdjacentHTML('beforeend', `<textarea readonly>${esc(txt)}</textarea>`); }); } });
+}
+tuneApply();
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();

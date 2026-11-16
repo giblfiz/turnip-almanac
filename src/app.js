@@ -1000,7 +1000,10 @@ document.addEventListener('input', ev => { const n = ev.target.closest?.('.loose
 const cam = { x: 0, y: 0, s: 0.2 };
 const MIN_S = 0.02, MAX_S = 14;
 function W() { return vp.clientWidth; } function H() { return vp.clientHeight; }
+// while the canvas moves, the worn-paper filters rest (they are costly to redraw at every zoom step) and come back after
+let movingT = 0;
 function apply() {
+  if (!vp.classList.contains('moving')) vp.classList.add('moving'); clearTimeout(movingT); movingT = setTimeout(() => vp.classList.remove('moving'), 220);
   world.style.transform = `translate(${-cam.x * cam.s}px, ${-cam.y * cam.s}px) scale(${cam.s})`;
   let step = 40; while (step * cam.s < 18) step *= 5; while (step * cam.s > 90) step /= 5;
   const g = step * cam.s; vp.style.backgroundSize = `${g}px ${g}px`; vp.style.backgroundPosition = `${-cam.x * cam.s % g}px ${-cam.y * cam.s % g}px`;
@@ -1498,7 +1501,7 @@ document.addEventListener('click', ev => {
 // ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
 // option is the look. Kept per browser.
 const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
-function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {}
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply();
   document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
 (() => {
   const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
@@ -1509,11 +1512,52 @@ function setLook(k) { document.documentElement.dataset.style = k; try { localSto
   b.addEventListener('click', ev => { ev.stopPropagation(); if (m) return close();
     m = document.createElement('div'); m.id = 'optsmenu'; m.setAttribute('role', 'menu');
     const cur = STYLE();
-    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
+    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><button class="tunebtn" data-tune="1">Tune the look…</button><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
     document.body.appendChild(m); const r = qb.getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.right - m.offsetWidth)) + 'px';
-    m.addEventListener('click', e2 => { const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
+    m.addEventListener('click', e2 => { if (e2.target.closest('[data-tune]')) { close(); openTuner(); return; } const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
   document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
 })();
+// the filters the looks use: chewed paper edges (three seeds) and letterpress ink. Scales are in each element's own units.
+document.body.insertAdjacentHTML('beforeend', `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  ${[1, 2, 3].map(k => `<filter id="chew${k}" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="${[0.045, 0.03, 0.06][k - 1]}" numOctaves="3" seed="${k * 11}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${[11, 14, 9][k - 1]}" xChannelSelector="R" yChannelSelector="G"/></filter>`).join('')}
+  <filter id="ink" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>`);
+// ---- the look tuner (H, 16 Nov: "we are going to need a hand tuner"): sliders over the live canvas for the dials of the
+// worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
+const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
+const DIALS = [
+  ['corner', 'Corner roundness', 0, 70, 1, 26], ['chew', 'Edge chew', 0, 3, 0.05, 1], ['edge', 'Edge ink', 0, 1, 0.01, 0.33],
+  ['tex', 'Paper texture', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 200, 2400, 20, 900], ['burn', 'Burned edges', 0, 0.6, 0.01, 0.2],
+  ['shy', 'Shadow depth', 0, 24, 0.5, 5], ['shblur', 'Shadow softness', 0, 40, 0.5, 12],
+  ['redh', 'Red hue', 340, 400, 1, 368], ['reds', 'Red strength', 0, 90, 1, 38], ['redl', 'Red lightness', 20, 60, 1, 48],
+  ['btnh', 'Button hue', 20, 60, 1, 39], ['btns', 'Button strength', 0, 90, 1, 68], ['btnl', 'Button lightness', 40, 85, 1, 64], ['btnr', 'Button rounding', 0, 40, 1, 16],
+  ['paperl', 'Paper lightness', 70, 98, 0.5, 85], ['ink', 'Ink roughness', 0, 4, 0.05, 1]];
+function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
+function tuneApply(t = tuneGet()) {
+  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--veil', '--tex-size', '--burn', '--sh-x', '--sh-y', '--sh-blur', '--ochre', '--ochre-soft', '--btn-c', '--btn-corner', '--paper'];
+  if (STYLE() !== 'pulp') { props.forEach(k => r.removeProperty(k)); return; }   // the dials belong to the worn-paper look
+  const v = k => t[k] ?? DIALS.find(d => d[0] === k)[5];
+  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--veil', `hsla(40, 45%, ${v('paperl')}%, ${1 - v('tex')})`);
+  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px');
+  r.setProperty('--ochre', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}% / .13)`);
+  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-corner', v('btnr') + 'px'); r.setProperty('--paper', `hsl(40 45% ${v('paperl')}%)`);
+  [11, 14, 9].forEach((base, i) => document.querySelector(`#chew${i + 1} feDisplacementMap`)?.setAttribute('scale', (base * v('chew')).toFixed(2)));
+  document.querySelector('#ink feDisplacementMap')?.setAttribute('scale', (2.2 * v('ink')).toFixed(2));
+}
+function openTuner() {
+  document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';
+  p.innerHTML = `<div class="th"><b>Tune the look</b><span>${esc(LOOKS.find(l => l[0] === STYLE())?.[1] || '')}</span><button data-tx="close" aria-label="Close">✕</button></div>
+    <div class="tbody">${DIALS.map(([k, n, lo, hi, st, def]) => `<label><span>${n}</span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${t[k] ?? def}" data-dial="${k}"><output>${t[k] ?? def}</output></label>`).join('')}</div>
+    <div class="tf"><button data-tx="copy">Copy settings</button><button data-tx="reset">Reset</button></div>`;
+  document.body.appendChild(p);
+  p.addEventListener('input', ev => { const i = ev.target.closest('[data-dial]'); if (!i) return; const t2 = tuneGet(); t2[i.dataset.dial] = +i.value; i.nextElementSibling.textContent = i.value;
+    try { localStorage.setItem(TUNE_KEY, JSON.stringify(t2)); } catch {} tuneApply(t2); });
+  p.addEventListener('click', ev => { const b = ev.target.closest('[data-tx]'); if (!b) return;
+    if (b.dataset.tx === 'close') p.remove();
+    if (b.dataset.tx === 'reset') { try { localStorage.removeItem(TUNE_KEY); } catch {} tuneApply({}); openTuner(); }
+    if (b.dataset.tx === 'copy') { const txt = JSON.stringify({ look: STYLE(), ...tuneGet() }); navigator.clipboard?.writeText(txt).then(() => { b.textContent = 'Copied'; }, () => { b.textContent = 'Select and copy below'; p.querySelector('.tf').insertAdjacentHTML('beforeend', `<textarea readonly>${esc(txt)}</textarea>`); }); } });
+}
+tuneApply();
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();
