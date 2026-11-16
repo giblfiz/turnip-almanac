@@ -158,3 +158,18 @@
 #vp.close .map { box-shadow: none !important; }
 :root[data-style="pulp"] .chapblk .entry { background: #f3dc9e !important; border: 1px solid #8f3a2e55 !important; border-left: 12px solid var(--ochre) !important; border-radius: 8px 16px 16px 8px !important; box-shadow: 2px 3px 0 #3b2a1f40 !important; }
 :root[data-style="pulp"] .chapblk .entry h3 { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .05em; color: #6b2e24; border: 0; }
+/* the desk sheet: one paper under the whole table, its chewed outline (mask) and burnt rim (an image) drawn once */
+.deskpaper { display: none; }
+:root[data-style="pulp"] .deskpaper { display: block; position: absolute; z-index: 0; pointer-events: none;
+  background-color: var(--paper); background-image: var(--desk-burn, none), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex);
+  background-size: 100% 100%, auto, var(--tex-size); background-blend-mode: multiply, normal, multiply;
+  -webkit-mask-image: var(--desk-mask, none); mask-image: var(--desk-mask, none); -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  filter: drop-shadow(0 30px 60px #000a); }
+#vp.close .deskpaper { -webkit-mask-image: none; mask-image: none; filter: none; background-image: linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex); background-size: auto, var(--tex-size); }
+:root[data-style="pulp"] { --chew-in: 2px; --burn: #8a5a201f; --burn-w: 40px; }
+#tuner .pick { display: grid; grid-template-columns: 1fr 64px; align-items: center; gap: 8px; }
+#tuner .pick input { width: 64px; height: 28px; border: 0; padding: 0; background: none; }
+/* index slips: the ink bar is painted inside the slip's own rounded paper, not hung outside it as a border */
+:root[data-style="pulp"] .chapblk .entry { border-left: 0 !important; }
+:root[data-style="pulp"] .chapblk .entry::before { --paper-c: #f3dc9e; background-image: linear-gradient(90deg, var(--ochre) 0 14px, #0000 14px), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex) !important; background-size: auto, auto, var(--tex-size) !important; background-blend-mode: normal, normal, multiply !important; }
+:root[data-style="pulp"] .chapblk .entry > * { position: relative; left: 8px; max-width: calc(100% - 8px); }

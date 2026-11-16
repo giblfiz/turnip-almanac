@@ -571,7 +571,7 @@ function layoutPeople() {
   ghostT = add(world, 'ghost', PCX + (PCW + SGAP) / 2, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newthread="1"><span class="plus">+</span><span>Thread</span></button>`);
   py = y + 360; refreshBacks(); updateBounds();
 }
-function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy, ADV_BOTTOM) - top + 120 }); }
+function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy, ADV_BOTTOM) - top + 120 }); if (typeof layoutDesk === 'function') try { layoutDesk(); } catch {} }
 const BOUNDS = {};
 // editing a person's or thread's name and words
 document.addEventListener('focusout', () => {}, true);
@@ -925,7 +925,7 @@ function restore(json) { const o = JSON.parse(json); const party = JSON.stringif
   if (party) { location.reload(); return; } PCS.forEach(renderSheet); }
 function doUndo() { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); }
 function doRedo() { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); }
-const editable = t => t?.closest?.('input, textarea, select, [contenteditable]');
+const editable = t => t?.closest?.('textarea, select, [contenteditable="true"], [contenteditable=""], input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]):not([type=button]):not([type=file])');
 document.addEventListener('keydown', ev => {
   const mod = ev.metaKey || ev.ctrlKey;
   if (mod && (ev.key === '[' || ev.key === ']')) { ev.preventDefault(); ev.stopPropagation(); ev.key === '[' ? goBack() : goFwd(); return; }
@@ -1081,7 +1081,7 @@ function flyToBuilder(id) {
   flash(id); flyToView(viewFor({ x, y, w, h }, 1.08));
 }
 function flash(id) { const e = nodes[id]?.el; if (!e) return; e.classList.add('hl'); setTimeout(() => e.classList.remove('hl'), 1800); }
-function overview() { flyToView(viewFor(BOUNDS, 1.02)); }
+function overview() { flyToView(viewFor(STYLE() === 'pulp' && DESK?.w ? DESK : BOUNDS, 1.02)); }
 function syncHist() { const b = document.getElementById('qback'); if (b) b.hidden = !hist.back.length; }
 function goBack() { if (!hist.back.length) return; hist.fwd.push(view()); flyToView(hist.back.pop(), false); syncHist(); }
 function goFwd() { if (!hist.fwd.length) return; hist.back.push(view()); flyToView(hist.fwd.pop(), false); syncHist(); }
@@ -1419,7 +1419,9 @@ function pagesPass() {
   for (let k = 0; k < nSharp - SHARP_MAX && k < sharp.length; k++) { const o = sharp[k].o; if (o._thumb) { o.el.querySelector('.cv').replaceChildren(o._thumb); o._res = 200; } }
 }
 document.addEventListener('keydown', ev => {
-  const typing = ev.target.closest('input, [contenteditable]');
+  // only real text entry keeps the keys to itself; a slider, checkbox, colour well or button does not (H, 16 Nov:
+  // "/" must always jump to the search bar, as in Turnip Works)
+  const typing = ev.target.closest('textarea, select, [contenteditable="true"], [contenteditable=""], input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]):not([type=button]):not([type=file])');
   if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); openPal(); return; }
   if (typing) { if (ev.key === 'Escape') ev.target.blur(); return; }
   if (ev.key === '/') { ev.preventDefault(); openPal(); }
@@ -1520,7 +1522,7 @@ document.addEventListener('click', ev => {
 // ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
 // option is the look. Kept per browser.
 const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
-function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply();
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply(); layoutDesk();
   document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
 (() => {
   const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
@@ -1566,12 +1568,17 @@ CHEW.forEach((u, i) => document.documentElement.style.setProperty(`--chew${i + 1
 // worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
 const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
 const DIALS = [   // [key, label, min, max, step, default] — wide ranges on purpose: find the edges, then come back
-  ['corner', 'Corner roundness', 0, 160, 1, 26], ['chew', 'Edge chew (px)', 0, 24, 0.5, 4], ['edgew', 'Ink rim width', 0, 16, 0.5, 7], ['edge', 'Ink rim darkness', 0, 1, 0.01, 0.45],
-  ['tex', 'Paper texture strength', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 100, 4000, 20, 900], ['burn', 'Burned edge darkness', 0, 1, 0.01, 0.35], ['burnw', 'Burned edge width', 0, 200, 2, 60],
+  ['dmargin', 'Sheet: margin around the table', 0, 8000, 50, 1800], ['dcorner', 'Sheet: corner roundness', 0, 8000, 50, 1600], ['dchew', 'Sheet: edge chew', 0, 2000, 10, 260], ['dburnw', 'Sheet: burn width', 0, 5000, 25, 900], ['dburn', 'Sheet: burn darkness', 0, 1, 0.01, 0.6],
+  ['corner', 'Cards: corner roundness', 0, 160, 1, 26], ['chew', 'Cards: edge chew (px)', 0, 24, 0.5, 1.5], ['edgew', 'Ink rim width', 0, 16, 0.5, 7], ['edge', 'Ink rim darkness', 0, 1, 0.01, 0.45],
+  ['tex', 'Paper texture strength', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 100, 4000, 20, 900], ['burn', 'Cards: burned edge darkness', 0, 1, 0.01, 0.12], ['burnw', 'Cards: burned edge width', 0, 200, 2, 40],
   ['shy', 'Shadow distance (shows on the map and paper)', 0, 60, 0.5, 5], ['shblur', 'Shadow blur', 0, 80, 0.5, 12], ['shd', 'Shadow darkness', 0, 1, 0.01, 0.44],
   ['paperh', 'Paper hue', 0, 360, 1, 40], ['papers', 'Paper colour strength', 0, 100, 1, 45], ['paperl', 'Paper lightness', 20, 100, 0.5, 85],
   ['redh', 'Accent red: hue', 0, 360, 1, 8], ['reds', 'Accent red: strength', 0, 100, 1, 38], ['redl', 'Accent red: lightness', 0, 90, 1, 48],
   ['btnh', 'Button hue', 0, 360, 1, 39], ['btns', 'Button colour strength', 0, 100, 1, 68], ['btnl', 'Button lightness', 10, 95, 1, 64], ['btnr', 'Button rounding', 0, 60, 1, 16]];
+const hslHex = (h, s, l) => { s /= 100; l /= 100; const f = n => { const k = (n + h / 30) % 12, c = l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(c * 255).toString(16).padStart(2, '0'); }; return '#' + f(0) + f(8) + f(4); };
+const hexHsl = hex => { const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  let h = 0; if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = Math.round((h * 60 + 360) % 360);
+  const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0; return [h, Math.round(s * 100), Math.round(l * 100)]; };
 function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
 function tuneApply(t = tuneGet()) {
   const r = document.documentElement.style, props = ['--corner', '--edge-c', '--edge-w', '--veil', '--tex-size', '--burn', '--burn-w', '--sh-x', '--sh-y', '--sh-blur', '--sh-c', '--ochre', '--ochre-soft', '--btn-c', '--btn-hi', '--btn-lo', '--btn-ledge', '--btn-corner', '--paper'];
@@ -1585,6 +1592,7 @@ function tuneApply(t = tuneGet()) {
   r.setProperty('--ochre', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}% / .13)`);
   r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-hi', `hsl(${v('btnh')} ${v('btns')}% ${Math.min(97, v('btnl') + 16)}%)`); r.setProperty('--btn-lo', `hsl(${v('btnh')} ${v('btns')}% ${Math.max(5, v('btnl') - 12)}%)`);
   r.setProperty('--btn-ledge', `hsl(${v('btnh')} ${Math.min(100, v('btns') + 10)}% ${Math.max(4, v('btnl') - 34)}%)`); r.setProperty('--btn-corner', v('btnr') + 'px');
+  if (['dmargin', 'dcorner', 'dchew', 'dburnw', 'dburn'].some(k => tuneApply['_' + k] !== v(k))) { ['dmargin', 'dcorner', 'dchew', 'dburnw', 'dburn'].forEach(k => tuneApply['_' + k] = v(k)); layoutDesk(); }
   const chewKey = v('chew') + ':' + v('corner');
   if (tuneApply._chew !== chewKey) { tuneApply._chew = chewKey; const k = 80 / Math.max(6, v('corner'));   // world px → tile px
     [[7, 1], [131, 1.25], [977, .85]].forEach(([sd, f], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, Math.min(36, v('chew') * f * k))})`)); }
@@ -1592,10 +1600,14 @@ function tuneApply(t = tuneGet()) {
 function openTuner() {
   document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';
   p.innerHTML = `<div class="th"><b>Tune the look</b><span>${esc(LOOKS.find(l => l[0] === STYLE())?.[1] || '')}</span><button data-tx="close" aria-label="Close">✕</button></div>
-    <div class="tbody">${DIALS.map(([k, n, lo, hi, st, def]) => `<label><span>${n}</span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${t[k] ?? def}" data-dial="${k}"><output>${t[k] ?? def}</output></label>`).join('')}</div>
+    <div class="tbody"><label class="pick"><span>Accent red (pick it)</span><input type="color" data-pick="red" value="${hslHex(t.redh ?? 8, t.reds ?? 38, t.redl ?? 48)}"></label>${DIALS.map(([k, n, lo, hi, st, def]) => `<label><span>${n}</span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${t[k] ?? def}" data-dial="${k}"><output>${t[k] ?? def}</output></label>`).join('')}</div>
     <div class="tf"><button data-tx="copy">Copy settings</button><button data-tx="reset">Reset</button></div>`;
   document.body.appendChild(p);
-  p.addEventListener('input', ev => { const i = ev.target.closest('[data-dial]'); if (!i) return; const t2 = tuneGet(); t2[i.dataset.dial] = +i.value; i.nextElementSibling.textContent = i.value;
+  p.addEventListener('input', ev => {
+    const pk = ev.target.closest('[data-pick]'); if (pk) { const [h, s2, l] = hexHsl(pk.value), t2 = tuneGet(); Object.assign(t2, { redh: h, reds: s2, redl: l });
+      ['redh', 'reds', 'redl'].forEach((k, j) => { const i = p.querySelector(`[data-dial="${k}"]`); i.value = [h, s2, l][j]; i.nextElementSibling.textContent = i.value; });
+      try { localStorage.setItem(TUNE_KEY, JSON.stringify(t2)); } catch {} tuneApply(t2); return; }
+    const i = ev.target.closest('[data-dial]'); if (!i) return; const t2 = tuneGet(); t2[i.dataset.dial] = +i.value; i.nextElementSibling.textContent = i.value;
     try { localStorage.setItem(TUNE_KEY, JSON.stringify(t2)); } catch {} tuneApply(t2); });
   p.addEventListener('click', ev => { const b = ev.target.closest('[data-tx]'); if (!b) return;
     if (b.dataset.tx === 'close') p.remove();
@@ -1603,6 +1615,39 @@ function openTuner() {
     if (b.dataset.tx === 'copy') { const txt = JSON.stringify({ look: STYLE(), ...tuneGet() }); navigator.clipboard?.writeText(txt).then(() => { b.textContent = 'Copied'; }, () => { b.textContent = 'Select and copy below'; p.querySelector('.tf').insertAdjacentHTML('beforeend', `<textarea readonly>${esc(txt)}</textarea>`); }); } });
 }
 tuneApply();
+// ---- the desk sheet (H, 16 Nov): the chewed and burnt edge belongs "between the paper and the brown desktop", huge,
+// "at the scale of all the way zoomed out", with margin. One sheet of paper under the whole table; its outline and
+// burn are drawn once as two images sized to the layout (mask + burn), so zooming costs nothing extra.
+var DESK = { x: 0, y: 0, w: 0, h: 0 }, deskEl = document.createElement('div'); deskEl.className = 'deskpaper'; world.prepend(deskEl);   // var: the tuner may ask before this runs
+function deskOutline(w, h, R, A, seed, inset = 0) {   // points around a rounded rectangle, each pushed in or out by layered noise
+  let s0 = seed; const rnd = () => (s0 = (s0 * 16807) % 2147483647) / 2147483647;
+  const oct = [[9, 0.55], [37, 0.3], [140, 0.15]].map(([K, a]) => [K, a, Array.from({ length: K }, () => rnd() * 2 - 1)]);
+  const noise = t => oct.reduce((sum, [K, a, wob]) => { const x = t * K, i = Math.floor(x) % K, f = x - Math.floor(x), p = wob[i], q = wob[(i + 1) % K]; return sum + a * (p + (q - p) * f * f * (3 - 2 * f)); }, 0);
+  const r = Math.min(R, w / 2 - A, h / 2 - A), m = A, L1 = w - 2 * m - 2 * r, L2 = h - 2 * m - 2 * r, q = Math.PI * r / 2, per = 2 * L1 + 2 * L2 + 4 * q, N = 1600, pts = [];
+  const arc = (cx, cy, a0) => u => { const a = a0 + u / r; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; };
+  const seg = [[L1, u => [m + r + u, m, 0, -1]], [q, arc(w - m - r, m + r, -Math.PI / 2)], [L2, u => [w - m, m + r + u, 1, 0]], [q, arc(w - m - r, h - m - r, 0)],
+    [L1, u => [w - m - r - u, h - m, 0, 1]], [q, arc(m + r, h - m - r, Math.PI / 2)], [L2, u => [m, h - m - r - u, -1, 0]], [q, arc(m + r, m + r, Math.PI)]];
+  for (let k = 0; k < N; k++) { let d = k / N * per, P; for (const [len, f] of seg) { if (d <= len) { P = f(d); break; } d -= len; } P = P || seg[0][1](0);
+    const off = noise(k / N) * A * 0.75 + (rnd() - 0.5) * A * 0.25 - inset; pts.push([P[0] + P[2] * off, P[1] + P[3] * off]); }
+  return pts;
+}
+let deskT = 0;
+function layoutDesk() {
+  if (!deskEl || !BOUNDS.w) return; const t = tuneGet(), dv = k => t[k] ?? DIALS.find(d => d[0] === k)[5], M = dv('dmargin');
+  Object.assign(DESK, { x: BOUNDS.x - M, y: BOUNDS.y - M, w: BOUNDS.w + 2 * M, h: BOUNDS.h + 2 * M });
+  Object.assign(deskEl.style, { left: DESK.x + 'px', top: DESK.y + 'px', width: DESK.w + 'px', height: DESK.h + 'px' });
+  clearTimeout(deskT); deskT = setTimeout(() => {
+    const k = 2048 / Math.max(DESK.w, DESK.h), W = Math.round(DESK.w * k), H = Math.round(DESK.h * k), A = dv('dchew') * k, R = dv('dcorner') * k, B = dv('dburnw') * k;
+    const path = (g, pts) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); };
+    const outer = deskOutline(W, H, R, Math.max(1, A), 4242), mk = document.createElement('canvas'); mk.width = W; mk.height = H;
+    const g = mk.getContext('2d'); g.fillStyle = '#000'; path(g, outer); g.fill();
+    const bk = document.createElement('canvas'); bk.width = W; bk.height = H; const b = bk.getContext('2d');
+    b.fillStyle = `rgba(74, 40, 12, ${dv('dburn')})`; path(b, outer); b.fill();
+    b.globalCompositeOperation = 'destination-out'; b.filter = `blur(${Math.max(1, B * 0.45)}px)`; b.fillStyle = '#000'; path(b, deskOutline(W, H, R, Math.max(1, A), 4242, B)); b.fill();
+    deskEl.style.setProperty('--desk-mask', `url(${mk.toDataURL()})`); deskEl.style.setProperty('--desk-burn', `url(${bk.toDataURL()})`);
+  }, 120);
+}
+layoutDesk();
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();
