@@ -24,7 +24,7 @@ r = lambda p: open(p).read()
 app = r('src/app.js'); assert '/*@RIG-UI@*/' in app
 app = app.replace('/*@RIG-UI@*/', r(ui), 1)
 import os
-css = r('src/style.css') + (r(ui.replace('-ui.js', '.css')) if os.path.exists(ui.replace('-ui.js', '.css')) else '')
+css = r('src/style.css') + ''.join(r('src/' + f) for f in sorted(os.listdir('src')) if f.startswith('theme-') and f.endswith('.css')) + (r(ui.replace('-ui.js', '.css')) if os.path.exists(ui.replace('-ui.js', '.css')) else '')
 page = '<!doctype html>\n' + r('src/head.html') + '<style>' + css + '</style>' + r('src/body.html') + r(scripts) + '<script>\n' + app + '</script>\n'
 open(out, 'w').write(page); print(f'built {out} ({len(page)} bytes) with {ui}')
 PY

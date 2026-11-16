@@ -4,7 +4,9 @@
 <title>Turnip Almanac</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=Alfa+Slab+One&family=Oswald:wght@500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@500;700;800&display=swap">
+<script>/* the look, set before anything draws (Options in the quickbar; pulp is the default) */
+try { document.documentElement.dataset.style = localStorage.getItem('turnip-almanac-style') || 'pulp'; } catch { document.documentElement.dataset.style = 'pulp'; }</script>
 <style>
 /* Layout: one infinite canvas. x = time (shelf → campaign → sessions → now), zoom = abstraction. HUD floats over it. */
 :root {
@@ -788,6 +790,101 @@ html, body { touch-action: none; overscroll-behavior: none; }
 /* a table with no street map: parchment until a world map is dropped on it */
 .map.blankmap { background: radial-gradient(ellipse at 50% 45%, #f3e7c9 0%, #e8d7ae 60%, #d9c393 100%); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map.blankmap { background: radial-gradient(ellipse at 50% 45%, #3a3222 0%, #2c261a 70%, #221d14 100%); } }
+#qopts { flex: none; margin: 6px 0; width: 30px; height: 28px; border-radius: 8px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+#optsmenu { position: fixed; z-index: 20; width: 280px; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; display: grid; gap: 8px; font-size: 14px; color: var(--ink); }
+#optsmenu .nmh { font: 700 13px var(--f-body); color: var(--ink-2); }
+#optsmenu .nmseg { display: flex; flex-wrap: wrap; gap: 6px; }
+#optsmenu .nmseg button { border: 1.5px solid var(--ochre); background: var(--btn-face); box-shadow: 0 2px 0 var(--ledge); border-radius: 10px; padding: 7px 12px; font: 600 14px var(--f-body); color: var(--ink); cursor: pointer; }
+#optsmenu .nmseg button.sel { background: var(--ochre); color: var(--paper); box-shadow: none; transform: translateY(2px); }
+#optsmenu .nmfoot { font-size: 12px; color: var(--ink-3); }
+/* ---- Theme: Pulp catalogue (Harry, 16 Nov: "grab the look and feel from the pulp catalog option").
+   From the generated study 15-pulp-catalogue, read by Gemini: newsprint cards on a dark desk, crimson and mustard,
+   slab display type, condensed caps labels, ink-ruled boxes with hard offset shadows, bevelled red keys,
+   yellow price-tag pills, a dashed coupon for the builder. Applies when <html data-style="pulp">. */
+:root[data-style="pulp"] {
+  --paper: #f0e6d2; --ground: #2a221c; --ink: #1c1815; --ink-2: #5c4d3f; --ink-3: #8a7660;
+  --rule: #614f3e66; --ochre: #a82418; --ochre-soft: #a8241822; --band: #e3d5b6; --crease: #d9c9a6;
+  --note: #f2d27a; --note-ink: #2a1f12; --teal: #48777f; --mustard: #dda22c;
+  --ledge: #5e140e; --btn-face: #9e2318;
+  --shadow: 4px 5px 0 #0b0806aa;
+  --f-display: "Alfa Slab One", "Rockwell", Georgia, serif;
+  --f-label: "Oswald", "Bebas Neue", "Arial Narrow", sans-serif;
+  --f-body: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --f-num: "Roboto Slab", "Rockwell", Georgia, serif;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+:root[data-style="pulp"] body { background: var(--ground) radial-gradient(ellipse at 50% 40%, #3a2e24 0%, #2a221c 55%, #1a1410 100%) fixed; }
+
+/* paper: ink-ruled newsprint with a hard offset shadow and a little grain */
+:root[data-style="pulp"] :is(.card, .sheet, .bk, .scard, .tablecard, .pcard, .inbox, .pockettab, .ghost, .seat, .helpcard, .histcard, .interpcard, .artcard, .chapblk) {
+  background-color: var(--paper); background-image: var(--grain); border: 1.5px solid var(--ink) !important; border-radius: 3px !important; box-shadow: var(--shadow) !important; }
+:root[data-style="pulp"] .chapblk { box-shadow: 3px 4px 0 #0b080666 !important; background-color: #e9dcc0; }
+:root[data-style="pulp"] .bk { border-left: 14px solid var(--ochre) !important; }
+:root[data-style="pulp"] .pagef { border: 1px solid var(--ink); border-radius: 0; box-shadow: 3px 4px 0 #0b080666; }
+:root[data-style="pulp"] .sheet { box-shadow: 6px 7px 0 #0b0806bb !important; }
+
+/* headings: slab display in crimson over a double rule; labels: condensed caps */
+:root[data-style="pulp"] :is(.card, .tablecard, .histcard, .helpcard, .interpcard) h3 { font-family: var(--f-display); font-weight: 400; color: var(--ochre); letter-spacing: .01em; border-bottom: 3px double var(--ink); padding-bottom: .15em; }
+:root[data-style="pulp"] :is(.sec, h4, .sub3, .chap, .grouph, .ahead .an, .q .no, .hday, .chaphead span, .date, .snum) { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .06em; }
+:root[data-style="pulp"] :is(.nm, .bhead h2, .shead h2, .bstep .q h3, .chaphead b) { font-family: var(--f-display); font-weight: 400; }
+:root[data-style="pulp"] .chaphead b { color: var(--ochre); }
+:root[data-style="pulp"] :is(.pv, .bv, .v, output, .hp, .tn, .ht) { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+
+/* the big canvas headlines: cream slab letters, inked outline, red offset (they sit on the dark desk and on paper) */
+:root[data-style="pulp"] .lbl { font-family: var(--f-display); font-weight: 400; color: #f4e7c4; -webkit-text-stroke: .022em var(--ink); paint-order: stroke fill; text-shadow: .045em .05em 0 var(--ochre); letter-spacing: .01em; }
+:root[data-style="pulp"] .lbl.pnumlbl { color: var(--mustard); }
+
+/* buttons: bevelled crimson keys with cream condensed caps; chosen: sunk and mustard */
+:root[data-style="pulp"] :is(.btn, .die, .stepper button, .asof button, .tokens button, .tokens .upl, .opt, .seg button, .chipgrid button, .tb, .track button, .launchbtn, .seatbtn, .donebtn, .qskills button, .keyb, .rmpc) {
+  background: var(--btn-face) !important; color: #fdfaf3 !important; border: 1.5px solid var(--ink) !important; border-radius: 5px !important;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 3px 0 var(--ledge), 0 4px 4px #0006 !important; }
+:root[data-style="pulp"] :is(.btn, .tb, .seg button, .asof button, .keyb, .rmpc, .donebtn) { font-family: var(--f-label) !important; text-transform: uppercase; letter-spacing: .05em; }
+:root[data-style="pulp"] .opt b { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+:root[data-style="pulp"] .opt span, :root[data-style="pulp"] .opt b em { color: #f3dfc2 !important; }
+:root[data-style="pulp"] :is(.opt.sel, .seg button.sel, .chipgrid button.sel, .asof button.on, .tokens button.sel) {
+  background: var(--mustard) !important; color: var(--ink) !important; box-shadow: inset 0 2px 3px #0005 !important; transform: translateY(3px); }
+:root[data-style="pulp"] :is(.opt.sel span, .opt.sel b em) { color: #3a2a14 !important; }
+:root[data-style="pulp"] .launchbtn { border-width: 4px !important; border-style: solid !important; border-radius: 10px !important; box-shadow: inset 0 2px 0 #ffffff40, 0 12px 0 var(--ledge), 0 14px 10px #0007 !important; }
+:root[data-style="pulp"] .launchbtn b { font-family: var(--f-display); font-weight: 400; }
+:root[data-style="pulp"] .seatbtn, :root[data-style="pulp"] .ghostbtn { background: transparent !important; color: #f4e7c4 !important; border: 4px dashed #f4e7c4aa !important; box-shadow: none !important; font-family: var(--f-display) !important; font-weight: 400 !important; }
+:root[data-style="pulp"] .seat, :root[data-style="pulp"] .ghost { background: transparent !important; box-shadow: none !important; border: 0 !important; }
+
+/* links to elsewhere: yellow price-tag pills */
+:root[data-style="pulp"] .chip { background: var(--mustard); color: #681616; border: 1px solid var(--ink); border-radius: 999px; box-shadow: 0 2px 0 #7a5410; font-family: var(--f-num); font-weight: 700; }
+
+/* information: flat newsprint tiles, value cells in red with white slab figures */
+:root[data-style="pulp"] :is(.budget > div, .der > div, .acol, .row) { background: var(--band) !important; border: 1px solid #1c181533 !important; border-radius: 2px; }
+:root[data-style="pulp"] .row.on { background: #f2d27a66 !important; }
+:root[data-style="pulp"] .sk { border-top: 1px solid #1c181522; }
+
+/* the builder: a dashed coupon with scissors */
+:root[data-style="pulp"] .builder { border: 3px dashed var(--ink) !important; border-radius: 0 !important; background: #efe3c8 !important; box-shadow: none; overflow: visible; }
+:root[data-style="pulp"] .builder::before { content: '✂'; position: absolute; right: 14px; top: -0.62em; font-size: 26px; line-height: 1; color: var(--ink); background: #efe3c8; padding: 0 4px; z-index: 2; }
+:root[data-style="pulp"] .builder.active { box-shadow: 0 0 0 6px #dda22c88; border-style: dashed !important; }
+:root[data-style="pulp"] .bstep { background: var(--paper); border: 1px solid #1c181544; border-radius: 2px; }
+
+/* the quickbar: a pill of newsprint with an inset */
+:root[data-style="pulp"] #qbar { background: #f3e7d2; border: 2px solid var(--ink); border-radius: 999px; box-shadow: inset 1px 2px 4px #0003, 0 4px 0 #0b080699; }
+:root[data-style="pulp"] #qbar textarea { font-family: var(--f-body); }
+:root[data-style="pulp"] #qback, :root[data-style="pulp"] #qopts { background: var(--btn-face); color: #fdfaf3; border: 1.5px solid var(--ink); }
+
+/* notes: canary paper, inked edge */
+:root[data-style="pulp"] .loose { background: #f2d27a; border: 1.5px solid var(--ink); border-radius: 2px; box-shadow: 3px 4px 0 #0b080699; }
+:root[data-style="pulp"] .loose .body { font-family: var(--f-body); }
+:root[data-style="pulp"] .loose .grip { background: #fbf3dc; }
+
+/* the map: framed like a folded insert */
+:root[data-style="pulp"] .map { border: 2px solid var(--ink); box-shadow: 8px 9px 0 #0b0806aa; }
+:root[data-style="pulp"] .map.blankmap { background: radial-gradient(ellipse at 50% 45%, #f0e2c0 0%, #e2cf9f 60%, #cfb47c 100%); }
+:root[data-style="pulp"] .tend { background: var(--mustard) !important; color: var(--ink) !important; border: 1px solid var(--ink) !important; }
+:root[data-style="pulp"] .arrow { background: #f3e7d2; border: 1.5px solid var(--ink); }
+:root[data-style="pulp"] .notemenu, :root[data-style="pulp"] #optsmenu { background: #f3e7d2; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 5px 6px 0 #0b0806aa; }
+/* headlines over content (the builder, chapters, the map's name): quieter, plain crimson, so they never shout over what they name */
+:root[data-style="pulp"] .lbl.over { color: color-mix(in srgb, var(--ochre) 85%, #000); -webkit-text-stroke: 0; text-shadow: 0 0 .12em #f0e6d2, 0 0 .3em #f0e6d2cc; }
+:root[data-style="pulp"] .lbl.over.pnumlbl { color: var(--mustard); text-shadow: none; }
+/* the launcher's small line, cream on its red key */
+:root[data-style="pulp"] .launchbtn small, :root[data-style="pulp"] .launchbtn .plus { color: #f3dfc2 !important; }
 </style>
 <div id="vp" aria-label="Campaign canvas"><div id="world"></div></div>
 <svg id="threads"></svg>
@@ -838,7 +935,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 // headline label: big readable text laid over a region; fades as it grows past readable
 const labels = [];
 function label(parent, text, x, y, size, opts = {}) {
-  const e = add(parent, 'lbl' + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
+  const e = add(parent, 'lbl' + (opts.over ? ' over' : '') + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
   e.style.fontSize = size + 'px'; if (opts.align) e.style.textAlign = opts.align;
   labels.push({ e, size: size * (opts.k || 1), over: !!opts.over, ww: opts.w != null ? opts.w * (opts.k || 1) : null }); return e;
 }
@@ -1225,7 +1322,7 @@ function renderSheet(pc) {
     <div class="builder${state.build?.pc === pc.id ? ' active' : ''}" data-id="builder-${pc.id}" style="left:${BREG.x}px;top:${BREG.y}px;width:${BREG.w}px;height:${BREG.h}px">
       <div class="binner" style="width:${BINNER.w}px;height:${BINNER.h}px;transform:scale(${BK_K})">${builderInner(pc, S)}</div>
     </div>`;
-  const bl = el('div', 'lbl blbl'); bl.innerHTML = 'CHARACTER<br>BUILDER'; bl.style.fontSize = '64px'; box.querySelector('.builder').appendChild(bl); labels.push({ e: bl, size: 64, over: true });
+  const bl = el('div', 'lbl over blbl'); bl.innerHTML = 'CHARACTER<br>BUILDER'; bl.style.fontSize = '64px'; box.querySelector('.builder').appendChild(bl); labels.push({ e: bl, size: 64, over: true });
   if (!ch.prof && !state.done[pc.id]) box.querySelector('.builder').classList.add('todo');
   box._prev = Object.fromEntries([...R.CH.map(k => ['c:' + k, S.char[k]]), ...R.SKILLS.map(s => ['s:' + s.id, S.skill[s.id]]), ['hp', S.der.hp], ['pp', S.der.pp], ['dmg', S.der.dmg]]);
   const prov = {}; Object.entries(S.prov).forEach(([k, ids]) => prov[k] = [...new Set(ids.flatMap(id => S.prov[id] && id !== k ? S.prov[id] : [id]).map(id => resolveSrc(pc, id)))]);
@@ -1308,13 +1405,14 @@ function builderCells() {
 // fill one builder cell: try 1–6 columns for its lists and keep the count that lets the contents be largest (E6, E7)
 // step + item count → { N, z }: shared by every sheet, so a click re-checks instead of re-searching. A fit is in world units
 // (independent of the screen), so it is kept across visits too.
-const CELLFIT_KEY = 'turnip-almanac-cellfit:' + (C.id || 'ssr') + ':' + (typeof BAREA === 'undefined' ? '' : Object.values(BAREA).join(','));
+const STYLE = () => document.documentElement.dataset.style || 'classic';
+const CELLFIT_KEY = 'turnip-almanac-cellfit:' + (C.id || 'ssr') + ':' + STYLE() + ':' + (typeof BAREA === 'undefined' ? '' : Object.values(BAREA).join(','));
 const cellFit = new Map((() => { try { return JSON.parse(localStorage.getItem(CELLFIT_KEY) || '[]'); } catch { return []; } })());
 let cellFitSave = 0; const saveCellFit = () => { clearTimeout(cellFitSave); cellFitSave = setTimeout(() => { try { localStorage.setItem(CELLFIT_KEY, JSON.stringify([...cellFit])); } catch {} }, 800); };
 function fitCell(cell) {
   const f = cell.querySelector(':scope > .bfit'); if (!f) return; const box = cell.getBoundingClientRect(); if (!box.height) return;
   const W = cell.clientWidth, lists = [...f.querySelectorAll('.opts, .rows')], n = lists.reduce((t, l) => t + l.children.length, 0);
-  const key = cell.dataset.id.split('-').pop() + ':' + n;
+  const key = STYLE() + ':' + cell.dataset.id.split('-').pop() + ':' + n;   // fits depend on the look's fonts
   const wide = () => [...f.querySelectorAll('.opt, .row, .q, .stepper')].some(e => e.scrollWidth > e.clientWidth + 1);
   const set = (N, z) => { lists.forEach(l => l.style.setProperty('--cols', N)); f.style.zoom = z; f.style.width = (W / z) + 'px'; f.style.minHeight = ''; };
   const fits = () => f.getBoundingClientRect().height <= box.height * 0.985 && !wide();
@@ -2553,6 +2651,25 @@ document.addEventListener('click', ev => {
   const rm = ev.target.closest?.('[data-rmpc]'); if (rm) { removePc(rm.dataset.rmpc); return; }
   const h = ev.target.closest?.('[data-hist]'); if (h) histGoBack(+h.dataset.hist);
 });
+// ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
+// option is the look. Kept per browser.
+const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {}
+  document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
+(() => {
+  const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+  qb.insertBefore(b, qb.querySelector('kbd'));
+  let m = null; const close = () => { m?.remove(); m = null; };
+  b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); });
+  b.addEventListener('click', ev => { ev.stopPropagation(); if (m) return close();
+    m = document.createElement('div'); m.id = 'optsmenu'; m.setAttribute('role', 'menu');
+    const cur = STYLE();
+    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
+    document.body.appendChild(m); const r = qb.getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.right - m.offsetWidth)) + 'px';
+    m.addEventListener('click', e2 => { const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
+  document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
+})();
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();

@@ -258,7 +258,7 @@ function renderSheet(pc) {
     <div class="builder${state.build?.pc === pc.id ? ' active' : ''}" data-id="builder-${pc.id}" style="left:${BREG.x}px;top:${BREG.y}px;width:${BREG.w}px;height:${BREG.h}px">
       <div class="binner" style="width:${BINNER.w}px;height:${BINNER.h}px;transform:scale(${BK_K})">${builderInner(pc, S)}</div>
     </div>`;
-  const bl = el('div', 'lbl blbl'); bl.innerHTML = 'CHARACTER<br>BUILDER'; bl.style.fontSize = '64px'; box.querySelector('.builder').appendChild(bl); labels.push({ e: bl, size: 64, over: true });
+  const bl = el('div', 'lbl over blbl'); bl.innerHTML = 'CHARACTER<br>BUILDER'; bl.style.fontSize = '64px'; box.querySelector('.builder').appendChild(bl); labels.push({ e: bl, size: 64, over: true });
   if (state.done[pc.id] === false || (!ch.meta && !state.done[pc.id])) box.querySelector('.builder').classList.add('todo');
   box._prev = Object.fromEntries([...R.ATTRS.map(a => ['a:' + a, S.attr[a]]), ...R.ALL_SKILLS.map(s => ['s:' + s, S.skill[s]]), ['actions', S.actions], ['armor', S.armor], ['health', S.health], ['essence', S.essence], ['pts', S.pts]]);
   const prov = {}; Object.entries(S.prov).forEach(([k, ids]) => prov[k] = [...new Set(ids.flatMap(id => S.prov[id] && id !== k ? S.prov[id] : [id]).map(id => resolveSrc(pc, id)))]);

@@ -31,7 +31,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 // headline label: big readable text laid over a region; fades as it grows past readable
 const labels = [];
 function label(parent, text, x, y, size, opts = {}) {
-  const e = add(parent, 'lbl' + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
+  const e = add(parent, 'lbl' + (opts.over ? ' over' : '') + (opts.cls ? ' ' + opts.cls : ''), x, y, opts.w ?? null, null, esc(text));
   e.style.fontSize = size + 'px'; if (opts.align) e.style.textAlign = opts.align;
   labels.push({ e, size: size * (opts.k || 1), over: !!opts.over, ww: opts.w != null ? opts.w * (opts.k || 1) : null }); return e;
 }
@@ -249,13 +249,14 @@ function builderCells() {
 // fill one builder cell: try 1–6 columns for its lists and keep the count that lets the contents be largest (E6, E7)
 // step + item count → { N, z }: shared by every sheet, so a click re-checks instead of re-searching. A fit is in world units
 // (independent of the screen), so it is kept across visits too.
-const CELLFIT_KEY = 'turnip-almanac-cellfit:' + (C.id || 'ssr') + ':' + (typeof BAREA === 'undefined' ? '' : Object.values(BAREA).join(','));
+const STYLE = () => document.documentElement.dataset.style || 'classic';
+const CELLFIT_KEY = 'turnip-almanac-cellfit:' + (C.id || 'ssr') + ':' + STYLE() + ':' + (typeof BAREA === 'undefined' ? '' : Object.values(BAREA).join(','));
 const cellFit = new Map((() => { try { return JSON.parse(localStorage.getItem(CELLFIT_KEY) || '[]'); } catch { return []; } })());
 let cellFitSave = 0; const saveCellFit = () => { clearTimeout(cellFitSave); cellFitSave = setTimeout(() => { try { localStorage.setItem(CELLFIT_KEY, JSON.stringify([...cellFit])); } catch {} }, 800); };
 function fitCell(cell) {
   const f = cell.querySelector(':scope > .bfit'); if (!f) return; const box = cell.getBoundingClientRect(); if (!box.height) return;
   const W = cell.clientWidth, lists = [...f.querySelectorAll('.opts, .rows')], n = lists.reduce((t, l) => t + l.children.length, 0);
-  const key = cell.dataset.id.split('-').pop() + ':' + n;
+  const key = STYLE() + ':' + cell.dataset.id.split('-').pop() + ':' + n;   // fits depend on the look's fonts
   const wide = () => [...f.querySelectorAll('.opt, .row, .q, .stepper')].some(e => e.scrollWidth > e.clientWidth + 1);
   const set = (N, z) => { lists.forEach(l => l.style.setProperty('--cols', N)); f.style.zoom = z; f.style.width = (W / z) + 'px'; f.style.minHeight = ''; };
   const fits = () => f.getBoundingClientRect().height <= box.height * 0.985 && !wide();
@@ -1494,6 +1495,25 @@ document.addEventListener('click', ev => {
   const rm = ev.target.closest?.('[data-rmpc]'); if (rm) { removePc(rm.dataset.rmpc); return; }
   const h = ev.target.closest?.('[data-hist]'); if (h) histGoBack(+h.dataset.hist);
 });
+// ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
+// option is the look. Kept per browser.
+const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {}
+  document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
+(() => {
+  const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+  qb.insertBefore(b, qb.querySelector('kbd'));
+  let m = null; const close = () => { m?.remove(); m = null; };
+  b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); });
+  b.addEventListener('click', ev => { ev.stopPropagation(); if (m) return close();
+    m = document.createElement('div'); m.id = 'optsmenu'; m.setAttribute('role', 'menu');
+    const cur = STYLE();
+    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
+    document.body.appendChild(m); const r = qb.getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.right - m.offsetWidth)) + 'px';
+    m.addEventListener('click', e2 => { const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
+  document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
+})();
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();
