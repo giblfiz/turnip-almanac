@@ -156,9 +156,16 @@ cells.forEach(cell => {
   if (pt.interp) { const e = add(bk, 'card interpcard', cx, cy, cw / U0, chh / U0, `<div class="fit"><h3>Where this book is open, the Almanac decides</h3><div class="t">${R.interpretations.map(esc).join('<br>')}</div></div>`); e.style.transformOrigin = '0 0'; e.style.transform = `scale(${U0})`; requestAnimationFrame(() => fitCard(e)); document.fonts?.ready.then(() => fitCard(e)); return; }
   // the block's own layout: the page-column count and index-column count that let it fill its cell at the largest scale
   let best = null; const m = pt.entries.length;
-  for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 8) : 0); ic++) {
-    const d = partNatural(pt.n, m, c, ic), u = Math.min(cw / d.w, chh / d.h, 1);
-    if (!best || u > best.u + 1e-9) best = { c, ic, u, d };
+  // the index wraps into as many columns as it needs to stay no taller than the pages beside it (H, 16 Nov: a long
+  // index next to one page left a tall strip of nothing); among those, the layout that fills the cell at the largest scale
+  for (const strict of [true, false]) {
+    for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 12) : 0); ic++) {
+      const d = partNatural(pt.n, m, c, ic), pagesH = d.rows * (PH + PG) - PG, idxH = ic ? Math.ceil(m / ic) * IRH - IGAP : 0;
+      if (strict && idxH > pagesH * 1.2) continue;
+      const u = Math.min(cw / d.w, chh / d.h, 1);
+      if (!best || u > best.u + 1e-9) best = { c, ic, u, d };
+    }
+    if (best) break;
   }
   const { c, ic, u, d } = best;
   // justify: spread what is left of the cell into the gaps, so the block fills its cell (no dead margin, E6)
@@ -191,7 +198,9 @@ if (advParts.length) {
   const SWID = PX + SW, ay0 = MH + 700, u = U0, gap = 120; let x = 0, y = ay0, rowH = 0;
   label(world, 'The adventure', 0, ay0 - 640, 420);
   advParts.forEach(pt => {
-    const m = pt.entries.length, ic = m ? Math.max(1, Math.ceil(m * IRH / (PH + PG))) : 0, d = partNatural(pt.n, m, pt.n, ic), w = d.w * u, h = d.h * u;
+    // the same rule as the chapter blocks: one index column if it fits within ~20% of the pages' height, else as many as needed
+    const m = pt.entries.length; let ic = m ? 1 : 0; while (ic && ic < m && Math.ceil(m / ic) * IRH - IGAP > PH * 1.2) ic++;
+    const d = partNatural(pt.n, m, pt.n, ic), w = d.w * u, h = d.h * u;
     if (x > 0 && x + w > SWID) { x = 0; y += rowH + gap; rowH = 0; }
     const blk = add(world, 'chapblk advblk', x, y, d.w, d.h, `<div class="chaphead"><b>${esc(pt.title)}</b> <span>pages ${pt.from}–${pt.to}</span></div>`);
     blk.style.transformOrigin = '0 0'; blk.style.transform = `scale(${u})`;
@@ -1384,6 +1393,7 @@ function renderPage(o, width) {
     return page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(() => { if (width <= 240) o._thumb = c; o.el.querySelector('.cv').replaceChildren(c); o._res = width; o._used = performance.now(); });
   }).catch(e => console.warn('page', o.n, e.message)).finally(() => { pagesBusy--; o._busy = false; dirty = true; });
 }
+let thumbIdle = 0;
 const COARSE = matchMedia('(pointer: coarse)').matches;   // a phone or tablet: smaller sharpenings, fewer kept
 function pagesPass() {
   if (!pdfDoc) return;
@@ -1392,12 +1402,18 @@ function pagesPass() {
   const scored = pageFrames.map(o => { const b = o.box, x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, sw = b.w * cam.s;
     return { o, sw, on: !(x0 > vw || y0 > vh || x0 + sw < 0 || y0 + b.h * cam.s < 0) }; });
   for (const { o, sw, on } of scored.sort((a, b) => (b.on - a.on) || (b.sw - a.sw))) {
-    if (pagesBusy >= 2) break;
+    if (pagesBusy >= 1) break;   // one at a time: drawing a page is main-thread work (parsing is in pdf.js's worker)
     if (o._busy) continue;
-    const want = !o._thumb ? 200 : on && sw * dpr > 1300 ? (COARSE ? 1600 : 2600) : on && sw * dpr > 240 ? 1300 : 0;
-    if (want && (o._res || 0) < want) renderPage(o, want);
+    // sharpen to the size it is actually shown at (in 25% steps), not a fixed jump to 2600 px
+    const need = sw * dpr, step = r => Math.min(COARSE ? 1600 : 2400, Math.ceil(r / 400) * 400);
+    const want = !o._thumb ? (on ? 200 : 0) : on && need > 260 ? step(need) : 0;
+    if (want && (o._res || 0) < want * 0.8) renderPage(o, want);
   }
-  if (pagesBusy < 2 && pageFrames.some(o => !o._thumb && !o._busy)) dirty = true;      // keep filling thumbnails in the background
+  // fill the remaining thumbnails only in idle moments, one per idle slot, never while the canvas moves
+  if (pagesBusy < 1 && !thumbIdle && pageFrames.some(o => !o._thumb && !o._busy)) {
+    thumbIdle = (window.requestIdleCallback || (f => setTimeout(() => f({ timeRemaining: () => 8 }), 120)))(dl => { thumbIdle = 0;
+      if (vp.classList.contains('moving') || ptrs.size || pagesBusy || dl.timeRemaining() < 6) { dirty = true; return; }
+      const o = pageFrames.find(o => !o._thumb && !o._busy); if (o) renderPage(o, 200); }, { timeout: 1500 }); }
   const sharp = scored.filter(x => (x.o._res || 0) >= 1300 && !x.on).sort((a, b) => a.o._used - b.o._used);
   const nSharp = pageFrames.filter(o => (o._res || 0) >= 1300).length;
   for (let k = 0; k < nSharp - SHARP_MAX && k < sharp.length; k++) { const o = sharp[k].o; if (o._thumb) { o.el.querySelector('.cv').replaceChildren(o._thumb); o._res = 200; } }
@@ -1520,11 +1536,32 @@ function setLook(k) { document.documentElement.dataset.style = k; try { localSto
     m.addEventListener('click', e2 => { if (e2.target.closest('[data-tune]')) { close(); openTuner(); return; } const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
   document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
 })();
-// the filters the looks use: chewed paper edges (three seeds) and letterpress ink. Scales are in each element's own units.
-document.body.insertAdjacentHTML('beforeend', `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  ${[1, 2, 3].map(k => `<filter id="chew${k}" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="${[0.045, 0.03, 0.06][k - 1]}" numOctaves="3" seed="${k * 11}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${[11, 14, 9][k - 1]}" xChannelSelector="R" yChannelSelector="G"/></filter>`).join('')}
-  <filter id="ink" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
-</defs></svg>`);
+// the chewed paper edge, made once as a mask tile (a rounded square whose rim wanders), then stretched around every card
+// with a border mask: as cheap as a rounded corner. Live SVG filters cost ~0.4 s at every zoom (H, 16 Nov: froze).
+// Three tiles with different wear, so neighbours differ. The tile is 240 px with 80 px corners; --corner sets the size.
+const CHEW = [];
+function makeChew(seed, amp) {
+  const N = 240, R = 80, c = document.createElement('canvas'); c.width = c.height = N; const g = c.getContext('2d');
+  let s0 = seed; const rnd = () => (s0 = (s0 * 16807) % 2147483647) / 2147483647;
+  const K = 64, wob = Array.from({ length: K }, () => rnd() * 2 - 1);   // smooth noise around the rim
+  const noise = t => { const x = t * K, i = Math.floor(x) % K, f = x - Math.floor(x), a = wob[i], b2 = wob[(i + 1) % K]; return a + (b2 - a) * (f * f * (3 - 2 * f)); };
+  const fine = () => (rnd() - 0.5) * amp * 0.35;
+  g.fillStyle = '#000'; g.beginPath();
+  const P = 360, inset = amp + 2, w = N - 2 * inset, r = R - inset;
+  for (let k = 0; k <= P; k++) {   // walk a rounded square; push each point in or out along its normal
+    const t = k / P, per = 2 * (w - 2 * r) * 2 + 2 * Math.PI * r; let d = t * per, x, y, nx, ny; const L = w - 2 * r, q = Math.PI * r / 2;
+    const seg = [[L, (u) => [inset + r + u, inset, 0, -1]], [q, (u) => { const a = -Math.PI / 2 + u / r; return [inset + w - r + Math.cos(a) * r, inset + r + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; }],
+      [L, (u) => [inset + w, inset + r + u, 1, 0]], [q, (u) => { const a = u / r; return [inset + w - r + Math.cos(a) * r, inset + w - r + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; }],
+      [L, (u) => [inset + w - r - u, inset + w, 0, 1]], [q, (u) => { const a = Math.PI / 2 + u / r; return [inset + r + Math.cos(a) * r, inset + w - r + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; }],
+      [L, (u) => [inset, inset + w - r - u, -1, 0]], [q, (u) => { const a = Math.PI + u / r; return [inset + r + Math.cos(a) * r, inset + r + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; }]];
+    for (const [len, f] of seg) { if (d <= len) { [x, y, nx, ny] = f(d); break; } d -= len; }
+    const off = noise(t) * amp * 0.6 + fine(); g.lineTo(x + nx * off, y + ny * off);
+  }
+  g.closePath(); g.fill(); return c.toDataURL();
+}
+[[7, 9], [131, 11], [977, 8]].forEach(([sd, amp]) => CHEW.push(makeChew(sd, amp)));
+CHEW.forEach((u, i) => document.documentElement.style.setProperty(`--chew${i + 1}`, `url(${u})`));
+
 // ---- the look tuner (H, 16 Nov: "we are going to need a hand tuner"): sliders over the live canvas for the dials of the
 // worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
 const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
@@ -1534,7 +1571,7 @@ const DIALS = [
   ['shy', 'Shadow depth', 0, 24, 0.5, 5], ['shblur', 'Shadow softness', 0, 40, 0.5, 12],
   ['redh', 'Red hue', 340, 400, 1, 368], ['reds', 'Red strength', 0, 90, 1, 38], ['redl', 'Red lightness', 20, 60, 1, 48],
   ['btnh', 'Button hue', 20, 60, 1, 39], ['btns', 'Button strength', 0, 90, 1, 68], ['btnl', 'Button lightness', 40, 85, 1, 64], ['btnr', 'Button rounding', 0, 40, 1, 16],
-  ['paperl', 'Paper lightness', 70, 98, 0.5, 85], ['ink', 'Ink roughness', 0, 4, 0.05, 1]];
+  ['paperl', 'Paper lightness', 70, 98, 0.5, 85]];
 function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
 function tuneApply(t = tuneGet()) {
   const r = document.documentElement.style, props = ['--corner', '--edge-c', '--veil', '--tex-size', '--burn', '--sh-x', '--sh-y', '--sh-blur', '--ochre', '--ochre-soft', '--btn-c', '--btn-corner', '--paper'];
@@ -1544,8 +1581,7 @@ function tuneApply(t = tuneGet()) {
   r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px');
   r.setProperty('--ochre', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}% / .13)`);
   r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-corner', v('btnr') + 'px'); r.setProperty('--paper', `hsl(40 45% ${v('paperl')}%)`);
-  [11, 14, 9].forEach((base, i) => document.querySelector(`#chew${i + 1} feDisplacementMap`)?.setAttribute('scale', (base * v('chew')).toFixed(2)));
-  document.querySelector('#ink feDisplacementMap')?.setAttribute('scale', (2.2 * v('ink')).toFixed(2));
+  if (tuneApply._chew !== v('chew')) { tuneApply._chew = v('chew'); [[7, 9], [131, 11], [977, 8]].forEach(([sd, amp], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, amp * v('chew'))})`)); }
 }
 function openTuner() {
   document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';

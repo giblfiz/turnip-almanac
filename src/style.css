@@ -799,3 +799,6 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #tuner .tf { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--rule); }
 #tuner .tf button, #optsmenu .tunebtn { border: 1.5px solid var(--ochre); background: var(--btn-face, var(--paper)); border-radius: 10px; padding: 7px 12px; font: 600 13px var(--f-body, system-ui); color: var(--ink); cursor: pointer; }
 #tuner .tf textarea { width: 100%; height: 60px; font: 11px monospace; }
+/* the book's index cards are not pages: manila slips with an ink bar, so they never read as more of the book */
+.chapblk .entry { background: #f6e9c4; border: 1px solid #a8770f55; border-left: 10px solid var(--ochre); border-radius: 6px 12px 12px 6px; box-shadow: 0 2px 0 #a8770f33; }
+.chapblk .entry h3 { font-family: var(--f-label, var(--f-display)); letter-spacing: .02em; }
