@@ -1565,23 +1565,29 @@ CHEW.forEach((u, i) => document.documentElement.style.setProperty(`--chew${i + 1
 // ---- the look tuner (H, 16 Nov: "we are going to need a hand tuner"): sliders over the live canvas for the dials of the
 // worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
 const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
-const DIALS = [
-  ['corner', 'Corner roundness', 0, 70, 1, 26], ['chew', 'Edge chew', 0, 3, 0.05, 1], ['edge', 'Edge ink', 0, 1, 0.01, 0.33],
-  ['tex', 'Paper texture', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 200, 2400, 20, 900], ['burn', 'Burned edges', 0, 0.6, 0.01, 0.2],
-  ['shy', 'Shadow depth', 0, 24, 0.5, 5], ['shblur', 'Shadow softness', 0, 40, 0.5, 12],
-  ['redh', 'Red hue', 340, 400, 1, 368], ['reds', 'Red strength', 0, 90, 1, 38], ['redl', 'Red lightness', 20, 60, 1, 48],
-  ['btnh', 'Button hue', 20, 60, 1, 39], ['btns', 'Button strength', 0, 90, 1, 68], ['btnl', 'Button lightness', 40, 85, 1, 64], ['btnr', 'Button rounding', 0, 40, 1, 16],
-  ['paperl', 'Paper lightness', 70, 98, 0.5, 85]];
+const DIALS = [   // [key, label, min, max, step, default] — wide ranges on purpose: find the edges, then come back
+  ['corner', 'Corner roundness', 0, 160, 1, 26], ['chew', 'Edge chew (px)', 0, 24, 0.5, 4], ['edgew', 'Ink rim width', 0, 16, 0.5, 7], ['edge', 'Ink rim darkness', 0, 1, 0.01, 0.45],
+  ['tex', 'Paper texture strength', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 100, 4000, 20, 900], ['burn', 'Burned edge darkness', 0, 1, 0.01, 0.35], ['burnw', 'Burned edge width', 0, 200, 2, 60],
+  ['shy', 'Shadow distance (shows on the map and paper)', 0, 60, 0.5, 5], ['shblur', 'Shadow blur', 0, 80, 0.5, 12], ['shd', 'Shadow darkness', 0, 1, 0.01, 0.44],
+  ['paperh', 'Paper hue', 0, 360, 1, 40], ['papers', 'Paper colour strength', 0, 100, 1, 45], ['paperl', 'Paper lightness', 20, 100, 0.5, 85],
+  ['redh', 'Accent red: hue', 0, 360, 1, 8], ['reds', 'Accent red: strength', 0, 100, 1, 38], ['redl', 'Accent red: lightness', 0, 90, 1, 48],
+  ['btnh', 'Button hue', 0, 360, 1, 39], ['btns', 'Button colour strength', 0, 100, 1, 68], ['btnl', 'Button lightness', 10, 95, 1, 64], ['btnr', 'Button rounding', 0, 60, 1, 16]];
 function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
 function tuneApply(t = tuneGet()) {
-  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--veil', '--tex-size', '--burn', '--sh-x', '--sh-y', '--sh-blur', '--ochre', '--ochre-soft', '--btn-c', '--btn-corner', '--paper'];
+  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--edge-w', '--veil', '--tex-size', '--burn', '--burn-w', '--sh-x', '--sh-y', '--sh-blur', '--sh-c', '--ochre', '--ochre-soft', '--btn-c', '--btn-hi', '--btn-lo', '--btn-ledge', '--btn-corner', '--paper'];
   if (STYLE() !== 'pulp') { props.forEach(k => r.removeProperty(k)); return; }   // the dials belong to the worn-paper look
   const v = k => t[k] ?? DIALS.find(d => d[0] === k)[5];
-  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--veil', `hsla(40, 45%, ${v('paperl')}%, ${1 - v('tex')})`);
-  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px');
-  r.setProperty('--ochre', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}% / .13)`);
-  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-corner', v('btnr') + 'px'); r.setProperty('--paper', `hsl(40 45% ${v('paperl')}%)`);
-  if (tuneApply._chew !== v('chew')) { tuneApply._chew = v('chew'); [[7, 9], [131, 11], [977, 8]].forEach(([sd, amp], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, amp * v('chew'))})`)); }
+  const paper = `hsl(${v('paperh')} ${v('papers')}% ${v('paperl')}%)`;
+  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--edge-w', v('edgew') + 'px');
+  r.setProperty('--paper', paper); r.setProperty('--veil', `hsl(${v('paperh')} ${v('papers')}% ${v('paperl')}% / ${1 - v('tex')})`);
+  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--burn-w', v('burnw') + 'px');
+  r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px'); r.setProperty('--sh-c', hexA('#0b0806', v('shd')));
+  r.setProperty('--ochre', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}% / .13)`);
+  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-hi', `hsl(${v('btnh')} ${v('btns')}% ${Math.min(97, v('btnl') + 16)}%)`); r.setProperty('--btn-lo', `hsl(${v('btnh')} ${v('btns')}% ${Math.max(5, v('btnl') - 12)}%)`);
+  r.setProperty('--btn-ledge', `hsl(${v('btnh')} ${Math.min(100, v('btns') + 10)}% ${Math.max(4, v('btnl') - 34)}%)`); r.setProperty('--btn-corner', v('btnr') + 'px');
+  const chewKey = v('chew') + ':' + v('corner');
+  if (tuneApply._chew !== chewKey) { tuneApply._chew = chewKey; const k = 80 / Math.max(6, v('corner'));   // world px → tile px
+    [[7, 1], [131, 1.25], [977, .85]].forEach(([sd, f], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, Math.min(36, v('chew') * f * k))})`)); }
 }
 function openTuner() {
   document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';

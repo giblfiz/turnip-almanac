@@ -802,7 +802,8 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #tuner .th { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
 #tuner .th b { font-size: 15px; } #tuner .th span { color: var(--ink-3); flex: 1; } #tuner .th button { border: 0; background: transparent; cursor: pointer; color: var(--ink-2); font-size: 15px; }
 #tuner .tbody { overflow: auto; padding: 8px 12px; display: grid; gap: 6px; }
-#tuner label { display: grid; grid-template-columns: 116px 1fr 44px; align-items: center; gap: 8px; }
+#tuner label { display: grid; grid-template-columns: 1fr 44px; grid-template-areas: 'n o' 'r r'; align-items: center; gap: 2px 8px; }
+#tuner label > span { grid-area: n; } #tuner label > output { grid-area: o; } #tuner label > input { grid-area: r; }
 #tuner input[type=range] { width: 100%; accent-color: var(--ochre); }
 #tuner output { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2); }
 #tuner .tf { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--rule); }
@@ -913,23 +914,24 @@ html, body { touch-action: none; overscroll-behavior: none; }
    edge is chewed by an SVG noise filter (#chew1-3, three seeds so neighbours wear differently); text stays crisp.
    Dials: --corner, --chew (in the paper's own units), --tex (the paper texture), --edge-c. While the canvas moves the
    filters switch off (#vp.moving) and come back when it settles. */
-:root[data-style="pulp"] { --corner: 26px; --chew-in: 7px; --edge-c: #3b2a1f55; --tex: url(assets/textures/paper.webp); --tex-size: 900px; --burn: #8a5a2033; }
+:root[data-style="pulp"] { --corner: 26px; --chew-in: 7px; --edge-c: #3b2a1f73; --edge-w: 7px; --burn-w: 60px; --tex: url(assets/textures/paper.webp); --tex-size: 900px; --burn: #8a5a2059; }
 :root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep) {
-  background: transparent !important; border: 0 !important; box-shadow: none !important; isolation: isolate; border-radius: var(--corner) !important; }
+  background: transparent !important; border: 0 !important; isolation: isolate; border-radius: calc(var(--corner) * var(--ck, 1)) !important;
+  /* the shadow is the card's own (a layer under it would be clipped by cards that hide their overflow) */
+  box-shadow: var(--sh-x, 3px) var(--sh-y, 5px) var(--sh-blur, 12px) var(--sh-c, #0b080670) !important; }
 /* the paper (::before) carries texture, tint and the burned edge, and is masked by a chewed-edge tile (border mask, made
    once in app.js: --chew1..3); the shadow is its own layer (::after) under it, so the mask cannot clip it */
 :root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  /* paper colour multiplied into the texture (so it tints and darkens it), then a veil of plain paper over it for strength */
   background-color: var(--paper-c, var(--paper)); background-image: linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex); background-size: auto, var(--tex-size);
+  background-blend-mode: normal, multiply;
   border-radius: calc(var(--corner) * var(--ck, 1));
-  box-shadow: inset 0 0 0 1.5px var(--edge-c), inset 0 0 calc(var(--corner) * 1.6 + 10px) var(--burn);
+  /* the ink rim is a band, wide enough to survive the chewed edge eating into it */
+  box-shadow: inset 0 0 0 var(--edge-w, 3px) var(--edge-c), inset 0 0 calc(var(--burn-w, 40px)) var(--burn);
   -webkit-mask-box-image: var(--chew-t, var(--chew1)) 80 fill / calc(var(--corner) * var(--ck, 1)) stretch; }
-:root[data-style="pulp"] :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .artcard, .loose, .bstep)::after {
-  content: ''; position: absolute; inset: 3px; z-index: -2; pointer-events: none; border-radius: calc(var(--corner) * var(--ck, 1));
-  box-shadow: var(--sh-x, 3px) var(--sh-y, 5px) var(--sh-blur, 12px) #0b080670; }
 :root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+1) { --chew-t: var(--chew2); --ck: 1.25; }
 :root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+2) { --chew-t: var(--chew3); --ck: .8; }
-:root[data-style="pulp"] .sheet::after { box-shadow: 5px 8px 18px #0b080690; }
 :root[data-style="pulp"] .sheet { --ck: 1.1; }
 :root[data-style="pulp"] .chapblk { --paper-c: #e6d6b6; }
 :root[data-style="pulp"] .bk { --paper-c: #eedfc2; }
@@ -945,7 +947,7 @@ html, body { touch-action: none; overscroll-behavior: none; }
 /* buttons: raised paper tokens you can press — mustard card stock, a lit top edge, a deep ledge, round, ink text;
    red is ink here (the border), never a fill under text */
 :root[data-style="pulp"] :is(.btn, .die, .stepper button, .asof button, .tokens button, .tokens .upl, .opt, .seg button, .chipgrid button, .tb, .track button, .launchbtn, .seatbtn, .donebtn, .qskills button, .keyb, .rmpc) {
-  background: linear-gradient(180deg, #f6dfa2 0%, var(--btn-c, #e2b763) 55%, #cf9f4a 100%) !important; color: #2a1d12 !important;
+  background: linear-gradient(180deg, var(--btn-hi, #f6dfa2) 0%, var(--btn-c, #e2b763) 55%, var(--btn-lo, #cf9f4a) 100%) !important; color: #2a1d12 !important;
   border: 1.6px solid var(--btn-edge, #8f3a2e) !important; border-radius: var(--btn-corner, 16px) !important;
   box-shadow: inset 0 2px 0 #fff6d8cc, inset 0 -2px 0 #0000001f, 0 5px 0 var(--btn-ledge, #7a4a1c), 0 7px 9px #0b080666 !important; }
 :root[data-style="pulp"] .opt span, :root[data-style="pulp"] .opt b em { color: #5a3a1e !important; }
@@ -965,7 +967,7 @@ html, body { touch-action: none; overscroll-behavior: none; }
    blur) and the chewed mask. At that distance the card's edge is off screen anyway (H, 16 Nov: "worse the deeper I go") */
 #vp.close :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep)::before {
   -webkit-mask-box-image: none !important; box-shadow: inset 0 0 0 1.5px var(--edge-c) !important; }
-#vp.close :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .artcard, .loose, .bstep)::after { box-shadow: none !important; }
+#vp.close :is(.card, .sheet, .scard, .tablecard, .pcard, .histcard, .helpcard, .interpcard, .pockettab, .inbox, .chapblk, .bk, .artcard, .loose, .bstep) { box-shadow: none !important; }
 #vp.close .pagef { box-shadow: none !important; }
 #vp.close .map { box-shadow: none !important; }
 :root[data-style="pulp"] .chapblk .entry { background: #f3dc9e !important; border: 1px solid #8f3a2e55 !important; border-left: 12px solid var(--ochre) !important; border-radius: 8px 16px 16px 8px !important; box-shadow: 2px 3px 0 #3b2a1f40 !important; }
@@ -2865,23 +2867,29 @@ CHEW.forEach((u, i) => document.documentElement.style.setProperty(`--chew${i + 1
 // ---- the look tuner (H, 16 Nov: "we are going to need a hand tuner"): sliders over the live canvas for the dials of the
 // worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
 const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
-const DIALS = [
-  ['corner', 'Corner roundness', 0, 70, 1, 26], ['chew', 'Edge chew', 0, 3, 0.05, 1], ['edge', 'Edge ink', 0, 1, 0.01, 0.33],
-  ['tex', 'Paper texture', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 200, 2400, 20, 900], ['burn', 'Burned edges', 0, 0.6, 0.01, 0.2],
-  ['shy', 'Shadow depth', 0, 24, 0.5, 5], ['shblur', 'Shadow softness', 0, 40, 0.5, 12],
-  ['redh', 'Red hue', 340, 400, 1, 368], ['reds', 'Red strength', 0, 90, 1, 38], ['redl', 'Red lightness', 20, 60, 1, 48],
-  ['btnh', 'Button hue', 20, 60, 1, 39], ['btns', 'Button strength', 0, 90, 1, 68], ['btnl', 'Button lightness', 40, 85, 1, 64], ['btnr', 'Button rounding', 0, 40, 1, 16],
-  ['paperl', 'Paper lightness', 70, 98, 0.5, 85]];
+const DIALS = [   // [key, label, min, max, step, default] — wide ranges on purpose: find the edges, then come back
+  ['corner', 'Corner roundness', 0, 160, 1, 26], ['chew', 'Edge chew (px)', 0, 24, 0.5, 4], ['edgew', 'Ink rim width', 0, 16, 0.5, 7], ['edge', 'Ink rim darkness', 0, 1, 0.01, 0.45],
+  ['tex', 'Paper texture strength', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 100, 4000, 20, 900], ['burn', 'Burned edge darkness', 0, 1, 0.01, 0.35], ['burnw', 'Burned edge width', 0, 200, 2, 60],
+  ['shy', 'Shadow distance (shows on the map and paper)', 0, 60, 0.5, 5], ['shblur', 'Shadow blur', 0, 80, 0.5, 12], ['shd', 'Shadow darkness', 0, 1, 0.01, 0.44],
+  ['paperh', 'Paper hue', 0, 360, 1, 40], ['papers', 'Paper colour strength', 0, 100, 1, 45], ['paperl', 'Paper lightness', 20, 100, 0.5, 85],
+  ['redh', 'Accent red: hue', 0, 360, 1, 8], ['reds', 'Accent red: strength', 0, 100, 1, 38], ['redl', 'Accent red: lightness', 0, 90, 1, 48],
+  ['btnh', 'Button hue', 0, 360, 1, 39], ['btns', 'Button colour strength', 0, 100, 1, 68], ['btnl', 'Button lightness', 10, 95, 1, 64], ['btnr', 'Button rounding', 0, 60, 1, 16]];
 function tuneGet() { try { return JSON.parse(localStorage.getItem(TUNE_KEY) || '{}'); } catch { return {}; } }
 function tuneApply(t = tuneGet()) {
-  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--veil', '--tex-size', '--burn', '--sh-x', '--sh-y', '--sh-blur', '--ochre', '--ochre-soft', '--btn-c', '--btn-corner', '--paper'];
+  const r = document.documentElement.style, props = ['--corner', '--edge-c', '--edge-w', '--veil', '--tex-size', '--burn', '--burn-w', '--sh-x', '--sh-y', '--sh-blur', '--sh-c', '--ochre', '--ochre-soft', '--btn-c', '--btn-hi', '--btn-lo', '--btn-ledge', '--btn-corner', '--paper'];
   if (STYLE() !== 'pulp') { props.forEach(k => r.removeProperty(k)); return; }   // the dials belong to the worn-paper look
   const v = k => t[k] ?? DIALS.find(d => d[0] === k)[5];
-  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--veil', `hsla(40, 45%, ${v('paperl')}%, ${1 - v('tex')})`);
-  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px');
-  r.setProperty('--ochre', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh') % 360} ${v('reds')}% ${v('redl')}% / .13)`);
-  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-corner', v('btnr') + 'px'); r.setProperty('--paper', `hsl(40 45% ${v('paperl')}%)`);
-  if (tuneApply._chew !== v('chew')) { tuneApply._chew = v('chew'); [[7, 9], [131, 11], [977, 8]].forEach(([sd, amp], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, amp * v('chew'))})`)); }
+  const paper = `hsl(${v('paperh')} ${v('papers')}% ${v('paperl')}%)`;
+  r.setProperty('--corner', v('corner') + 'px'); r.setProperty('--edge-c', hexA('#3b2a1f', v('edge'))); r.setProperty('--edge-w', v('edgew') + 'px');
+  r.setProperty('--paper', paper); r.setProperty('--veil', `hsl(${v('paperh')} ${v('papers')}% ${v('paperl')}% / ${1 - v('tex')})`);
+  r.setProperty('--tex-size', v('texsize') + 'px'); r.setProperty('--burn', hexA('#8a5a20', v('burn'))); r.setProperty('--burn-w', v('burnw') + 'px');
+  r.setProperty('--sh-x', (v('shy') * 0.6) + 'px'); r.setProperty('--sh-y', v('shy') + 'px'); r.setProperty('--sh-blur', v('shblur') + 'px'); r.setProperty('--sh-c', hexA('#0b0806', v('shd')));
+  r.setProperty('--ochre', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}% / .13)`);
+  r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-hi', `hsl(${v('btnh')} ${v('btns')}% ${Math.min(97, v('btnl') + 16)}%)`); r.setProperty('--btn-lo', `hsl(${v('btnh')} ${v('btns')}% ${Math.max(5, v('btnl') - 12)}%)`);
+  r.setProperty('--btn-ledge', `hsl(${v('btnh')} ${Math.min(100, v('btns') + 10)}% ${Math.max(4, v('btnl') - 34)}%)`); r.setProperty('--btn-corner', v('btnr') + 'px');
+  const chewKey = v('chew') + ':' + v('corner');
+  if (tuneApply._chew !== chewKey) { tuneApply._chew = chewKey; const k = 80 / Math.max(6, v('corner'));   // world px → tile px
+    [[7, 1], [131, 1.25], [977, .85]].forEach(([sd, f], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, Math.min(36, v('chew') * f * k))})`)); }
 }
 function openTuner() {
   document.querySelector('#tuner')?.remove(); const t = tuneGet(), p = document.createElement('div'); p.id = 'tuner';

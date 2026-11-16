@@ -793,7 +793,8 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #tuner .th { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
 #tuner .th b { font-size: 15px; } #tuner .th span { color: var(--ink-3); flex: 1; } #tuner .th button { border: 0; background: transparent; cursor: pointer; color: var(--ink-2); font-size: 15px; }
 #tuner .tbody { overflow: auto; padding: 8px 12px; display: grid; gap: 6px; }
-#tuner label { display: grid; grid-template-columns: 116px 1fr 44px; align-items: center; gap: 8px; }
+#tuner label { display: grid; grid-template-columns: 1fr 44px; grid-template-areas: 'n o' 'r r'; align-items: center; gap: 2px 8px; }
+#tuner label > span { grid-area: n; } #tuner label > output { grid-area: o; } #tuner label > input { grid-area: r; }
 #tuner input[type=range] { width: 100%; accent-color: var(--ochre); }
 #tuner output { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2); }
 #tuner .tf { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--rule); }
