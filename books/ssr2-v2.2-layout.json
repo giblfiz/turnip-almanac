@@ -420,7 +420,7 @@
     "top": 359.12699999999995,
     "width": 366.0,
     "height": 12.221,
-    "label": "Vehicles cannot Soak. Soak does not prevent spell Drain."
+    "label": "Vehicles cannot Soak. Soak works against ICE but does not prevent spell Drain."
   },
   {
     "page": 3,
