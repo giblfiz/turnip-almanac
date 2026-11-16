@@ -114,7 +114,7 @@
   background-blend-mode: normal, multiply;
   border-radius: calc(var(--corner) * var(--ck, 1));
   /* the ink rim is a band, wide enough to survive the chewed edge eating into it */
-  box-shadow: inset 0 0 0 var(--edge-w, 3px) var(--edge-c), inset 0 0 calc(var(--burn-w, 40px)) var(--burn);
+  box-shadow: inset 0 0 0 var(--edge-w, 3px) var(--edge-c), inset 0 0 var(--burn-w, 40px) calc(var(--burn-w, 40px) * 0.18) var(--burn);
   -webkit-mask-box-image: var(--chew-t, var(--chew1)) 80 fill / calc(var(--corner) * var(--ck, 1)) stretch; }
 :root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+1) { --chew-t: var(--chew2); --ck: 1.25; }
 :root[data-style="pulp"] :is(.card, .scard, .pcard, .bstep, .chapblk):nth-child(3n+2) { --chew-t: var(--chew3); --ck: .8; }
