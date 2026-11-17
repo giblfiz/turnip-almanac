@@ -989,6 +989,14 @@ html, body { touch-action: none; overscroll-behavior: none; }
 :root[data-style="pulp"] .chapblk .entry { border-left: 0 !important; }
 :root[data-style="pulp"] .chapblk .entry::before { --paper-c: #f3dc9e; background-image: linear-gradient(90deg, var(--ochre) 0 14px, #0000 14px), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex) !important; background-size: auto, auto, var(--tex-size) !important; background-blend-mode: normal, normal, multiply !important; }
 :root[data-style="pulp"] .chapblk .entry > * { position: relative; left: 8px; max-width: calc(100% - 8px); }
+/* index slips (H, 17 Nov): one piece of card with a red tab. No fill on the slip itself (it showed as a pale halo round
+   the paper layer), no chewed mask (at this size it reads as a heavy outline), a thin rim, and the tab flush to the
+   slip's left edge, clipped only by its own rounding */
+:root[data-style="pulp"] .chapblk .entry { background: transparent !important; border: 0 !important; box-shadow: 1px 2px 4px #0b080640 !important; border-radius: 14px !important; padding-left: 26px !important; }
+:root[data-style="pulp"] .chapblk .entry::before { inset: 0 !important; border-radius: 14px !important; -webkit-mask-box-image: none !important; mask: none !important;
+  background-color: #f3dc9e !important; background-image: linear-gradient(90deg, var(--ochre) 0 12px, #0000 12px), var(--tex) !important; background-size: auto, var(--tex-size) !important; background-blend-mode: normal, multiply !important;
+  box-shadow: inset 0 0 0 1px #3b2a1f55 !important; }
+:root[data-style="pulp"] .chapblk .entry > * { left: 0 !important; max-width: none !important; }
 /* Lady Blackbird rig: only this rig's own classes (lb*) */
 .lbt { display: inline-block; font: 600 17px var(--f-body); padding: 5px 11px; margin: 0 6px 6px 0; border-radius: 9px; cursor: pointer; white-space: nowrap;
   background: var(--btn-face); border: 2px solid var(--ochre); box-shadow: 0 3px 0 var(--ledge); color: var(--ink); transition: transform .06s, box-shadow .06s; }
