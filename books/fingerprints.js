@@ -9,8 +9,8 @@ window.BOOK_PRINTS = {
   "size": 58106
  },
  "ssr2-v2.2.pdf": {
-  "sha256": "33792758019e6c925e507eb7c104064102cd67baad76dc1166fc4fbafd1984ea",
-  "size": 58238
+  "sha256": "830c69bb858c8aa85ecfd35794273674f0bacdb87cb9c20732de7a9e19a7764f",
+  "size": 58256
  },
  "lb.pdf": {
   "sha256": "9cc19519748ae6db2900ba9427eece47cb9129ebe46cfe370843147a65caccc1",

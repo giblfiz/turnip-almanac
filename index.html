@@ -1342,7 +1342,7 @@ function stepHtml(pc, S, key) {
     h += `</div>`;
   }
   if (key === 'circles') {
-    h += `${stepHead(S, 'circles', '9', 'Social circles', P.circles)}<div class="hint">Contact 1 pt [6L], friend 3 [9M], patron 5 [12S]. First two contacts free.</div><div class="rows one">`;
+    h += `${stepHead(S, 'circles', '9', 'Social circles', P.circles)}<div class="hint">A circle is a world you live in; its level is your tool there. Regular 1 pt [6L], Insider 3 [9M], Pillar 5 [12S]. First two Regulars free.</div><div class="rows one">`;
     R.CIRCLES.forEach(c => { const cur = ch.circles[c] || ''; h += `<div class="row${cur ? ' on' : ''}"><div><b>${c}</b></div><div class="seg">${['', 'contact', 'friend', 'patron'].map(l => `<button class="${cur === l ? 'sel' : ''}" data-act="set" data-pc="${pc.id}" data-path="circles.${c}" data-v="${l}">${l ? R.CIRCLE_LV[l].name : 'None'}</button>`).join('')}</div></div>`; });
     h += `</div>`;
   }

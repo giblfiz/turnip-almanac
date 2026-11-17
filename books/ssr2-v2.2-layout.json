@@ -33,7 +33,7 @@
     "top": 437.8,
     "width": 194,
     "height": 199.29,
-    "label": "['<b>Social<br/>Circles</b>', 'Contact<br/>[6L]', 'Friend<br/>[9M]', 'Patron<br/>[12S]']"
+    "label": "['<b>Social<br/>Circles</b>', 'Regular<br/>[6L]', 'Insider<br/>[9M]', 'Pillar<br/>[12S]']"
   },
   {
     "page": 1,
@@ -644,35 +644,35 @@
     "x": 402.0,
     "top": 569.0,
     "width": 366.0,
-    "height": 24.442,
-    "label": "During downtime, gather information, buy special equipment and make arrangements. These ch"
-  },
-  {
-    "page": 4,
-    "kind": "paragraph",
-    "x": 402.0,
-    "top": 540.558,
-    "width": 366.0,
-    "height": 24.442,
-    "label": "A missing contact can be hired for <b>\u00a5200 per roll</b>; friends and patrons cannot. Gener"
-  },
-  {
-    "page": 4,
-    "kind": "paragraph",
-    "x": 402.0,
-    "top": 512.116,
-    "width": 366.0,
-    "height": 24.442,
-    "label": "Social circles can supply appropriate <b>identities, credentials, disguises, tools and wor"
-  },
-  {
-    "page": 4,
-    "kind": "paragraph",
-    "x": 402.0,
-    "top": 483.674,
-    "width": 366.0,
     "height": 36.663,
-    "label": "Blending in uses Etiquette, with clothing or a disguise as the tool. These may come from a"
+    "label": "A circle is a world you live in: its people, papers, clothes, tools and gossip. Its level "
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 528.337,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Without the circle, hire a Regular for <b>\u00a5200 per roll</b>; Insiders and Pillars cannot b"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 499.895,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Circles supply <b>identities, credentials, disguises, tools and workshop access</b>; entry"
+  },
+  {
+    "page": 4,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 471.453,
+    "width": 366.0,
+    "height": 24.442,
+    "label": "Blending in uses Etiquette, with clothing or a disguise from a lifestyle or circle as the "
   },
   {
     "page": 4,
@@ -789,6 +789,6 @@
     "top": 58.59099999999992,
     "width": 366.0,
     "height": 24.442,
-    "label": "Sell gear for <b>70%</b> of list price; add 5% for a fixer contact or 10% for a fixer frie"
+    "label": "Sell gear for <b>70%</b> of list price; add 5% for a Fixer Regular or 10% for an Insider, "
   }
 ]

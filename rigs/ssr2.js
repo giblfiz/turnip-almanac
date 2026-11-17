@@ -129,7 +129,7 @@ window.RIG = (() => {
     return { roll: r, rating };
   }
   const CIRCLES = ['Political', 'Corporate', 'Police', 'Gang / Street', 'Media / Entertainment', 'Academic / Medical', 'Tribal', 'Fence / Fixer', 'Hacker', 'Magical', 'Rigger / Engineer'];
-  const CIRCLE_LV = { contact: { name: 'Contact', tool: '[6L]', pts: 1 }, friend: { name: 'Friend', tool: '[9M]', pts: 3 }, patron: { name: 'Patron', tool: '[12S]', pts: 5 } };
+  const CIRCLE_LV = { contact: { name: 'Regular', tool: '[6L]', pts: 1 }, friend: { name: 'Insider', tool: '[9M]', pts: 3 }, patron: { name: 'Pillar', tool: '[12S]', pts: 5 } };
   const FREE_CONTACTS = 2;
   const LIFE = { poor: { name: 'Poor', cash: 500, tool: '[3L]', pts: 1 }, normal: { name: 'Normal', cash: 2500, tool: '[6M]', pts: 3 }, rich: { name: 'Rich', cash: 15000, tool: '[9S]', pts: 7 } };
   const BYID = l => Object.fromEntries(l.map(x => [x.id, x]));
@@ -221,7 +221,7 @@ window.RIG = (() => {
     VEH.forEach(v => { const n = ch.veh[v.id] || 0; if (!n) return; add(`${v.name}${n > 1 ? ' ×' + n : ''}`, v.pts * n, B('veh'), P.veh); vehList.push({ ...v, n }); });
     const deck = ch.deck ? DE[ch.deck] : null; if (deck) add(deck.name, deck.pts, B('deck'), P.decks);
     Object.keys(ch.chips || {}).forEach(id => { if (!ch.chips[id]) return; const c = CHIP_BY_ID[id]; add(`Chip: ${c.name}`, c.pts, B('deck'), P.chips); chipList.push(c); });
-    // circles: the first two contacts are free
+    // circles: the first two Regular circles are free (ids stay contact/friend/patron for saved data; names are v2.2's)
     let freeC = FREE_CONTACTS; const circleList = [];
     CIRCLES.forEach(name => { const lv = ch.circles[name]; if (!lv) return; const L = CIRCLE_LV[lv]; let pts = L.pts; let free = false;
       if (lv === 'contact' && freeC > 0) { freeC--; pts = 0; free = true; } add(`${name} ${L.name.toLowerCase()}`, pts, B('circles'), P.circles); circleList.push({ ...L, level: L.name, name, free }); });
