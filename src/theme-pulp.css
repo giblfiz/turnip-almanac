@@ -158,15 +158,6 @@
 #vp.close .map { box-shadow: none !important; }
 :root[data-style="pulp"] .chapblk .entry { background: #f3dc9e !important; border: 1px solid #8f3a2e55 !important; border-left: 12px solid var(--ochre) !important; border-radius: 8px 16px 16px 8px !important; box-shadow: 2px 3px 0 #3b2a1f40 !important; }
 :root[data-style="pulp"] .chapblk .entry h3 { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .05em; color: #6b2e24; border: 0; }
-/* the desk sheet: one paper under the whole table, its chewed outline (mask) and burnt rim (an image) drawn once */
-.deskpaper { display: none; }
-:root[data-style="pulp"] .deskpaper { display: block; position: absolute; z-index: 0; pointer-events: none;
-  background-color: var(--paper); background-image: var(--desk-burn, none), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex);
-  background-size: 100% 100%, auto, var(--tex-size); background-blend-mode: multiply, normal, multiply;
-  -webkit-mask-image: var(--desk-mask, none); mask-image: var(--desk-mask, none); -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
-  filter: drop-shadow(0 30px 60px #000a); }
-#vp.close .deskpaper { -webkit-mask-image: none; mask-image: none; filter: none; background-image: linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex); background-size: auto, var(--tex-size); }
-:root[data-style="pulp"] { --chew-in: 2px; --burn: #8a5a201f; --burn-w: 40px; }
 #tuner .pick { display: grid; grid-template-columns: 1fr 64px; align-items: center; gap: 8px; }
 #tuner .pick input { width: 64px; height: 28px; border: 0; padding: 0; background: none; }
 /* index slips: the ink bar is painted inside the slip's own rounded paper, not hung outside it as a border */
@@ -181,3 +172,17 @@
   background-color: #f3dc9e !important; background-image: linear-gradient(90deg, var(--ochre) 0 12px, #0000 12px), var(--tex) !important; background-size: auto, var(--tex-size) !important; background-blend-mode: normal, multiply !important;
   box-shadow: inset 0 0 0 1px #3b2a1f55 !important; }
 :root[data-style="pulp"] .chapblk .entry > * { left: 0 !important; max-width: none !important; }
+
+/* each major section is its own paper: its own chewed outline (--pmask) and burnt rim (--pburn), made in app.js
+   (paperize). Only the paper layer is masked, so content stays crisp; the map, whose picture is its content, is masked
+   whole. No rectangular shadow under a chewed paper (it would show as a box). */
+:root[data-style="pulp"] .paper { box-shadow: none !important; }
+:root[data-style="pulp"] .paper::before { inset: calc(var(--pout, 0px) * -1) !important; -webkit-mask-box-image: none !important; -webkit-mask-image: var(--pmask) !important; mask-image: var(--pmask) !important;
+  -webkit-mask-size: 100% 100% !important; mask-size: 100% 100% !important; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; border-radius: 0 !important;
+  background-image: var(--pburn), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex) !important; background-size: 100% 100%, auto, var(--tex-size) !important;
+  background-blend-mode: multiply, normal, multiply !important; box-shadow: none !important; }
+:root[data-style="pulp"] .map.paper { -webkit-mask-image: var(--pmask); mask-image: var(--pmask); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; border-radius: 0 !important; border: 0 !important; }
+:root[data-style="pulp"] .map.paper::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: var(--pburn) 0 0 / 100% 100% no-repeat; mix-blend-mode: multiply; }
+:root[data-style="pulp"] .map.paper::before { content: none; }
+#vp.close .paper::before, #vp.close .map.paper { -webkit-mask-image: none !important; mask-image: none !important; }
+#vp.close .map.paper::after { display: none; }

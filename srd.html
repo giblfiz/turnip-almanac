@@ -974,15 +974,6 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #vp.close .map { box-shadow: none !important; }
 :root[data-style="pulp"] .chapblk .entry { background: #f3dc9e !important; border: 1px solid #8f3a2e55 !important; border-left: 12px solid var(--ochre) !important; border-radius: 8px 16px 16px 8px !important; box-shadow: 2px 3px 0 #3b2a1f40 !important; }
 :root[data-style="pulp"] .chapblk .entry h3 { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .05em; color: #6b2e24; border: 0; }
-/* the desk sheet: one paper under the whole table, its chewed outline (mask) and burnt rim (an image) drawn once */
-.deskpaper { display: none; }
-:root[data-style="pulp"] .deskpaper { display: block; position: absolute; z-index: 0; pointer-events: none;
-  background-color: var(--paper); background-image: var(--desk-burn, none), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex);
-  background-size: 100% 100%, auto, var(--tex-size); background-blend-mode: multiply, normal, multiply;
-  -webkit-mask-image: var(--desk-mask, none); mask-image: var(--desk-mask, none); -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
-  filter: drop-shadow(0 30px 60px #000a); }
-#vp.close .deskpaper { -webkit-mask-image: none; mask-image: none; filter: none; background-image: linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex); background-size: auto, var(--tex-size); }
-:root[data-style="pulp"] { --chew-in: 2px; --burn: #8a5a201f; --burn-w: 40px; }
 #tuner .pick { display: grid; grid-template-columns: 1fr 64px; align-items: center; gap: 8px; }
 #tuner .pick input { width: 64px; height: 28px; border: 0; padding: 0; background: none; }
 /* index slips: the ink bar is painted inside the slip's own rounded paper, not hung outside it as a border */
@@ -997,6 +988,20 @@ html, body { touch-action: none; overscroll-behavior: none; }
   background-color: #f3dc9e !important; background-image: linear-gradient(90deg, var(--ochre) 0 12px, #0000 12px), var(--tex) !important; background-size: auto, var(--tex-size) !important; background-blend-mode: normal, multiply !important;
   box-shadow: inset 0 0 0 1px #3b2a1f55 !important; }
 :root[data-style="pulp"] .chapblk .entry > * { left: 0 !important; max-width: none !important; }
+
+/* each major section is its own paper: its own chewed outline (--pmask) and burnt rim (--pburn), made in app.js
+   (paperize). Only the paper layer is masked, so content stays crisp; the map, whose picture is its content, is masked
+   whole. No rectangular shadow under a chewed paper (it would show as a box). */
+:root[data-style="pulp"] .paper { box-shadow: none !important; }
+:root[data-style="pulp"] .paper::before { inset: calc(var(--pout, 0px) * -1) !important; -webkit-mask-box-image: none !important; -webkit-mask-image: var(--pmask) !important; mask-image: var(--pmask) !important;
+  -webkit-mask-size: 100% 100% !important; mask-size: 100% 100% !important; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; border-radius: 0 !important;
+  background-image: var(--pburn), linear-gradient(var(--veil, #0000), var(--veil, #0000)), var(--tex) !important; background-size: 100% 100%, auto, var(--tex-size) !important;
+  background-blend-mode: multiply, normal, multiply !important; box-shadow: none !important; }
+:root[data-style="pulp"] .map.paper { -webkit-mask-image: var(--pmask); mask-image: var(--pmask); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; border-radius: 0 !important; border: 0 !important; }
+:root[data-style="pulp"] .map.paper::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: var(--pburn) 0 0 / 100% 100% no-repeat; mix-blend-mode: multiply; }
+:root[data-style="pulp"] .map.paper::before { content: none; }
+#vp.close .paper::before, #vp.close .map.paper { -webkit-mask-image: none !important; mask-image: none !important; }
+#vp.close .map.paper::after { display: none; }
 /* SRD 5.2.1 rig: only this rig's own classes (srd*). The sheet: 2100 × 1300, no whitespace (E6); the spells and
    features sections are 'dense' (they may shrink far below the usual floor and are read by zooming in). */
 .sheet .srdA { left: 34px; top: 30px; width: 530px; height: 440px; }
@@ -1156,7 +1161,7 @@ const PX = MW + 160;                                        // party column x, o
 // ------------------------------------------------------------------ the map: the anchor
 const mapEl = add(world, 'map' + (C.mapBlank ? ' blankmap' : ''), 0, 0, MW, MH, `<img class="mapimg" src="${MAP.src || ''}" alt="${esc(MAP.alt || 'Street map of central Seattle')}" draggable="false" ${MAP.src ? '' : 'hidden'}>${MAP_ART ? `<div class="mapwait">The map comes from your copy of the book.<br>Open it on the book above.</div>` : C.mapBlank && !state.mapImg ? `<div class="mapwait">Your world map goes here.<br>Drop a picture of it on this spot.</div>` : ''}`);
 reg('map', { el: mapEl, title: `Campaign map · ${C.mapTitle || 'Seattle'}`, kind: 'map', icon: 'assets/type-OFC.png', box: { x: 0, y: 0, w: MW, h: MH } });
-label(mapEl, C.mapTitle || 'Seattle · the sprawl', 300, 160, 520, { cls: 'onmap', over: true });
+label(world, C.mapTitle || 'Seattle · the sprawl', 560, 520, 520, { cls: 'onmap', over: true });   // on the world, not the map: the map's torn edge must not cut it
 add(mapEl, 'attrib', MW - 1500, MH - 110, 1440, 80, esc(MAP.attribution || 'Map data © OpenStreetMap contributors, ODbL'));
 C.places.forEach(p => {
   const pt = p.fx != null ? { fx: p.fx, fy: p.fy } : (MAP.points || {})[p.key] || { fx: p.x / 1400, fy: p.y / 1000 };
@@ -2140,7 +2145,7 @@ function layoutPeople() {
   ghostT = add(world, 'ghost', PCX + (PCW + SGAP) / 2, y, (PCW - SGAP) / 2, 300, `<button class="ghostbtn" data-newthread="1"><span class="plus">+</span><span>Thread</span></button>`);
   py = y + 360; refreshBacks(); updateBounds();
 }
-function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy, ADV_BOTTOM) - top + 120 }); if (typeof layoutDesk === 'function') try { layoutDesk(); } catch {} }
+function updateBounds() { const top = Math.min(BY - 700, -3700), left = -HISTW - 360; Object.assign(BOUNDS, { x: left, y: top, w: PCX + PCW + 200 - left, h: Math.max(MH, py, sy, ADV_BOTTOM) - top + 120 }); }
 const BOUNDS = {};
 // editing a person's or thread's name and words
 document.addEventListener('focusout', () => {}, true);
@@ -2650,7 +2655,7 @@ function flyToBuilder(id) {
   flash(id); flyToView(viewFor({ x, y, w, h }, 1.08));
 }
 function flash(id) { const e = nodes[id]?.el; if (!e) return; e.classList.add('hl'); setTimeout(() => e.classList.remove('hl'), 1800); }
-function overview() { flyToView(viewFor(STYLE() === 'pulp' && DESK?.w ? DESK : BOUNDS, 1.02)); }
+function overview() { flyToView(viewFor(BOUNDS, 1.02)); }
 function syncHist() { const b = document.getElementById('qback'); if (b) b.hidden = !hist.back.length; }
 function goBack() { if (!hist.back.length) return; hist.fwd.push(view()); flyToView(hist.back.pop(), false); syncHist(); }
 function goFwd() { if (!hist.fwd.length) return; hist.back.push(view()); flyToView(hist.fwd.pop(), false); syncHist(); }
@@ -3096,7 +3101,7 @@ document.addEventListener('click', ev => {
 // ---- Options (H, 16 Nov: "we are ultimately going to need an options menu"). A small key in the quickbar; the first
 // option is the look. Kept per browser.
 const LOOKS = [['pulp', 'Pulp catalogue'], ['classic', 'Classic']];
-function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply(); layoutDesk();
+function setLook(k) { document.documentElement.dataset.style = k; try { localStorage.setItem('turnip-almanac-style', k); } catch {} tuneApply(); if (typeof paperAll === 'function') setTimeout(paperAll, 50);
   document.fonts?.ready.then(() => { PCS.forEach(renderSheet); sessionEls.forEach(x => fitCard(x.card)); renderTable(); dirty = true; }); }
 (() => {
   const b = document.createElement('button'); b.type = 'button'; b.id = 'qopts'; b.title = 'Options'; b.setAttribute('aria-label', 'Options');
@@ -3142,7 +3147,7 @@ CHEW.forEach((u, i) => document.documentElement.style.setProperty(`--chew${i + 1
 // worn-paper look. Saved per browser; "Copy settings" puts them on the clipboard to send back.
 const TUNE_KEY = 'turnip-almanac-tune', hexA = (h, a) => h + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
 const DIALS = [   // [key, label, min, max, step, default] — wide ranges on purpose: find the edges, then come back
-  ['dmargin', 'Sheet: margin around the table', 0, 8000, 50, 1800], ['dcorner', 'Sheet: corner roundness', 0, 8000, 50, 1600], ['dchew', 'Sheet: edge chew', 0, 2000, 10, 260], ['dburnw', 'Sheet: burn width', 0, 5000, 25, 900], ['dburn', 'Sheet: burn darkness', 0, 1, 0.01, 0.6],
+  ['pchew', 'Papers: edge chew (share of size)', 0, 0.2, 0.002, 0.06], ['pburnw', 'Papers: burn width (× chew)', 0, 8, 0.1, 2.4], ['pburn', 'Papers: burn darkness', 0, 1, 0.01, 0.6], ['pcorner', 'Papers: corner (share of size)', 0, 0.3, 0.005, 0.03],
   ['corner', 'Cards: corner roundness', 0, 160, 1, 26], ['chew', 'Cards: edge chew (px)', 0, 24, 0.5, 1.5], ['edgew', 'Ink rim width', 0, 16, 0.5, 7], ['edge', 'Ink rim darkness', 0, 1, 0.01, 0.45],
   ['tex', 'Paper texture strength', 0, 1, 0.01, 1], ['texsize', 'Texture scale', 100, 4000, 20, 900], ['burn', 'Cards: burned edge darkness', 0, 1, 0.01, 0.12], ['burnw', 'Cards: burned edge width', 0, 200, 2, 40],
   ['shy', 'Shadow distance (shows on the map and paper)', 0, 60, 0.5, 5], ['shblur', 'Shadow blur', 0, 80, 0.5, 12], ['shd', 'Shadow darkness', 0, 1, 0.01, 0.44],
@@ -3166,7 +3171,7 @@ function tuneApply(t = tuneGet()) {
   r.setProperty('--ochre', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}%)`); r.setProperty('--ochre-soft', `hsl(${v('redh')} ${v('reds')}% ${v('redl')}% / .13)`);
   r.setProperty('--btn-c', `hsl(${v('btnh')} ${v('btns')}% ${v('btnl')}%)`); r.setProperty('--btn-hi', `hsl(${v('btnh')} ${v('btns')}% ${Math.min(97, v('btnl') + 16)}%)`); r.setProperty('--btn-lo', `hsl(${v('btnh')} ${v('btns')}% ${Math.max(5, v('btnl') - 12)}%)`);
   r.setProperty('--btn-ledge', `hsl(${v('btnh')} ${Math.min(100, v('btns') + 10)}% ${Math.max(4, v('btnl') - 34)}%)`); r.setProperty('--btn-corner', v('btnr') + 'px');
-  if (['dmargin', 'dcorner', 'dchew', 'dburnw', 'dburn'].some(k => tuneApply['_' + k] !== v(k))) { ['dmargin', 'dcorner', 'dchew', 'dburnw', 'dburn'].forEach(k => tuneApply['_' + k] = v(k)); layoutDesk(); }
+  if (['pchew', 'pburnw', 'pburn', 'pcorner'].some(k => tuneApply['_' + k] !== v(k))) { ['pchew', 'pburnw', 'pburn', 'pcorner'].forEach(k => tuneApply['_' + k] = v(k)); if (typeof paperAll === 'function') paperAll(); }
   const chewKey = v('chew') + ':' + v('corner');
   if (tuneApply._chew !== chewKey) { tuneApply._chew = chewKey; const k = 80 / Math.max(6, v('corner'));   // world px → tile px
     [[7, 1], [131, 1.25], [977, .85]].forEach(([sd, f], i) => r.setProperty(`--chew${i + 1}`, `url(${makeChew(sd, Math.min(36, v('chew') * f * k))})`)); }
@@ -3192,36 +3197,49 @@ tuneApply();
 // ---- the desk sheet (H, 16 Nov): the chewed and burnt edge belongs "between the paper and the brown desktop", huge,
 // "at the scale of all the way zoomed out", with margin. One sheet of paper under the whole table; its outline and
 // burn are drawn once as two images sized to the layout (mask + burn), so zooming costs nothing extra.
-var DESK = { x: 0, y: 0, w: 0, h: 0 }, deskEl = document.createElement('div'); deskEl.className = 'deskpaper'; world.prepend(deskEl);   // var: the tuner may ask before this runs
 function deskOutline(w, h, R, A, seed, inset = 0) {   // points around a rounded rectangle, each pushed in or out by layered noise
   let s0 = seed; const rnd = () => (s0 = (s0 * 16807) % 2147483647) / 2147483647;
   const oct = [[9, 0.55], [37, 0.3], [140, 0.15]].map(([K, a]) => [K, a, Array.from({ length: K }, () => rnd() * 2 - 1)]);
   const noise = t => oct.reduce((sum, [K, a, wob]) => { const x = t * K, i = Math.floor(x) % K, f = x - Math.floor(x), p = wob[i], q = wob[(i + 1) % K]; return sum + a * (p + (q - p) * f * f * (3 - 2 * f)); }, 0);
-  const r = Math.min(R, w / 2 - A, h / 2 - A), m = A, L1 = w - 2 * m - 2 * r, L2 = h - 2 * m - 2 * r, q = Math.PI * r / 2, per = 2 * L1 + 2 * L2 + 4 * q, N = 1600, pts = [];
+  const r = Math.min(R, w / 2 - A, h / 2 - A), m = A * 0.45, L1 = w - 2 * m - 2 * r, L2 = h - 2 * m - 2 * r, q = Math.PI * r / 2, per = 2 * L1 + 2 * L2 + 4 * q, N = 1600, pts = [];
   const arc = (cx, cy, a0) => u => { const a = a0 + u / r; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r, Math.cos(a), Math.sin(a)]; };
   const seg = [[L1, u => [m + r + u, m, 0, -1]], [q, arc(w - m - r, m + r, -Math.PI / 2)], [L2, u => [w - m, m + r + u, 1, 0]], [q, arc(w - m - r, h - m - r, 0)],
     [L1, u => [w - m - r - u, h - m, 0, 1]], [q, arc(m + r, h - m - r, Math.PI / 2)], [L2, u => [m, h - m - r - u, -1, 0]], [q, arc(m + r, m + r, Math.PI)]];
   for (let k = 0; k < N; k++) { let d = k / N * per, P; for (const [len, f] of seg) { if (d <= len) { P = f(d); break; } d -= len; } P = P || seg[0][1](0);
-    const off = noise(k / N) * A * 0.75 + (rnd() - 0.5) * A * 0.25 - inset; pts.push([P[0] + P[2] * off, P[1] + P[3] * off]); }
+    const off = Math.min(m, noise(k / N) * A * 0.75 + (rnd() - 0.5) * A * 0.25) - inset; pts.push([P[0] + P[2] * off, P[1] + P[3] * off]); }   // never past the box
   return pts;
 }
-let deskT = 0;
-function layoutDesk() {
-  if (!deskEl || !BOUNDS.w) return; const t = tuneGet(), dv = k => t[k] ?? DIALS.find(d => d[0] === k)[5], M = dv('dmargin');
-  Object.assign(DESK, { x: BOUNDS.x - M, y: BOUNDS.y - M, w: BOUNDS.w + 2 * M, h: BOUNDS.h + 2 * M });
-  Object.assign(deskEl.style, { left: DESK.x + 'px', top: DESK.y + 'px', width: DESK.w + 'px', height: DESK.h + 'px' });
-  clearTimeout(deskT); deskT = setTimeout(() => {
-    const k = 2048 / Math.max(DESK.w, DESK.h), W = Math.round(DESK.w * k), H = Math.round(DESK.h * k), A = dv('dchew') * k, R = dv('dcorner') * k, B = dv('dburnw') * k;
-    const path = (g, pts) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); };
-    const outer = deskOutline(W, H, R, Math.max(1, A), 4242), mk = document.createElement('canvas'); mk.width = W; mk.height = H;
-    const g = mk.getContext('2d'); g.fillStyle = '#000'; path(g, outer); g.fill();
-    const bk = document.createElement('canvas'); bk.width = W; bk.height = H; const b = bk.getContext('2d');
-    b.fillStyle = `rgba(74, 40, 12, ${dv('dburn')})`; path(b, outer); b.fill();
-    b.globalCompositeOperation = 'destination-out'; b.filter = `blur(${Math.max(1, B * 0.45)}px)`; b.fillStyle = '#000'; path(b, deskOutline(W, H, R, Math.max(1, A), 4242, B)); b.fill();
-    deskEl.style.setProperty('--desk-mask', `url(${mk.toDataURL()})`); deskEl.style.setProperty('--desk-burn', `url(${bk.toDataURL()})`);
-  }, 120);
+// ---- each section is its own paper (H, 17 Nov: "the individual highlighted sections, like characters, play sheets,
+// the map or the history, are what is a piece of paper, and that's where you need the large edges … and behind that the
+// actual table, dark brown"). Every major paper gets its own chewed outline and burnt rim, scaled to its size so they read
+// zoomed all the way out, drawn once as two images sized to that paper (redrawn only if it changes size).
+var PAPER_SEL = '.sheet, .map, .bk, .chapblk, .card:not(.entry), .pockettab, .inbox', paperDone = new WeakMap(), paperQ = new Set(), paperT = 0;   // var: the tuner may call in during load
+function paperize(el) {
+  if (STYLE() !== 'pulp' || !el.isConnected) return; const w = el.offsetWidth, h = el.offsetHeight; if (w < 60 || h < 60) return;
+  const t = tuneGet(), dv = k => t[k] ?? DIALS.find(d => d[0] === k)[5];
+  const key = [w, h, dv('pchew'), dv('pburnw'), dv('pburn'), dv('pcorner'), el.className].join(':'); if (paperDone.get(el) === key) return; paperDone.set(el, key);
+  // how big the tear is for this kind of paper: the map and the book carry the big ragged look; sheets and cards hold
+  // text near their edges, so theirs are smaller. Papers that let things show past their box (sheets, the book, its
+  // chapters) put their paper a little beyond it, so the tear happens outside the content.
+  const kind = el.classList.contains('map') || el.classList.contains('bk') ? 1 : el.classList.contains('chapblk') ? 0.8 : el.classList.contains('sheet') ? 0.6 : 0.45;
+  const m = Math.min(w, h), A = Math.min(dv('pchew') * m * kind, 420), B = A * dv('pburnw'), R = Math.max(8, dv('pcorner') * m);
+  const out = !el.classList.contains('map') && getComputedStyle(el).overflow === 'visible' ? Math.min(30, A * 0.8) : 0;
+  el.style.setProperty('--pout', out + 'px');
+  const ww = w + 2 * out, hh = h + 2 * out, k = 900 / Math.max(ww, hh), W = Math.max(8, Math.round(ww * k)), H = Math.max(8, Math.round(hh * k));
+  let seed = 7; for (const ch of (el.dataset.id || el.className || 'p') + w + h) seed = (seed * 31 + ch.charCodeAt(0)) % 2147483647;
+  const path = (g, pts) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); };
+  const outer = deskOutline(W, H, R * k, Math.max(1, A * k), seed + 1);
+  const mk = document.createElement('canvas'); mk.width = W; mk.height = H; const g = mk.getContext('2d'); g.fillStyle = '#000'; path(g, outer); g.fill();
+  const bk = document.createElement('canvas'); bk.width = W; bk.height = H; const b = bk.getContext('2d');
+  b.fillStyle = `rgba(70, 38, 12, ${dv('pburn')})`; path(b, outer); b.fill();
+  b.globalCompositeOperation = 'destination-out'; b.filter = `blur(${Math.max(1, B * k * 0.45)}px)`; b.fillStyle = '#000'; path(b, deskOutline(W, H, R * k, Math.max(1, A * k), seed + 1, B * k)); b.fill();
+  el.style.setProperty('--pmask', `url(${mk.toDataURL()})`); el.style.setProperty('--pburn', `url(${bk.toDataURL()})`); el.classList.add('paper');
 }
-layoutDesk();
+function paperAll() { if (!PAPER_SEL) return; document.querySelectorAll(PAPER_SEL).forEach(e => paperQ.add(e)); clearTimeout(paperT); paperT = setTimeout(paperFlush, 60); }
+function paperFlush() { const t0 = performance.now(); for (const e of paperQ) { paperQ.delete(e); paperize(e); if (performance.now() - t0 > 30) { paperT = setTimeout(paperFlush, 30); return; } } }
+var paperRO = new ResizeObserver(es => { es.forEach(x => paperQ.add(x.target)); clearTimeout(paperT); paperT = setTimeout(paperFlush, 120); });
+function paperWatch() { document.querySelectorAll(PAPER_SEL).forEach(e => { if (!e._pw) { e._pw = 1; paperRO.observe(e); } }); paperAll(); }
+paperWatch(); new MutationObserver(() => { clearTimeout(paperWatch._t); paperWatch._t = setTimeout(paperWatch, 300); }).observe(world, { childList: true });
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();
