@@ -1012,6 +1012,8 @@ html, body { touch-action: none; overscroll-behavior: none; }
 // Nothing changes what it shows when you zoom. Big headline labels sit over regions and fade only once
 // they are bigger than the detail under them.
 const C = window.CAMPAIGN, R = window.RIG;
+// an illustrated edition (books/<sys>-art.js): its art regions join the book's index, and the table expects that file
+if (window.BOOK_ART?.[C.book.id]) { const A = window.BOOK_ART[C.book.id]; C.print = [...(C.print || []), ...A.art]; if (A.file) C.book.file = 'books/' + A.file; if (A.pages) C.book.pages = A.pages; }
 const $ = (s, r = document) => r.querySelector(s);
 const vp = $('#vp'), world = $('#world');
 const STORE_KEY = C.id ? `turnip-almanac-2:${C.id}` : 'turnip-almanac-2';   // one saved table per campaign
@@ -2620,10 +2622,15 @@ async function cutArt() {
       bookArt[a.id] = o.toDataURL('image/jpeg', 0.9); placeArt(a); } catch (e) { console.warn('art', a.id, e.message); }
   }
 }
+const BOOK_PORTRAITS = {};
+{ const po = portraitOf; portraitOf = (pc, S) => { const r = po(pc, S), b = BOOK_PORTRAITS[pc.id]; if (!b) return r;
+    return { ...r, src: state.portraits[pc.id] ? r.src : b, options: [b, ...(r.options || []).filter(o => o !== b)] }; }; }
 const artCards = {}; let artY = null;
 function placeArt(a) {
   const src = bookArt[a.id];
   if (a.use === 'map' && a.id === C.mapArt) { const im = mapEl.querySelector('.mapimg'); im.src = src; im.hidden = false; mapEl.querySelector('.mapwait')?.remove(); return; }
+  // a portrait from the book becomes that character's face (unless the table chose one) and joins the portrait choices
+  if (a.use === 'portrait' && a.for && pcById[a.for]) { BOOK_PORTRAITS[a.for] = src; renderSheet(pcById[a.for]); renderTable?.(); return; }
   // scenes and pictures: in a strip west of the book (the quiet side), packed tight, each its own size
   if (artCards[a.id]) { artCards[a.id].querySelector('img').src = src; return; }
   const w = 1300, h = Math.round(w * a.rect[3] / a.rect[2]); if (artY == null) artY = BY;
