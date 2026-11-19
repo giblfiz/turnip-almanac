@@ -293,6 +293,15 @@
     "x": 24,
     "top": 284.68499999999995,
     "width": 366.0,
+    "height": 48.884,
+    "label": "<b>Extra Actions only do their own job:</b> Wired Reflexes and Speed, physical actions (dr"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 24,
+    "top": 231.80099999999993,
+    "width": 366.0,
     "height": 24.442,
     "label": "Order each round by <b>total Actions, then Coordination, then Palming</b>, highest first. "
   },
@@ -300,7 +309,7 @@
     "page": 3,
     "kind": "paragraph",
     "x": 24,
-    "top": 256.24299999999994,
+    "top": 203.35899999999992,
     "width": 366.0,
     "height": 24.442,
     "label": "<b>Aim:</b> spend an action; a scoped rifle ignores range penalties on its next shot. <b>S"
@@ -309,7 +318,7 @@
     "page": 3,
     "kind": "paragraph",
     "x": 24,
-    "top": 219.80099999999993,
+    "top": 166.91699999999992,
     "width": 366.0,
     "height": 14,
     "label": "Downtime"
@@ -318,7 +327,7 @@
     "page": 3,
     "kind": "paragraph",
     "x": 24,
-    "top": 200.80099999999993,
+    "top": 147.91699999999992,
     "width": 366.0,
     "height": 24.442,
     "label": "Downtime requires <b>a few uninterrupted hours</b> and access to homes and tools. It inclu"
@@ -327,7 +336,7 @@
     "page": 3,
     "kind": "paragraph",
     "x": 24,
-    "top": 172.35899999999992,
+    "top": 119.47499999999991,
     "width": 366.0,
     "height": 36.663,
     "label": "Downtime checks represent best effort. They cannot be rerolled until significant play occu"
@@ -336,7 +345,7 @@
     "page": 3,
     "kind": "paragraph",
     "x": 24,
-    "top": 131.6959999999999,
+    "top": 78.81199999999991,
     "width": 366.0,
     "height": 12.221,
     "label": "Adepts may change the skill enhanced by Buff during downtime."
