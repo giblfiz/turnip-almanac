@@ -491,6 +491,15 @@
     "x": 402.0,
     "top": 134.4749999999999,
     "width": 366.0,
+    "height": 36.663,
+    "label": "<b>Social targets:</b> rating = their Social + 2 (GM adds 1\u20133 for a big ask); armor = thei"
+  },
+  {
+    "page": 3,
+    "kind": "paragraph",
+    "x": 402.0,
+    "top": 93.81199999999991,
+    "width": 366.0,
     "height": 24.442,
     "label": "<b>Attribute swaps:</b> keep the skill, but may use Body for strength-based Athletics or p"
   },
