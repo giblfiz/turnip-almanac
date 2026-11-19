@@ -29,8 +29,8 @@ window.RIG = (() => {
   const HUMAN_BONUS_PTS = 3, HUMAN_BONUS_MAX = 3;
 
   const CYBER = [
-    { id: 'wired', name: 'Wired Reflexes', eff: '+1 Action; buy up to 3 times.', ess: 15, pts: 9, max: 3, fx: { actions: 1 } },
-    { id: 'vcr', name: 'Vehicle Control Rig', eff: 'Remote pilot/fire: +1 Action; up to 3 times.', ess: 15, pts: 5, max: 3, fx: { rig: 1 } },
+    { id: 'wired', name: 'Wired Reflexes', eff: '+1 Action; up to 3 times. The third costs 20 Ess, 20 pts.', ess: 15, pts: 9, max: 3, third: { ess: 20, pts: 20 }, fx: { actions: 1 } },
+    { id: 'vcr', name: 'Vehicle Control Rig', eff: 'Remote pilot/fire: +1 Action; up to 3. Third: 20 Ess, 20 pts.', ess: 15, pts: 5, max: 3, third: { ess: 20, pts: 20 }, fx: { rig: 1 } },
     { id: 'dermal', name: 'Dermal & Bone Plates', eff: '+5 armor; unarmed [7M] bashing.', ess: 9, pts: 10, max: 1, fx: { armor: 5 } },
     { id: 'spurs', name: 'Retractable Spurs', eff: 'Melee [9M] lethal; retractable.', ess: 5, pts: 3, max: 1 },
     { id: 'implgun', name: 'Implanted Gun', eff: 'Pistol or SMG in arm; retractable.', ess: 7, pts: 5, max: 1 },
@@ -71,7 +71,7 @@ window.RIG = (() => {
     ['milspec', 'Aries MilSpec', 'Car', 8, 12, 100, '1', 15], ['battlewagon', 'Aries Battlewagon', 'Van / APC', 9, 17, 80, '2', 20], ['dragonfly', 'Bowing Dragonfly', 'Helicopter', 4, 5, 200, '1', 25],
     ['gunboat', 'Gunboat', 'Helicopter', 10, 17, 200, '2', 45], ['zippbug', 'ZippBug', 'Quadcopter', 1, 0, 20, '0', 1], ['gunbug', 'GunBug', 'Quadcopter', 1, 0, 20, '1 light pistol', 3],
     ['bigbeatle', 'BigBeatle', 'Quadcopter', 3, 5, 30, '1 SMG/pistol', 5], ['rover', 'Rover', 'RC car (40 cm)', 1, 0, 25, 'Arm', 1], ['sentinel', 'Sentinel', 'RC car (50 cm)', 3, 5, 15, '1 SMG/pistol', 3],
-    ['gunplatform', 'GunPlatform', 'Hexapod (2 m)', 8, 12, 7, '2', 10], ['creeper', 'Creeper', 'RC insect (10 cm)', 1, 0, 2, '0', 2],
+    ['gunplatform', 'GunPlatform', 'Hexapod (2 m)', 8, 12, 7, '2', 20], ['creeper', 'Creeper', 'RC insect (10 cm)', 1, 0, 2, '0', 2],
   ].map(([id, name, form, hp, armor, speed, mounts, pts]) => ({ id, name, form, hp, armor, speed, mounts, pts, max: 3 }));
   const DECKS = [
     { id: 'laptop', name: 'Laptop', actions: 1, armor: 0, pts: 1 }, { id: 'sony', name: 'Sony CTY', actions: 2, armor: 0, pts: 3 },
@@ -187,7 +187,9 @@ window.RIG = (() => {
     }));
     // essence first (Magic cap depends on it)
     let essSpent = 0; const cyberList = [];
-    CYBER.forEach(c => { const n = ch.cyber[c.id] || 0; if (!n) return; essSpent += c.ess * n; add(`${c.name}${n > 1 ? ' ×' + n : ''}`, c.pts * n, B('cyber'), P.cyber); cyberList.push({ ...c, n }); pv('essence', B('cyber'), P.cyber); });
+    // v2.2 (Harry, 18 Nov): the third Wired Reflexes / VCR level costs 20 Ess and 20 pts instead of the usual
+    const lvl = (c, n, k) => c[k] * Math.min(n, 2) + (n >= 3 ? (c.third ? c.third[k] : c[k]) * (n - 2) : 0);
+    CYBER.forEach(c => { const n = ch.cyber[c.id] || 0; if (!n) return; essSpent += lvl(c, n, 'ess'); add(`${c.name}${n > 1 ? ' ×' + n : ''}`, lvl(c, n, 'pts'), B('cyber'), P.cyber); cyberList.push({ ...c, n }); pv('essence', B('cyber'), P.cyber); });
     const essence = ESSENCE - essSpent + essBack;   // karma Essence is uncapped (Harry, 15 Nov): Essence 70 → Magic cap 7 pv('essence', P.start);
     const magicCap = Math.max(0, Math.floor(essence / 10)); pv('magiccap', 'essence', P.skillcost);
     // effective attributes
