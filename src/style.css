@@ -819,3 +819,10 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .visknob .vispanel .viswho button { font-size: 11px; padding: 2px 7px; box-shadow: 0 1px 0 var(--ledge, #7a4a1c); }
 .visknob .vispanel i { font-size: 10.5px; color: var(--ink-3); }
 .vis-private { outline: 3px dashed color-mix(in srgb, var(--ochre) 65%, transparent); outline-offset: 6px; }
+#twpanel { position: fixed; z-index: 30; right: 12px; top: 64px; width: min(380px, calc(100vw - 24px)); background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 14px; box-shadow: 0 8px 30px #0006; font: 13px var(--f-body, system-ui); }
+#twpanel .th { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--rule); } #twpanel .th button { border: 0; background: none; cursor: pointer; }
+#twpanel .tbody { padding: 10px 12px; display: grid; gap: 8px; } #twpanel textarea { width: 100%; height: 64px; font: 12px monospace; box-sizing: border-box; }
+#twpanel .tbody .btn { justify-self: stretch; }
+#twpanel .st { color: var(--ink-3); font-size: 12px; } #twpanel code { font-size: 11px; }
+#dupnote { position: fixed; inset: 0; z-index: 60; display: grid; place-content: center; gap: 8px; text-align: center; background: #000a; color: #fff; font: 18px var(--f-body, system-ui); }
+#dupnote span { font-size: 14px; opacity: .8; }

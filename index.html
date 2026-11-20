@@ -828,6 +828,13 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .visknob .vispanel .viswho button { font-size: 11px; padding: 2px 7px; box-shadow: 0 1px 0 var(--ledge, #7a4a1c); }
 .visknob .vispanel i { font-size: 10.5px; color: var(--ink-3); }
 .vis-private { outline: 3px dashed color-mix(in srgb, var(--ochre) 65%, transparent); outline-offset: 6px; }
+#twpanel { position: fixed; z-index: 30; right: 12px; top: 64px; width: min(380px, calc(100vw - 24px)); background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 14px; box-shadow: 0 8px 30px #0006; font: 13px var(--f-body, system-ui); }
+#twpanel .th { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--rule); } #twpanel .th button { border: 0; background: none; cursor: pointer; }
+#twpanel .tbody { padding: 10px 12px; display: grid; gap: 8px; } #twpanel textarea { width: 100%; height: 64px; font: 12px monospace; box-sizing: border-box; }
+#twpanel .tbody .btn { justify-self: stretch; }
+#twpanel .st { color: var(--ink-3); font-size: 12px; } #twpanel code { font-size: 11px; }
+#dupnote { position: fixed; inset: 0; z-index: 60; display: grid; place-content: center; gap: 8px; text-align: center; background: #000a; color: #fff; font: 18px var(--f-body, system-ui); }
+#dupnote span { font-size: 14px; opacity: .8; }
 /* ---- Theme: Pulp catalogue (Harry, 16 Nov: "grab the look and feel from the pulp catalog option").
    From the generated study 15-pulp-catalogue, read by Gemini: newsprint cards on a dark desk, crimson and mustard,
    slab display type, condensed caps labels, ink-ruled boxes with hard offset shadows, bevelled red keys,
@@ -2081,7 +2088,7 @@ function renderLog(stick) {
   const fmt = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const rows = state.log.map(e => { const sp = speakerOf(e.who);
     const face = sp.icon ? `<span class="lface"><img src="${sp.icon}" alt="" draggable="false"></span>` : `<span class="lface gm">${esc(sp.name.slice(0, 2))}</span>`;
-    return e.kind === 'roll' ? `<div class="lrow roll-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span>${rollHtml(e.rec)}</div></div>`
+    return e.kind === 'roll' ? `<div class="lrow roll-e${e.ext ? ' ext' : ''}">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span>${e.rec?.ext ? `<div class="roll"><b>${esc(e.rec.label)}</b><span class="tn">${esc(e.rec.expr || '')}</span><span class="dd">${(e.rec.rolls || []).map(v => `<i>${esc(String(v))}</i>`).join('')}</span><span class="verdict">${esc(String(e.rec.total))}${e.rec.verdict ? ' · ' + esc(e.rec.verdict) : ''}</span></div>` : rollHtml(e.rec)}</div></div>`
       : `<div class="lrow chat-e">${face}<div class="lbody"><span class="lt">${fmt(e.t)}</span><b>${esc(sp.name)}</b> ${renderNote(e.text, '', new Set())}</div></div>`; }).join('');
   const opts = [['gm', 'GM'], ...PCS.map(pc => [pc.id, choicesOf(pc).name || WORDS.Char])].map(([v, n]) => `<option value="${v}" ${v === logSpeaker ? 'selected' : ''}>${esc(n)}</option>`).join('');
   const had = logCard.querySelector('.loginput'), draft = had ? had.value : '';
@@ -2950,9 +2957,9 @@ function setLook(k) { document.documentElement.dataset.style = k; try { localSto
   b.addEventListener('click', ev => { ev.stopPropagation(); if (m) return close();
     m = document.createElement('div'); m.id = 'optsmenu'; m.setAttribute('role', 'menu');
     const cur = STYLE();
-    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><button class="tunebtn" data-tune="1">Tune the look…</button><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
+    m.innerHTML = `<div class="nmh">Look</div><div class="nmseg">${LOOKS.map(([k, n]) => `<button data-look="${k}" class="${k === cur ? 'sel' : ''}" aria-pressed="${k === cur}">${n}</button>`).join('')}</div><button class="tunebtn" data-tune="1">Tune the look…</button><button class="tunebtn" data-twopen="1">Turnip Works table…</button><div class="nmfoot">Kept in this browser. More options will live here.</div>`;
     document.body.appendChild(m); const r = qb.getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(innerWidth - m.offsetWidth - 12, r.right - m.offsetWidth)) + 'px';
-    m.addEventListener('click', e2 => { if (e2.target.closest('[data-tune]')) { close(); openTuner(); return; } const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
+    m.addEventListener('click', e2 => { if (e2.target.closest('[data-twopen]')) { close(); openTwPanel(); return; } if (e2.target.closest('[data-tune]')) { close(); openTuner(); return; } const l = e2.target.closest('[data-look]'); if (!l) return; setLook(l.dataset.look); close(); }); });
   document.addEventListener('pointerdown', ev => { if (m && !ev.target.closest('#optsmenu, #qopts')) close(); }, true);
 })();
 // the chewed paper edge, made once as a mask tile (a rounded square whose rim wanders), then stretched around every card
@@ -3121,7 +3128,219 @@ document.addEventListener('click', ev => {
   historyNote(`Visibility of ${nodes[id]?.title || id}: ${VIS_MODES.find(x => x[0] === state.vis[id].mode)[1]}`); persist();
   document.querySelectorAll(`.visknob[data-vid="${id}"]`).forEach(k => { k.innerHTML = knobHtml(id); k._o = null; k.parentElement.classList.toggle('vis-private', state.vis[id].mode !== 'all'); }); dirty = true;
 }, true);
-window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
+// ---- the desk link to Turnip Works (docs/DESK-PROTOCOL.md; Harry, 20 Nov). The Almanac is a desk client of a TW
+// campaign's relay, through TW's GET API (CORS-open): rolls and chat go both ways, the party's pawns carry this sheet's
+// own dice buttons (pressing one there presses it here, so every rules system rolls by its own rules), and a mechanics-
+// only snapshot lets an AI seat read the table. Book text and art never cross.
+const TW_KEY = 'turnip-almanac-tw:' + (C.id || 'ssr');
+const tw = (() => { try { return JSON.parse(localStorage.getItem(TW_KEY) || 'null'); } catch { return null; } })() || {};
+const twSave = () => { try { localStorage.setItem(TW_KEY, JSON.stringify(tw)); } catch {} };
+const twId = (pre = 'alm') => pre + '_' + (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).slice(0, 20);   // TW ids: /^[a-z]{1,6}_[0-9a-z]{4,24}$/
+let twStatus = '', twAskFor = {};   // pc id → the ask id the next roll answers
+function twPairing(b64) {   // #tw=<base64url {r: relay, c: campaign, a: area, s: seat token, p: TW page}>
+  const o = JSON.parse(decodeURIComponent(escape(atob(b64.replace(/-/g, '+').replace(/_/g, '/')))));
+  if (!o.r || !o.c || !o.s) throw new Error('That pairing link is missing its table');
+  return { relay: String(o.r).replace(/\/$/, ''), cid: o.c, areaHint: o.a || null, token: o.s, page: o.p || null };
+}
+async function twGet(path, params = {}) {
+  const q = new URLSearchParams({ ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])), seat: tw.token });
+  const r = await fetch(`${tw.relay}${path}?${q}`, { cache: 'no-store' }); const txt = await r.text();
+  let body; try { body = JSON.parse(txt); } catch { body = txt; } if (!r.ok) throw new Error((body && body.error) || txt.slice(0, 160) || r.status); return body;
+}
+const twDo = (cmd, args) => twGet(`/c/${tw.cid}/a/${tw.area}/do`, { cmd, nonce: twId(), ...args });
+async function twLink(pair) {
+  const was = tw.cid; Object.assign(tw, pair); if (was && was !== tw.cid) { tw.pawns = {}; tw.rev = 0; tw.synced = null; }
+  const st = await twGet(`/c/${tw.cid}/state`);
+  const areas = st.campaign?.areas || [], mine = st.campaign?.seats?.find?.(x => x.id === st.you?.id)?.area;
+  tw.area = tw.areaHint || mine || areas[0]?.id; tw.seatName = st.you?.name || ''; tw.tableName = st.campaign?.name || '';
+  if (!tw.area) throw new Error('No area found in that campaign');
+  tw.after = ''; tw.pawns = tw.pawns || {}; tw.on = true; twSave(); historyNote('Linked to a Turnip Works table');
+  window.name = 'turnip-almanac:' + tw.cid; twPoll(); twSnapshotSoon(); await twStoreSync(true); return st;
+}
+function twUnlink() { tw.on = false; twSave(); twStatus = 'unlinked'; }
+// a roll, described from the system's own roll markup (label, target line, dice, verdict): one reader for every rig
+function twRollOf(rec) {
+  const d = document.createElement('div'); d.innerHTML = rollHtml(rec);
+  const tn = d.querySelector('.tn')?.textContent.trim() || '', verdict = d.querySelector('.verdict')?.textContent.trim() || '';
+  const rolls = [...d.querySelectorAll('.dd i')].map(i => i.textContent.split('+').reduce((t, x) => t + (parseInt(x, 10) || 0), 0)).filter(n => !isNaN(n)).slice(0, 100);
+  const total = Math.round(Number(rec.total ?? rec.succ ?? rec.hits ?? rec.roll ?? rolls.reduce((t, n) => t + n, 0)) || 0);
+  const m = tn.match(/(\d+)\s*d\s*(\d+)/i) || tn.match(/^d(\d+)/i), expr = m ? (m[2] ? `${m[1]}d${m[2]}` : `1d${m[1]}`) : `${rolls.length || 1}d6`;
+  return { expr, rolls: rolls.length ? rolls : [total], total, why: rec.label || 'Roll', verdict: `${tn}${tn && verdict ? ' → ' : ''}${verdict}`.slice(0, 80), level: rec.level || (rec.ok === true ? 'success' : rec.ok === false ? 'failure' : '') };
+}
+async function twSend(e) {
+  if (!tw.on || e.ext) return;
+  try {
+    if (e.kind === 'roll') { const r = twRollOf(e.rec), pcId = e.who && e.who !== 'gm' ? e.who : null, ask = pcId && twAskFor[pcId]; if (ask) delete twAskFor[pcId];
+      await twDo('dice.roll', { id: twId(), expr: r.expr, rolls: r.rolls, total: r.total, why: r.why, info: { src: 'almanac', sys: C.book.id.replace(/^book-/, ''), verdict: r.verdict, ...(r.level && { level: r.level }), ...(pcId && { pc: pcId }), ...(ask && { button: ask }) } }); }
+    else if (e.kind === 'chat' && e.text) { const sp = speakerOf(e.who); await twDo('chat.say', { id: twId(), text: e.text, ...(sp?.name && e.who !== 'gm' && { as: sp.name }) }); }
+    twStatus = 'linked';
+  } catch (err) { twStatus = 'send failed: ' + err.message; }
+}
+{ const lp = logPush; logPush = function (e) { lp(e); twSend(e); }; }
+{ const sp0 = speakerOf; speakerOf = function (id) { return typeof id === 'string' && id.startsWith('tw:') ? { name: id.slice(3) + ' · at the table', icon: null } : sp0(id); }; }
+// the table, coming in: rolls, says and asks (long poll)
+let twPolling = false;
+async function twPoll() {
+  if (twPolling || !tw.on) return; twPolling = true;
+  while (tw.on) {
+    try {
+      const first = !tw.after, r = await twGet(`/c/${tw.cid}/changes`, { kinds: 'chat,roll,ask', after: tw.after || '', wait: first ? 0 : 25 });
+      if (!first) for (const ev of r.events || []) twIn(ev);   // the first read only takes the cursor: no replay of old talk
+      tw.after = r.cursor || tw.after; twSave(); twStatus = 'linked';
+    } catch (err) { twStatus = 'connection: ' + err.message; await new Promise(res => setTimeout(res, 5000)); }
+  }
+  twPolling = false;
+}
+function twIn(ev) {
+  if (ev.kind === 'ask') { twAnswer(ev.ask || ev); return; }
+  if (ev.you || ev.kind === 'ping') return;   // our own lines (the desk speaks through this seat), and pointing
+  const who = ev.as || ev.by || 'Table';
+  if (ev.roll) { if (ev.roll.info?.src === 'almanac') return;
+    logPushRaw({ kind: 'roll', who: 'tw:' + who, ext: true, rec: { ext: true, label: ev.roll.why || ev.roll.expr || 'Roll', expr: ev.roll.expr, rolls: ev.roll.rolls || [], total: ev.roll.total, verdict: ev.roll.info?.verdict || '' } }); return; }
+  if (ev.text) logPushRaw({ kind: 'chat', who: 'tw:' + who, ext: true, text: ev.text });
+}
+const logPushRaw = e => logPush(e);   // external entries carry ext, which twSend skips
+// an ask from a pawn's Sheet menu: press the same dice button on this character's sheet
+function twAnswer(ev) {
+  const pcId = ev.pc || Object.keys(tw.pawns || {}).find(k => tw.pawns[k] === ev.pawn); const box = sheetEls[pcId];
+  const b = box && [...box.querySelectorAll(ROLLSEL)].find(x => twButtonId(x) === ev.button);
+  if (!b) { logPushRaw({ kind: 'say', who: 'gm', ext: true, text: `The table asked for “${ev.label || ev.button}”, which this sheet no longer has.` }); return; }
+  twAskFor[pcId] = ev.id; b.click();
+}
+// the buttons a pawn carries: this sheet's own dice buttons, grouped by the section they sit in
+const twButtonId = b => rollKey(b).replace(/[^a-z0-9|:_-]/gi, '').slice(0, 60);
+function twButtons(pc) {
+  const box = sheetEls[pc.id]; if (!box) return []; const seen = new Set(), out = [];
+  box.querySelectorAll('.main ' + ROLLSEL).forEach(b => { const id = twButtonId(b); if (seen.has(id) || out.length >= 60) return; seen.add(id);
+    let label = (b.getAttribute('aria-label') || b.dataset.label || (b.title || '').replace(/:.*$/, '') || b.textContent).replace(/^(Roll|Test)\s+/i, '').trim();
+    if (/^(sheet roll|\d+ dic?e)$/i.test(label) || /^⚄/.test(label)) label = 'Roll the pool'; label = label.slice(0, 40);
+    const h = b.closest('section')?.querySelector('h4, .sec, .ahead .an'), group = ((h && [...h.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('')) || 'Rolls').replace(/[^\w &'-]/g, '').trim().slice(0, 24) || 'Rolls';
+    if (label) out.push({ id, label, group }); });
+  return out;
+}
+async function twPutParty() {
+  const list = PCS.filter(pc => choicesOf(pc).name); let i = 0;
+  for (const pc of list) {
+    const name = choicesOf(pc).name, url = location.origin + location.pathname + '#pc=' + pc.id;
+    const desk = { url, pc: pc.id, sys: C.book.id.replace(/^book-/, ''), buttons: twButtons(pc) };
+    try { if (!tw.pawns[pc.id]) { const id = twId('tok'); await twDo('token.create', { id, name, x: (i % 4) * 5, z: Math.floor(i / 4) * 5 }); tw.pawns[pc.id] = id; }
+      await twDo('token.set', { id: tw.pawns[pc.id], name, sheet: url, desk }); } catch (err) { twStatus = `pawn ${name}: ${err.message}`; }
+    i++;
+  }
+  twSave(); historyNote(`Put ${list.length} on the Turnip Works table`); twSnapshotSoon();
+}
+// the desk snapshot: mechanics only, for the AI seat
+let twSnapT = 0;
+function twSnapshotSoon() { if (!tw.on) return; clearTimeout(twSnapT); twSnapT = setTimeout(twSnapshot, 3000); }
+async function twSnapshot() {
+  const party = PCS.filter(pc => choicesOf(pc).name).map(pc => { const box = sheetEls[pc.id];
+    const nums = box ? [...box.querySelectorAll('.main .pv[data-prov]')].slice(0, 80).map(v => [v.dataset.prov, v.textContent.trim()]) : [];
+    return { pc: pc.id, name: choicesOf(pc).name, player: pc.player || '', pawn: tw.pawns?.[pc.id] || null, values: Object.fromEntries(nums), buttons: twButtons(pc) }; });
+  const sessions = (typeof allSessions === 'function' ? allSessions() : C.sessions).map(x => ({ n: x.n, title: x.title, date: x.date, prep: !!x.prep }));
+  try { await twDo('desk.put', { json: { app: 'Turnip Almanac', sys: C.book.id.replace(/^book-/, ''), book: C.book.fullTitle || C.book.title, party, sessions, page: location.origin + location.pathname } }); } catch (err) { twStatus = 'snapshot: ' + err.message; }
+}
+{ const rs = renderSheet; renderSheet = function (pc) { rs(pc); twSnapshotSoon(); }; }
+// THE STORE (item 11; Harry: "keeping everything on the server except for the uploaded book"). Linked, this campaign's
+// saved record (STORE_KEY: characters, notes and their dropped pictures, sessions, log, counts) lives with the TW
+// campaign; this browser is a cache. The book, and anything cut from it, is never in that record (it lives in
+// IndexedDB and window.__bookArt), so it never leaves: the same mechanical firewall as the bridge.
+const twLocal = () => localStorage.getItem(STORE_KEY) || '{}';
+async function twStorePost(raw) {
+  const r = await fetch(`${tw.relay}/c/${tw.cid}/desk/store?seat=${encodeURIComponent(tw.token)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rev: tw.rev || 0, state: JSON.parse(raw) }) });
+  const body = await r.json().catch(() => ({})); return { status: r.status, body };
+}
+let twStoreBusy = false;
+async function twStoreSync(first = false) {
+  if (!tw.on || twStoreBusy || FROZEN) return; twStoreBusy = true;
+  try {
+    const raw = twLocal();
+    if (first) {   // on link and on load: the server's record wins over a cache that has not changed since we last synced
+      const g = await twGet(`/c/${tw.cid}/desk/store`).catch(e => (String(e.message).match(/404|no store|not found/i) ? { rev: 0 } : Promise.reject(e)));
+      if (g.rev && g.rev !== tw.rev) {
+        const theirs = JSON.stringify(g.state || {});
+        if (raw === (tw.synced ?? raw) || raw === '{}' || !tw.rev) {   // nothing of ours unsaved: take the server's and reload once
+          if (theirs !== raw) { tw.rev = g.rev; tw.synced = theirs; twSave(); lsSet(STORE_KEY, theirs); if (!sessionStorage.getItem('tw-reloaded')) { sessionStorage.setItem('tw-reloaded', '1'); location.reload(); return; } }
+        } else { tw.rev = g.rev; twSave(); localStorage.setItem(STORE_KEY, JSON.stringify(twMerge(JSON.parse(tw.synced || '{}'), JSON.parse(raw), g.state || {}))); }
+      }
+      sessionStorage.removeItem('tw-reloaded');
+    }
+    const now = twLocal(); if (now === tw.synced) return;
+    let r = await twStorePost(now);
+    if (r.status === 409) {   // someone saved since: keep their keys, except the ones we changed since our last sync
+      const merged = JSON.stringify(twMerge(JSON.parse(tw.synced || '{}'), JSON.parse(now), r.body.state || {}));
+      tw.rev = r.body.rev; lsSet(STORE_KEY, merged); r = await twStorePost(merged);
+      if (r.ok || r.status === 200) historyNote('Merged changes saved at the table');
+    }
+    if (r.status === 200 && r.body.rev) { tw.rev = r.body.rev; tw.synced = twLocal(); twSave(); twRedraw(); }
+    else throw new Error((r.body && (r.body.why || r.body.error)) || 'store ' + r.status);
+  } catch (err) { twStatus = 'saving: ' + err.message; twRedraw(); }
+  finally { twStoreBusy = false; }
+}
+function twMerge(base, ours, theirs) { const out = { ...theirs }; for (const k in ours) if (JSON.stringify(ours[k]) !== JSON.stringify(base[k])) out[k] = ours[k]; return out; }
+setInterval(() => twStoreSync(), 4000);
+// THE FRAGMENT: #tw=<pairing> links (and leaves the address bar at once: the seat token is not left in history),
+// #pc=<id>, #rule=<id>, #session=<n> fly there. One window per table: a second tab for the same table hands its
+// deep link to the first and says so.
+const bc = (() => { try { return new BroadcastChannel('turnip-almanac'); } catch { return null; } })();
+let twDup = false;
+function deepGo(h) {
+  const q = new URLSearchParams(h.replace(/^#/, ''));
+  const pc = q.get('pc'), rule = q.get('rule'), sess = q.get('session');
+  if (pc && pcById[pc]) setTimeout(() => flyTo(pc), 400);
+  else if (rule && nodes[rule]) setTimeout(() => flyTo(rule), 400);
+  else if (sess) { const x = (typeof sessionEls !== 'undefined' ? sessionEls : []).find(e => String(e.s.n) === sess); if (x) setTimeout(() => flyTo(x.id || x.card?.dataset.id), 400); }
+}
+async function hashIn() {
+  const h = location.hash; if (!h || h === '#') return;
+  const q = new URLSearchParams(h.slice(1)), pair = q.get('tw');
+  if (pair) { q.delete('tw'); history.replaceState(null, '', location.pathname + location.search + (q.toString() ? '#' + q : ''));
+    try { await twLink(twPairing(pair)); toast({ msg: 'Linked to the Turnip Works table', note: 'Rolls and chat now go both ways.' }); } catch (err) { twStatus = err.message; toast({ msg: 'Could not link to Turnip Works', note: err.message }); } }
+  deepGo(location.hash);
+}
+if (bc) {
+  bc.onmessage = ev => { const m = ev.data || {}; if (m.page !== location.pathname) return;
+    if (m.t === 'hello' && !twDup) bc.postMessage({ t: 'here', page: location.pathname, id: m.id });
+    if (m.t === 'go' && !twDup) { if (m.pair) { try { twLink(twPairing(m.pair)); } catch {} } deepGo(m.hash || ''); toast({ msg: 'Opened here', note: 'Another tab asked for this table; it is this one.' }); } };
+  const me = Math.random().toString(36).slice(2); let older = false;
+  const on = ev => { if (ev.data?.t === 'here' && ev.data.id === me) older = true; }; bc.addEventListener('message', on);
+  bc.postMessage({ t: 'hello', page: location.pathname, id: me });
+  setTimeout(() => { bc.removeEventListener('message', on);
+    if (older) { twDup = true; const q = new URLSearchParams(location.hash.slice(1)), pair = q.get('tw'); q.delete('tw');
+      history.replaceState(null, '', location.pathname + location.search);
+      bc.postMessage({ t: 'go', page: location.pathname, hash: '#' + q, pair });
+      document.body.insertAdjacentHTML('beforeend', '<div id="dupnote"><b>This table is already open in another tab.</b><span>It has your link; you can close this one.</span></div>');
+    } else hashIn(); }, 350);
+} else hashIn();
+addEventListener('hashchange', () => { if (/[#&]tw=/.test(location.hash)) hashIn(); else deepGo(location.hash); });
+if (tw.on) { window.name = 'turnip-almanac:' + tw.cid; setTimeout(() => { twPoll(); twStoreSync(true); }, 1500); }
+// Options → Turnip Works. Pairing is a click (Harry, 20 Nov): TW's "Open the desk" opens this page with #tw=…, or
+// this panel opens a new TW table that pairs back. No pasting.
+const TW_HOME = (window.TW_HOME || 'https://turnipworks.net/').replace(/\/?$/, '/');
+const twWin = () => 'turnip-works:' + (tw.cid || 'new');
+function twOpen(extra = '') {   // TW, in its one named window: a second click focuses and re-points it
+  if (!tw.on) return window.open(`${TW_HOME}?desk=${encodeURIComponent(location.origin + location.pathname)}`, twWin());
+  const page = tw.page || TW_HOME; return window.open(`${page}#s=${tw.token}${tw.area ? '&area=' + tw.area : ''}${extra}`, twWin());
+}
+function openTwPanel() {
+  document.querySelector('#twpanel')?.remove(); const p = document.createElement('div'); p.id = 'twpanel';
+  const draw = () => { const pcs = PCS.filter(pc => choicesOf(pc).name);
+    p.innerHTML = `<div class="th"><b>Turnip Works table</b><button data-tw="close" aria-label="Close">✕</button></div>
+    <div class="tbody">${tw.on ? `<p>Linked to the table <b>${esc(tw.tableName || tw.cid || '')}</b>${tw.seatName ? ` as ${esc(tw.seatName)}` : ''}. Rolls and chat go both ways; this campaign is kept on the server (the book stays in this browser).<br><span class="st">${esc(twStatus || 'connecting…')}${tw.rev ? ` · saved, version ${tw.rev}` : ''}</span></p>
+      <button class="btn" data-tw="open">Open the table in Turnip Works</button><button class="btn" data-tw="party">Put the party on the table</button>
+      ${pcs.filter(pc => tw.pawns?.[pc.id]).map(pc => `<button class="btn" data-tw="focus" data-pc="${pc.id}">Show ${esc(choicesOf(pc).name)} on the table</button>`).join('')}
+      <button class="btn" data-tw="unlink">Unlink</button>`
+    : `<p>Not linked. Open this table from Turnip Works (its <b>Open the desk</b> menu), or start a new Turnip Works table for this campaign: it links back here by itself.</p><button class="btn" data-tw="new">Open a Turnip Works table for this campaign</button><span class="st">${esc(twStatus)}</span>`}</div>`; };
+  draw(); document.body.appendChild(p); p.twDraw = draw;
+  p.addEventListener('click', async ev => { const b = ev.target.closest('[data-tw]'); if (!b) return; const k = b.dataset.tw;
+    if (k === 'close') return p.remove();
+    try { if (k === 'new' || k === 'open') twOpen();
+      if (k === 'focus') twOpen('&focus=' + tw.pawns[b.dataset.pc]);
+      if (k === 'unlink') twUnlink(); if (k === 'party') { twStatus = 'putting the party on the table…'; draw(); await twPutParty(); twStatus = twStatus.startsWith('pawn') ? twStatus : 'party on the table'; }
+    } catch (err) { twStatus = err.message; }
+    draw(); });
+}
+const twRedraw = () => document.querySelector('#twpanel')?.twDraw?.();
+window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt, tw, twRollOf, twButtons, twIn, twLink, twPairing, twStoreSync };   // for tests
 requestAnimationFrame(frame);
 })();
 </script>
