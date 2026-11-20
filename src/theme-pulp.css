@@ -186,3 +186,8 @@
 :root[data-style="pulp"] .map.paper::before { content: none; }
 #vp.close .paper::before, #vp.close .map.paper { -webkit-mask-image: none !important; mask-image: none !important; }
 #vp.close .map.paper::after { display: none; }
+/* the visibility menu's options: the same raised mustard keys as every pulp button; the chosen one sinks, ringed in red */
+:root[data-style="pulp"] .visknob .vispanel { background: #f3e7d2; border-color: #8f3a2e88; }
+:root[data-style="pulp"] .visknob .vispanel button { background: linear-gradient(180deg, var(--btn-hi, #f6dfa2) 0%, var(--btn-c, #e2b763) 55%, var(--btn-lo, #cf9f4a) 100%); color: #2a1d12; border: 1.4px solid #8f3a2e; box-shadow: inset 0 1px 0 #fff6d8cc, 0 3px 0 var(--btn-ledge, #7a4a1c); }
+:root[data-style="pulp"] .visknob .vispanel button.sel { background: #c99146; color: #1c1209; transform: translateY(3px); box-shadow: inset 0 3px 6px #3b2a1f88, 0 0 0 2.5px var(--ochre); }
+:root[data-style="pulp"] .visknob .visicon { background: #f3e7d2; border-color: var(--ochre); }

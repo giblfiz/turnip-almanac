@@ -45,6 +45,11 @@ rejected designs. The implementation is replaceable; these contracts are not.
 - E13a **Phones** (H, 14 Nov): a finger pans from anywhere, including from buttons (a drag that moved never presses);
   two fingers pinch, and lifting one hands the pan to the other; a flick coasts; double-tap zooms into the thing (or in,
   on empty canvas); a long press on empty canvas makes a note; the page itself never zooms; the quickbar hint shortens.
+- E13b **Pointer software** (H, 20 Nov): a mouse or a touch is required. No screen-reader or keyboard-only path is planned
+  (an intentional choice); the existing shortcuts stay.
+- E13c **Controls live one zoom level deeper** (H, 20 Nov): a card's visibility menu sits on the card, drawn small under an
+  icon that fades as you zoom in on it (like headline labels); clicking the icon flies you in. Saved now, enforced once more
+  than one seat joins.
 - E13 **Keys follow convention**: ⌘[ ⌘] back/forward, ⌘Z ⇧⌘Z undo/redo, ⌘C copy what is under the pointer,
   ⌘V paste (image → portrait/art/pocket, text → note/pocket), Tab/⇧Tab between builder steps, Esc closes.
 

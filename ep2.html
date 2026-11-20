@@ -814,6 +814,20 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .chapblk .entry h3 { font-family: var(--f-label, var(--f-display)); letter-spacing: .02em; }
 /* classic: the slip's ink bar inside its rounding too */
 .chapblk .entry { border-left: 1px solid #a8770f55; background: linear-gradient(90deg, var(--ochre) 0 10px, #f6e9c4 10px); padding-left: 22px; }
+/* visibility knobs: an icon over a menu drawn at the knob's own size (--vk = knob / 300) */
+.visknob { position: absolute; right: 1.6%; top: 1.6%; z-index: 6; }
+.visknob .visicon { position: absolute; inset: 0; border-radius: 50%; background: var(--paper); border: 2px solid var(--ochre); color: var(--ochre); display: flex; align-items: center; justify-content: center; cursor: zoom-in; box-shadow: 0 2px 6px #0003; z-index: 2; }
+.visknob .visicon svg { width: 62%; height: 62%; }
+.visknob .vispanel { position: absolute; left: 0; top: 0; width: 300px; height: 300px; transform: scale(var(--vk)); transform-origin: 0 0; box-sizing: border-box; padding: 16px; border-radius: 22px;
+  background: var(--paper); border: 1.5px solid var(--ochre); display: grid; grid-template-rows: auto repeat(4, 1fr) auto auto; gap: 6px; font: 13px var(--f-body); color: var(--ink); }
+.visknob .vispanel b { font: 700 16px var(--f-display); }
+.visknob .vispanel button { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--ochre); background: var(--btn-face, var(--paper)); border-radius: 10px; font: 600 14px var(--f-body); color: var(--ink); cursor: pointer; padding: 0 10px; box-shadow: 0 2px 0 var(--ledge, #7a4a1c); }
+.visknob .vispanel button.sel { background: var(--ochre); color: var(--paper); box-shadow: none; transform: translateY(2px); }
+.visknob .vispanel button svg { width: 18px; height: 18px; flex: none; }
+.visknob .vispanel .viswho { display: flex; flex-wrap: wrap; gap: 4px; }
+.visknob .vispanel .viswho button { font-size: 11px; padding: 2px 7px; box-shadow: 0 1px 0 var(--ledge, #7a4a1c); }
+.visknob .vispanel i { font-size: 10.5px; color: var(--ink-3); }
+.vis-private { outline: 3px dashed color-mix(in srgb, var(--ochre) 65%, transparent); outline-offset: 6px; }
 /* ---- Theme: Pulp catalogue (Harry, 16 Nov: "grab the look and feel from the pulp catalog option").
    From the generated study 15-pulp-catalogue, read by Gemini: newsprint cards on a dark desk, crimson and mustard,
    slab display type, condensed caps labels, ink-ruled boxes with hard offset shadows, bevelled red keys,
@@ -1002,6 +1016,11 @@ html, body { touch-action: none; overscroll-behavior: none; }
 :root[data-style="pulp"] .map.paper::before { content: none; }
 #vp.close .paper::before, #vp.close .map.paper { -webkit-mask-image: none !important; mask-image: none !important; }
 #vp.close .map.paper::after { display: none; }
+/* the visibility menu's options: the same raised mustard keys as every pulp button; the chosen one sinks, ringed in red */
+:root[data-style="pulp"] .visknob .vispanel { background: #f3e7d2; border-color: #8f3a2e88; }
+:root[data-style="pulp"] .visknob .vispanel button { background: linear-gradient(180deg, var(--btn-hi, #f6dfa2) 0%, var(--btn-c, #e2b763) 55%, var(--btn-lo, #cf9f4a) 100%); color: #2a1d12; border: 1.4px solid #8f3a2e; box-shadow: inset 0 1px 0 #fff6d8cc, 0 3px 0 var(--btn-ledge, #7a4a1c); }
+:root[data-style="pulp"] .visknob .vispanel button.sel { background: #c99146; color: #1c1209; transform: translateY(3px); box-shadow: inset 0 3px 6px #3b2a1f88, 0 0 0 2.5px var(--ochre); }
+:root[data-style="pulp"] .visknob .visicon { background: #f3e7d2; border-color: var(--ochre); }
 /* Eclipse Phase 2e rig: only this rig's own classes (ep2*). The sheet: 2100 × 1300, no whitespace (E6). The ego sits on
    the left (identity, aptitudes, skills), the morph worn now in the middle in its own colour (it is the body, not the
    self), the face and the owned morphs on the right. Skills, the morph and the trait list are 'dense' sections. */
@@ -1107,11 +1126,11 @@ const store = {
   set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, vis: saved.vis || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks, mapImg: state.mapImg });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks, mapImg: state.mapImg, vis: state.vis });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -2743,7 +2762,7 @@ function labelPass() {
     if (l._o !== o) { l.e.style.opacity = o.toFixed(2); l.e.style.visibility = o < 0.01 ? 'hidden' : ''; l._o = o; } }
 }
 function frame() {
-  if (dirty) { dirty = false; labelPass(); edgeArrows(); drawThreads(); pagesPass(); }
+  if (dirty) { dirty = false; labelPass(); if (typeof knobsPass === 'function') knobsPass(); edgeArrows(); drawThreads(); pagesPass(); }
   requestAnimationFrame(frame);
 }
 
@@ -3257,6 +3276,49 @@ function paperFlush() { const t0 = performance.now(); for (const e of paperQ) { 
 var paperRO = new ResizeObserver(es => { es.forEach(x => paperQ.add(x.target)); clearTimeout(paperT); paperT = setTimeout(paperFlush, 120); });
 function paperWatch() { document.querySelectorAll(PAPER_SEL).forEach(e => { if (!e._pw) { e._pw = 1; paperRO.observe(e); } }); paperAll(); }
 paperWatch(); new MutationObserver(() => { clearTimeout(paperWatch._t); paperWatch._t = setTimeout(paperWatch, 300); }).observe(world, { childList: true });
+// ---- controls one zoom level deeper (H, 20 Nov): a card's visibility menu lives on the card, drawn small under an icon.
+// The icon fades as you zoom in on it, the way headline labels do, and then the menu is what you are looking at (nothing
+// appears or vanishes: E1). Clicking the icon flies you in. Pointer software by design: no keyboard or screen-reader path.
+const VIS_SEL = '.sheet, .scard, .pcard, .bookart, .artcard:not(.bookart)';
+const VIS_MODES = [['all', 'Everyone', 'eye'], ['gm', 'GM only', 'eyeoff'], ['me', 'Only me', 'person'], ['some', 'Some players', 'people']];
+const VIS_ICON = { eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6"/>',
+  person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>', people: '<circle cx="9" cy="8" r="3.4"/><circle cx="17" cy="9" r="2.6"/><path d="M2.5 20c1.2-3.6 3.7-5.4 6.5-5.4s5.3 1.8 6.5 5.4M15.5 14.8c2.5 0 4.5 1.6 5.5 4.6"/>' };
+const knobs = new Set();
+const visOf = id => state.vis[id] || { mode: 'all', who: [] };
+function knobHtml(id) {
+  const v = visOf(id), m = VIS_MODES.find(x => x[0] === v.mode) || VIS_MODES[0];
+  return `<div class="visicon" data-visfly="${id}" title="Who can see this (click to open)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${VIS_ICON[m[2]]}</svg></div>
+    <div class="vispanel"><b>Who can see this</b>${VIS_MODES.map(([k, n, ic]) => `<button class="${k === v.mode ? 'sel' : ''}" data-vis="${k}" data-vt="${id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${VIS_ICON[ic]}</svg>${n}</button>`).join('')}
+    <div class="viswho">${PCS.map(pc => `<button class="${v.mode === 'some' && v.who.includes(pc.id) ? 'sel' : ''}" data-viswho="${pc.id}" data-vt="${id}">${esc(choicesOf(pc).name || WORDS.Char)}</button>`).join('')}</div>
+    <i>Kept with the card; enforced once more than one seat joins.</i></div>`;
+}
+function attachKnob(el) {
+  const id = el.dataset.id || el.querySelector?.('[data-id]')?.dataset.id; if (!id || el.querySelector(':scope > .visknob')) return;
+  const w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
+  const S = Math.round(Math.max(36, Math.min(150, Math.min(w, h) * 0.085)));
+  const k = document.createElement('div'); k.className = 'visknob'; k.dataset.vid = id; k.style.width = k.style.height = S + 'px';
+  k.style.setProperty('--vk', S / 300); k.innerHTML = knobHtml(id); el.appendChild(k); knobs.add(k);
+  el.classList.toggle('vis-private', visOf(id).mode !== 'all');
+}
+function knobsAll() { document.querySelectorAll(VIS_SEL).forEach(attachKnob); dirty = true; }
+// the icon's fade, by its size on screen: whole until ~110 px, gone by ~220 px; past that the menu is what you see
+function knobsPass() {
+  for (const k of knobs) { if (!k.isConnected) { knobs.delete(k); continue; }
+    const on = k.offsetWidth * (k.closest('.chapblk') ? 1 : 1) * cam.s, ic = k.firstElementChild, o = on <= 110 ? 1 : on >= 220 ? 0 : 1 - (on - 110) / 110;
+    if (k._o !== o) { ic.style.opacity = o.toFixed(2); ic.style.pointerEvents = o > 0.3 ? 'auto' : 'none'; ic.style.visibility = o < 0.01 ? 'hidden' : ''; k._o = o; } }
+}
+new MutationObserver(() => { clearTimeout(knobsAll._t); knobsAll._t = setTimeout(knobsAll, 200); }).observe(world, { childList: true, subtree: true });
+setTimeout(knobsAll, 300);
+document.addEventListener('click', ev => {
+  const f = ev.target.closest?.('[data-visfly]'); if (f) { ev.stopPropagation(); const k = f.parentElement, r = k.getBoundingClientRect(); const b = { x: cam.x + r.left / cam.s, y: cam.y + r.top / cam.s, w: r.width / cam.s, h: r.height / cam.s }; flyToView(viewFor({ x: b.x - b.w * 0.15, y: b.y - b.w * 0.15, w: b.w * 1.3, h: b.h * 1.3 }, 1)); return; }
+  const v = ev.target.closest?.('[data-vis], [data-viswho]'); if (!v) return; ev.stopPropagation();
+  const id = v.dataset.vt, cur = visOf(id);
+  if (v.dataset.vis) state.vis[id] = { mode: v.dataset.vis, who: cur.who || [] };
+  else { const w = new Set(cur.who || []); w.has(v.dataset.viswho) ? w.delete(v.dataset.viswho) : w.add(v.dataset.viswho); state.vis[id] = { mode: 'some', who: [...w] }; }
+  historyNote(`Visibility of ${nodes[id]?.title || id}: ${VIS_MODES.find(x => x[0] === state.vis[id].mode)[1]}`); persist();
+  document.querySelectorAll(`.visknob[data-vid="${id}"]`).forEach(k => { k.innerHTML = knobHtml(id); k._o = null; k.parentElement.classList.toggle('vis-private', state.vis[id].mode !== 'all'); }); dirty = true;
+}, true);
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();

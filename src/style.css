@@ -805,3 +805,17 @@ html, body { touch-action: none; overscroll-behavior: none; }
 .chapblk .entry h3 { font-family: var(--f-label, var(--f-display)); letter-spacing: .02em; }
 /* classic: the slip's ink bar inside its rounding too */
 .chapblk .entry { border-left: 1px solid #a8770f55; background: linear-gradient(90deg, var(--ochre) 0 10px, #f6e9c4 10px); padding-left: 22px; }
+/* visibility knobs: an icon over a menu drawn at the knob's own size (--vk = knob / 300) */
+.visknob { position: absolute; right: 1.6%; top: 1.6%; z-index: 6; }
+.visknob .visicon { position: absolute; inset: 0; border-radius: 50%; background: var(--paper); border: 2px solid var(--ochre); color: var(--ochre); display: flex; align-items: center; justify-content: center; cursor: zoom-in; box-shadow: 0 2px 6px #0003; z-index: 2; }
+.visknob .visicon svg { width: 62%; height: 62%; }
+.visknob .vispanel { position: absolute; left: 0; top: 0; width: 300px; height: 300px; transform: scale(var(--vk)); transform-origin: 0 0; box-sizing: border-box; padding: 16px; border-radius: 22px;
+  background: var(--paper); border: 1.5px solid var(--ochre); display: grid; grid-template-rows: auto repeat(4, 1fr) auto auto; gap: 6px; font: 13px var(--f-body); color: var(--ink); }
+.visknob .vispanel b { font: 700 16px var(--f-display); }
+.visknob .vispanel button { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--ochre); background: var(--btn-face, var(--paper)); border-radius: 10px; font: 600 14px var(--f-body); color: var(--ink); cursor: pointer; padding: 0 10px; box-shadow: 0 2px 0 var(--ledge, #7a4a1c); }
+.visknob .vispanel button.sel { background: var(--ochre); color: var(--paper); box-shadow: none; transform: translateY(2px); }
+.visknob .vispanel button svg { width: 18px; height: 18px; flex: none; }
+.visknob .vispanel .viswho { display: flex; flex-wrap: wrap; gap: 4px; }
+.visknob .vispanel .viswho button { font-size: 11px; padding: 2px 7px; box-shadow: 0 1px 0 var(--ledge, #7a4a1c); }
+.visknob .vispanel i { font-size: 10.5px; color: var(--ink-3); }
+.vis-private { outline: 3px dashed color-mix(in srgb, var(--ochre) 65%, transparent); outline-offset: 6px; }

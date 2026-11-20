@@ -17,11 +17,11 @@ const store = {
   set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
 };
 const saved = store.get();
-const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
+const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, vis: saved.vis || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
 let dirty = true;
 let openPop = null;
 const qdice = { pool: 4, tn: 4 };
-const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks, mapImg: state.mapImg });
+const persist = () => store.set({ notes: state.notes, pins: state.pins, live: state.live, choices: state.choices, rolls: state.rolls, extra: state.extra, portraits: state.portraits, art: state.art, done: state.done, summons: state.summons, order: state.order, removed: state.removed, rollCount: state.rollCount, adv: state.adv, checks: state.checks, mapImg: state.mapImg, vis: state.vis });
 
 const nodes = {};
 const lodNodes = new Set();                       // kept for the engine; nothing registers LOD any more
@@ -1171,7 +1171,7 @@ function labelPass() {
     if (l._o !== o) { l.e.style.opacity = o.toFixed(2); l.e.style.visibility = o < 0.01 ? 'hidden' : ''; l._o = o; } }
 }
 function frame() {
-  if (dirty) { dirty = false; labelPass(); edgeArrows(); drawThreads(); pagesPass(); }
+  if (dirty) { dirty = false; labelPass(); if (typeof knobsPass === 'function') knobsPass(); edgeArrows(); drawThreads(); pagesPass(); }
   requestAnimationFrame(frame);
 }
 
@@ -1685,6 +1685,49 @@ function paperFlush() { const t0 = performance.now(); for (const e of paperQ) { 
 var paperRO = new ResizeObserver(es => { es.forEach(x => paperQ.add(x.target)); clearTimeout(paperT); paperT = setTimeout(paperFlush, 120); });
 function paperWatch() { document.querySelectorAll(PAPER_SEL).forEach(e => { if (!e._pw) { e._pw = 1; paperRO.observe(e); } }); paperAll(); }
 paperWatch(); new MutationObserver(() => { clearTimeout(paperWatch._t); paperWatch._t = setTimeout(paperWatch, 300); }).observe(world, { childList: true });
+// ---- controls one zoom level deeper (H, 20 Nov): a card's visibility menu lives on the card, drawn small under an icon.
+// The icon fades as you zoom in on it, the way headline labels do, and then the menu is what you are looking at (nothing
+// appears or vanishes: E1). Clicking the icon flies you in. Pointer software by design: no keyboard or screen-reader path.
+const VIS_SEL = '.sheet, .scard, .pcard, .bookart, .artcard:not(.bookart)';
+const VIS_MODES = [['all', 'Everyone', 'eye'], ['gm', 'GM only', 'eyeoff'], ['me', 'Only me', 'person'], ['some', 'Some players', 'people']];
+const VIS_ICON = { eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6"/>',
+  person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>', people: '<circle cx="9" cy="8" r="3.4"/><circle cx="17" cy="9" r="2.6"/><path d="M2.5 20c1.2-3.6 3.7-5.4 6.5-5.4s5.3 1.8 6.5 5.4M15.5 14.8c2.5 0 4.5 1.6 5.5 4.6"/>' };
+const knobs = new Set();
+const visOf = id => state.vis[id] || { mode: 'all', who: [] };
+function knobHtml(id) {
+  const v = visOf(id), m = VIS_MODES.find(x => x[0] === v.mode) || VIS_MODES[0];
+  return `<div class="visicon" data-visfly="${id}" title="Who can see this (click to open)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${VIS_ICON[m[2]]}</svg></div>
+    <div class="vispanel"><b>Who can see this</b>${VIS_MODES.map(([k, n, ic]) => `<button class="${k === v.mode ? 'sel' : ''}" data-vis="${k}" data-vt="${id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${VIS_ICON[ic]}</svg>${n}</button>`).join('')}
+    <div class="viswho">${PCS.map(pc => `<button class="${v.mode === 'some' && v.who.includes(pc.id) ? 'sel' : ''}" data-viswho="${pc.id}" data-vt="${id}">${esc(choicesOf(pc).name || WORDS.Char)}</button>`).join('')}</div>
+    <i>Kept with the card; enforced once more than one seat joins.</i></div>`;
+}
+function attachKnob(el) {
+  const id = el.dataset.id || el.querySelector?.('[data-id]')?.dataset.id; if (!id || el.querySelector(':scope > .visknob')) return;
+  const w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
+  const S = Math.round(Math.max(36, Math.min(150, Math.min(w, h) * 0.085)));
+  const k = document.createElement('div'); k.className = 'visknob'; k.dataset.vid = id; k.style.width = k.style.height = S + 'px';
+  k.style.setProperty('--vk', S / 300); k.innerHTML = knobHtml(id); el.appendChild(k); knobs.add(k);
+  el.classList.toggle('vis-private', visOf(id).mode !== 'all');
+}
+function knobsAll() { document.querySelectorAll(VIS_SEL).forEach(attachKnob); dirty = true; }
+// the icon's fade, by its size on screen: whole until ~110 px, gone by ~220 px; past that the menu is what you see
+function knobsPass() {
+  for (const k of knobs) { if (!k.isConnected) { knobs.delete(k); continue; }
+    const on = k.offsetWidth * (k.closest('.chapblk') ? 1 : 1) * cam.s, ic = k.firstElementChild, o = on <= 110 ? 1 : on >= 220 ? 0 : 1 - (on - 110) / 110;
+    if (k._o !== o) { ic.style.opacity = o.toFixed(2); ic.style.pointerEvents = o > 0.3 ? 'auto' : 'none'; ic.style.visibility = o < 0.01 ? 'hidden' : ''; k._o = o; } }
+}
+new MutationObserver(() => { clearTimeout(knobsAll._t); knobsAll._t = setTimeout(knobsAll, 200); }).observe(world, { childList: true, subtree: true });
+setTimeout(knobsAll, 300);
+document.addEventListener('click', ev => {
+  const f = ev.target.closest?.('[data-visfly]'); if (f) { ev.stopPropagation(); const k = f.parentElement, r = k.getBoundingClientRect(); const b = { x: cam.x + r.left / cam.s, y: cam.y + r.top / cam.s, w: r.width / cam.s, h: r.height / cam.s }; flyToView(viewFor({ x: b.x - b.w * 0.15, y: b.y - b.w * 0.15, w: b.w * 1.3, h: b.h * 1.3 }, 1)); return; }
+  const v = ev.target.closest?.('[data-vis], [data-viswho]'); if (!v) return; ev.stopPropagation();
+  const id = v.dataset.vt, cur = visOf(id);
+  if (v.dataset.vis) state.vis[id] = { mode: v.dataset.vis, who: cur.who || [] };
+  else { const w = new Set(cur.who || []); w.has(v.dataset.viswho) ? w.delete(v.dataset.viswho) : w.add(v.dataset.viswho); state.vis[id] = { mode: 'some', who: [...w] }; }
+  historyNote(`Visibility of ${nodes[id]?.title || id}: ${VIS_MODES.find(x => x[0] === state.vis[id].mode)[1]}`); persist();
+  document.querySelectorAll(`.visknob[data-vid="${id}"]`).forEach(k => { k.innerHTML = knobHtml(id); k._o = null; k.parentElement.classList.toggle('vis-private', state.vis[id].mode !== 'all'); }); dirty = true;
+}, true);
 window.almanac = { cam, flyTo, nodes, hist: () => HIST, fitCell, fitSections, setView, viewFor, overview, state, R, renderSheet, pcById, sheetEls, newRunner, BK_K, BREG, BINNER, setBuild, BOUNDS, pdfState: () => ({ ok: !!pdfDoc, failed: pdfFailed, copy: copyState }), openCopy, bookArt };   // for tests
 requestAnimationFrame(frame);
 })();

@@ -60,6 +60,9 @@ one Claude Code session; commits in this repo.
 | P-48 | H: History out in the left suburbs ("back in time") | history west of the map | verified (in the overview; edge arrow; quickbar) | |
 | P-49 | H: build advancement for both systems | an Advancement step after All done, filed under the latest session | verified. SSR: karma award ±, skills raised at their creation cost up to the cap, spells at 3, take back the last spend; the session card shows it. BRP: a successful roll ticks the skill's check, checks added or taken back by hand, an end-of-session roll (d100 + experience bonus over the skill → 1D6/1D8/1D10) logged to the Log and History | one engine seam: `karmaOf(pc)` = the campaign's log + this table's entries; each rig decides what an entry holds (SSR `award`/`buy`, BRP `gain`/`tried`) |
 
+| P-66 | H: "we are underutilizing levels of zoom … the visibility control is an icon … when you zoom in on it you end up looking at the menu"; click the icon to fly in | E13c | verified (12 knobs on BRP; icon whole at 65 px, gone at 638 px; GM-only saves and dashes the card) | in pulp the menu first inherited a red button face: the selection was invisible (caught by a blind read, confirmed in the DOM) |
+| P-67 | H: no screen-reader or keyboard-only support, by choice | E13b | recorded | |
+
 ## Evaluator note (automation frontier, 2026-11-13; Claude Opus 5.5 builder; Gemini via agy-run as the blind reader)
 Gemini blind reads found real bugs (mojibake, LOD leak, missing toast CSS, Contact duplication, crop framing) and
 made confident false claims (a "clipped" note that measured fine, a "missing" Soak button, a "duplicate" toast).
