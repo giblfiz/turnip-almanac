@@ -2686,14 +2686,16 @@ async function loadPdf(buf) {
   renderCopyPanel(); dirty = true; cutArt();
 }
 // the art: the stencil marks each illustration (page + rect); it is cut from the reader's own copy, here, at runtime
-const bookArt = {};
+const bookArt = window.__bookArt = {};   // rigs read window.__bookArt (art regions cut from the reader's copy) when they draw
 async function cutArt() {
   for (const a of (C.print || []).filter(p => p.kind === 'art')) {
     try { const page = await pdfDoc.getPage(a.page), [x, y, w, h] = a.rect, k = a.use === 'map' ? Math.min(8, 4200 / w) : Math.min(4, 2400 / w), v = page.getViewport({ scale: k });   // the map is zoomed into: cut it finer
       const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height); await page.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
       const o = document.createElement('canvas'); o.width = Math.round(w * k); o.height = Math.round(h * k); o.getContext('2d').drawImage(c, -x * k, -y * k);
       bookArt[a.id] = o.toDataURL('image/jpeg', 0.9); placeArt(a); } catch (e) { console.warn('art', a.id, e.message); }
+      await new Promise(r => setTimeout(r, 40));   // one picture at a time, so a book full of art never stalls the table
   }
+  if (typeof PCS !== 'undefined') PCS.forEach(pc => renderSheet(pc));   // rigs may use the art (e.g. a body's picture as the face)
 }
 const BOOK_PORTRAITS = {};
 { const po = portraitOf; portraitOf = (pc, S) => { const r = po(pc, S), b = BOOK_PORTRAITS[pc.id]; if (!b) return r;
