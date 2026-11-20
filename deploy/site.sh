@@ -6,8 +6,11 @@
 # Script and style references get ?v=<content hash> (Cloudflare keeps static files about 4 hours).
 # No rulebook PDF is ever copied here, except our own books listed in OWN_BOOKS (the reader downloads the rest from
 # their makers and opens their own copy; see SPEC E2c, the stencil).
+#   deploy/site.sh --install-desk   the desk BRANCH: install to /var/www/almanac-desk, paired with desk.turnipworks.net
 set -euo pipefail
 cd "$(dirname "$0")/.."
+DEST=/var/www/almanac; TW_HOME=""
+if [ "${1:-}" = --install-desk ]; then DEST=/var/www/almanac-desk; TW_HOME=https://desk.turnipworks.net/; set -- --install; fi
 TABLES=("ssr2:shadowrun" "brp:brp")
 [ -f src/scripts-lb.html ] && TABLES+=("lb:lady-blackbird")
 [ -f src/scripts-srd.html ] && TABLES+=("srd:fifth-edition")
@@ -18,7 +21,7 @@ for t in "${TABLES[@]}"; do sys=${t%%:*}; slug=${t##*:}; ./build.sh "$sys" >/dev
 cp -r assets "$D/"; mkdir -p "$D/rigs"; cp rigs/*.js "$D/rigs/"; rm -f "$D"/rigs/*-ui.js   # the UI halves are built into the pages
 cp campaign*.js "$D/"; cp books/fingerprints.js "$D/books/"; cp books/*-art.js "$D/books/" 2>/dev/null || true
 for f in "${OWN_BOOKS[@]}"; do cp "$f" "$D/downloads/"; done
-python3 - "$D" "${TABLES[@]}" <<'PY'
+TW_HOME="$TW_HOME" python3 - "$D" "${TABLES[@]}" <<'PY'
 import hashlib, os, re, sys
 D, tables = sys.argv[1], sys.argv[2:]
 def ver(path):
@@ -29,6 +32,7 @@ for t in tables:
     src = 'index.html' if sys_ == 'ssr2' else f'{sys_}.html'
     html = open(src).read()
     html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">', 1)
+    if os.environ.get('TW_HOME'): html = html.replace('<base href="/">', '<base href="/">\n<meta name="robots" content="noindex">\n<script>window.TW_HOME = ' + repr(os.environ['TW_HOME']) + ';</script>', 1)
     assert '<base href="/">' in html, 'no place for <base>'
     names = {'ssr2': 'Simplified Shadowrun', 'brp': 'Basic Roleplaying', 'lb': 'Lady Blackbird', 'srd': 'Fifth-edition SRD', 'ep2': 'Eclipse Phase'}
     html = html.replace('<title>Turnip Almanac</title>', f'<title>Turnip Almanac · {names.get(sys_, slug)}</title>', 1)
@@ -61,14 +65,15 @@ if any(t.startswith('ep2:') for t in tables):
       <span class="go">Open the table →</span>
     </a>
     <!--@MORE-TABLES@-->''', 1).replace('<!--@MORE-NOTES@-->', '<p><b>Eclipse Phase</b> Second Edition © Posthuman Studios, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>; free from the co-author at <a href="https://robboyle.info/">robboyle.info</a>. The table holds page locations, names, mechanics and our own one-line rule summaries; setting text, fiction and art come only from your own copy. Not affiliated with Posthuman Studios.</p>\n    <!--@MORE-NOTES@-->', 1)
+if os.environ.get('TW_HOME'): landing = landing.replace('<span class="wip">Working in public · early</span>', '<span class="wip">Desk branch · paired with <a href="' + os.environ['TW_HOME'] + '">' + os.environ['TW_HOME'].split('//')[1].rstrip('/') + '</a></span>', 1)
 open(os.path.join(D, 'index.html'), 'w').write(landing)
 print('tables:', ', '.join(t.split(':')[1] for t in tables))
 PY
 find "$D" -name '*.pdf' | grep -v '/downloads/' && { echo "a rulebook PDF slipped into the site: refusing"; exit 1; } || true
 echo "assembled $(du -sh "$D" | cut -f1) in $D"
 if [ "${1:-}" = --install ]; then
-  sudo rm -rf /var/www/almanac.new && sudo cp -r "$D" /var/www/almanac.new
-  sudo find /var/www/almanac.new -type d -exec chmod 755 {} + && sudo find /var/www/almanac.new -type f -exec chmod 644 {} +
-  sudo rm -rf /var/www/almanac.old; [ -d /var/www/almanac ] && sudo mv /var/www/almanac /var/www/almanac.old; sudo mv /var/www/almanac.new /var/www/almanac
-  echo "installed to /var/www/almanac"
+  sudo rm -rf "$DEST.new" && sudo cp -r "$D" "$DEST.new"
+  sudo find "$DEST.new" -type d -exec chmod 755 {} + && sudo find "$DEST.new" -type f -exec chmod 644 {} +
+  sudo rm -rf "$DEST.old"; [ -d "$DEST" ] && sudo mv "$DEST" "$DEST.old"; sudo mv "$DEST.new" "$DEST"
+  echo "installed to $DEST"
 fi
