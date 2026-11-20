@@ -1,0 +1,71 @@
+/* Eclipse Phase 2e rig: only this rig's own classes (ep2*). The sheet: 2100 × 1300, no whitespace (E6). The ego sits on
+   the left (identity, aptitudes, skills), the morph worn now in the middle in its own colour (it is the body, not the
+   self), the face and the owned morphs on the right. Skills, the morph and the trait list are 'dense' sections. */
+.sheet .ep2A { left: 34px; top: 30px; width: 540px; height: 420px; }
+.sheet .ep2Apt { left: 34px; top: 480px; width: 540px; height: 440px; }
+.sheet .ep2Sk { left: 604px; top: 30px; width: 520px; height: 1240px; }
+.sheet .ep2Mo { left: 1154px; top: 30px; width: 580px; height: 760px; background: color-mix(in srgb, #3a7d8c 10%, var(--paper, transparent)); border-radius: 18px; }
+.sheet .ep2Ts { left: 1154px; top: 820px; width: 580px; height: 450px; }
+.sheet .sP.ep2P { left: 1764px; top: 30px; width: 306px; height: 380px; }
+.sheet .ep2P .portrait { width: 306px; height: 290px; }
+.sheet .ep2P .tokens button, .sheet .ep2P .tokens .upl { width: 58px; height: 58px; }
+.sheet .ep2Own { left: 1764px; top: 440px; width: 306px; height: 420px; }
+.sheet .ep2Ex { left: 1764px; top: 890px; width: 306px; height: 380px; }
+.ep2book { border-color: #3a7d8c; }
+.ep2muse { font-size: 18px; } .ep2muse .k { font: 700 14px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); cursor: pointer; }
+.ep2muse .e, .ep2pen, .ep2om .e, .ep2ware .e, .ep2pool .e, .ep2atk .e, .ep2trk .e { color: var(--ink-2); font-size: 14px; }
+.ep2aptg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ep2ax { background: var(--band); border-radius: 14px; padding: 6px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.ep2ax > .k { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.ep2chk { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); }
+.ep2chk .pv { font-size: 20px; }
+.ep2chk .die, .ep2rep .die { width: 32px; height: 32px; font-size: 16px; }
+.ep2Apt .der, .ep2Mo .der { grid-template-columns: repeat(4, 1fr); }
+.ep2trk { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.ep2trk b { font: 700 22px var(--f-display); }
+.ep2trk .btn { padding: 5px 10px; }
+.ep2rep { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 8px; align-items: center; }
+.ep2rep > .k { grid-column: 1 / -1; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.ep2rep .sk { grid-template-columns: 1fr auto auto; padding: 3px 6px; }
+.ep2skl { display: flex; flex-direction: column; gap: 2px; }
+.ep2skl .sk { grid-template-columns: auto 1fr auto auto auto; padding: 3px 8px; }
+.ep2skl .sk .pv { font-size: 24px; }
+.ep2skl .sk .die { width: 32px; height: 32px; font-size: 16px; }
+.ep2dot { color: var(--ochre); font-size: 14px; }
+.ep2ab3 { font-size: 12px; color: var(--ink-3); letter-spacing: .06em; }
+.ep2spec { font-style: normal; font-size: 12px; color: var(--ochre); }
+.ep2mh { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.ep2mn { font: 700 34px var(--f-display); color: #2c6472; cursor: pointer; }
+.ep2pools { display: flex; flex-direction: column; gap: 4px; }
+.ep2pool { display: grid; grid-template-columns: 90px auto 1fr auto; gap: 8px; align-items: center; background: var(--band); border-radius: 10px; padding: 4px 10px; }
+.ep2pool > .k { font: 700 18px var(--f-display); color: var(--ink); cursor: pointer; }
+.ep2pool .pv { font-size: 24px; }
+.ep2pips { display: flex; gap: 4px; flex-wrap: wrap; }
+.ep2pips button { width: 26px; height: 26px; border-radius: 7px; border: 2px solid #2c6472; background: transparent; cursor: pointer; padding: 0; font: 700 13px var(--f-body); color: #fff; }
+.ep2pips button.L { background: #b3412c; border-color: #7a2a1c; }
+.ep2rch { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ep2rch .btn { padding: 5px 10px; }
+.ep2tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.ep2tags > .k, .ep2wl > .k { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-right: 4px; }
+.ep2tag { font: 600 14px var(--f-body); padding: 3px 8px; border-radius: 8px; background: var(--band); color: var(--ink); }
+.ep2tag[data-go] { cursor: pointer; }
+.ep2tag.neg { background: color-mix(in srgb, #b3412c 16%, var(--band)); }
+.ep2wl { display: flex; flex-direction: column; gap: 3px; }
+.ep2ware { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: baseline; border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); padding-top: 3px; }
+.ep2ware .k { font: 700 16px var(--f-display); }
+.ep2ware .die { width: 30px; height: 30px; font-size: 15px; }
+.ep2om { display: grid; grid-template-columns: 64px 1fr auto; gap: 8px; align-items: center; padding: 5px 6px; border-radius: 12px; background: var(--band); margin-bottom: 6px; }
+.ep2om.on { outline: 2px solid #3a7d8c; }
+.ep2om b { font: 700 18px var(--f-display); display: block; }
+.ep2thumb { width: 64px; height: 64px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--rule); }
+.ep2thumb b { font-size: 28px; color: var(--ink-3); }
+.ep2worn { font: 600 13px var(--f-body); color: #2c6472; }
+.ep2om .btn { padding: 5px 10px; }
+.ep2mods { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+.ep2mods .k { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.ep2mods .btn.on { background: var(--ochre-soft); border-color: var(--ochre); }
+.ep2pen .btn, .ep2flip { padding: 5px 10px; }
+.ep2atk { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 4px 0; border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
+.ep2atk .die.wide { margin-left: 0; }
+.ep2wrap { flex-wrap: wrap; }
+.sheet .ep2A, .sheet .ep2Apt, .sheet .ep2Sk, .sheet .ep2Mo, .sheet .ep2Ts, .sheet .ep2P, .sheet .ep2Own, .sheet .ep2Ex { contain: strict; }

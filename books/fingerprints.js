@@ -9,8 +9,8 @@ window.BOOK_PRINTS = {
   "size": 58106
  },
  "ssr2-v2.2.pdf": {
-  "sha256": "fd7c461a73096d24ef67db1b61d7fb3ce2ac411ec696681ccfb9e7f3a386af34",
-  "size": 58274
+  "sha256": "b84a5cdf7e51be6a948c954a0b9ed9279ef07251a1e60c32c68fc825d8fa4a4e",
+  "size": 58760
  },
  "lb.pdf": {
   "sha256": "9cc19519748ae6db2900ba9427eece47cb9129ebe46cfe370843147a65caccc1",
@@ -19,5 +19,13 @@ window.BOOK_PRINTS = {
  "srd-5.2.1.pdf": {
   "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87",
   "size": 6031375
+ },
+ "EclipsePhase_SecondEdition_CharacterSheet.pdf": {
+  "sha256": "0ff4e0435532308982fce207e7f3d9a1479c686972654b5a94f46690bdfc7440",
+  "size": 176036
+ },
+ "EclipsePhase_SecondEdition_v1.3.pdf": {
+  "sha256": "05e2bd309dc2b64e20a0d591b8f4e4685af5db51fd50e342f3b3c74829292fcd",
+  "size": 53103004
  }
 };
