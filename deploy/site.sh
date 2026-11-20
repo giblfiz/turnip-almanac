@@ -11,11 +11,11 @@ cd "$(dirname "$0")/.."
 TABLES=("ssr2:shadowrun" "brp:brp")
 [ -f src/scripts-lb.html ] && TABLES+=("lb:lady-blackbird")
 [ -f src/scripts-srd.html ] && TABLES+=("srd:fifth-edition")
-OWN_BOOKS=(books/ssr2-v2.2.pdf)            # Harry's own rules: fine to host (H, 13 Nov)
+OWN_BOOKS=(books/ssr2-v2.2*.pdf)           # Harry's own rules (and our illustrated edition of them): fine to host (H, 13 Nov)
 D=deploy/dist; rm -rf "$D"; mkdir -p "$D/downloads" "$D/books"
 for t in "${TABLES[@]}"; do sys=${t%%:*}; slug=${t##*:}; ./build.sh "$sys" >/dev/null; done
 cp -r assets "$D/"; mkdir -p "$D/rigs"; cp rigs/*.js "$D/rigs/"; rm -f "$D"/rigs/*-ui.js   # the UI halves are built into the pages
-cp campaign*.js "$D/"; cp books/fingerprints.js "$D/books/"
+cp campaign*.js "$D/"; cp books/fingerprints.js "$D/books/"; cp books/*-art.js "$D/books/" 2>/dev/null || true
 for f in "${OWN_BOOKS[@]}"; do cp "$f" "$D/downloads/"; done
 python3 - "$D" "${TABLES[@]}" <<'PY'
 import hashlib, os, re, sys
