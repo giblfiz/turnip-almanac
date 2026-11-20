@@ -11,6 +11,7 @@ cd "$(dirname "$0")/.."
 TABLES=("ssr2:shadowrun" "brp:brp")
 [ -f src/scripts-lb.html ] && TABLES+=("lb:lady-blackbird")
 [ -f src/scripts-srd.html ] && TABLES+=("srd:fifth-edition")
+[ -f src/scripts-ep2.html ] && TABLES+=("ep2:eclipse-phase")
 OWN_BOOKS=(books/ssr2-v2.2*.pdf)           # Harry's own rules (and our illustrated edition of them): fine to host (H, 13 Nov)
 D=deploy/dist; rm -rf "$D"; mkdir -p "$D/downloads" "$D/books"
 for t in "${TABLES[@]}"; do sys=${t%%:*}; slug=${t##*:}; ./build.sh "$sys" >/dev/null; done
@@ -29,7 +30,7 @@ for t in tables:
     html = open(src).read()
     html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">', 1)
     assert '<base href="/">' in html, 'no place for <base>'
-    names = {'ssr2': 'Simplified Shadowrun', 'brp': 'Basic Roleplaying', 'lb': 'Lady Blackbird', 'srd': 'Fifth-edition SRD'}
+    names = {'ssr2': 'Simplified Shadowrun', 'brp': 'Basic Roleplaying', 'lb': 'Lady Blackbird', 'srd': 'Fifth-edition SRD', 'ep2': 'Eclipse Phase'}
     html = html.replace('<title>Turnip Almanac</title>', f'<title>Turnip Almanac · {names.get(sys_, slug)}</title>', 1)
     def bust(m):
         v = ver(m.group(2)); return f'{m.group(1)}{m.group(2)}?v={v}"' if v else m.group(0)
@@ -52,6 +53,14 @@ if any(t.startswith('srd:') for t in tables):
       <span class="go">Open the table →</span>
     </a>
     <!--@MORE-TABLES@-->''', 1).replace('<!--@MORE-NOTES@-->', '<p><b>Fifth-edition SRD</b>: This work includes material from the System Reference Document 5.2.1 (“SRD 5.2.1”) by Wizards of the Coast LLC, available at <a href="https://www.dndbeyond.com/srd">https://www.dndbeyond.com/srd</a>. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at <a href="https://creativecommons.org/licenses/by/4.0/legalcode">https://creativecommons.org/licenses/by/4.0/legalcode</a>. Not affiliated with or endorsed by Wizards of the Coast.</p>\n    <!--@MORE-NOTES@-->', 1)
+if any(t.startswith('ep2:') for t in tables):
+    landing = landing.replace('<!--@MORE-TABLES@-->', '''<a class="table" href="/eclipse-phase/">
+      <h2>Eclipse Phase</h2>
+      <p>Firewall agents who change bodies: minds and morphs kept apart, resleeving, reputation, muses; faces come from your copy's art.</p>
+      <div class="book">Rules: Eclipse Phase Second Edition (free from its co-author's share).</div>
+      <span class="go">Open the table →</span>
+    </a>
+    <!--@MORE-TABLES@-->''', 1).replace('<!--@MORE-NOTES@-->', '<p><b>Eclipse Phase</b> Second Edition © Posthuman Studios, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>; free from the co-author at <a href="https://robboyle.info/">robboyle.info</a>. The table holds page locations, names, mechanics and our own one-line rule summaries; setting text, fiction and art come only from your own copy. Not affiliated with Posthuman Studios.</p>\n    <!--@MORE-NOTES@-->', 1)
 open(os.path.join(D, 'index.html'), 'w').write(landing)
 print('tables:', ', '.join(t.split(':')[1] for t in tables))
 PY

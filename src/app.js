@@ -106,7 +106,7 @@ function goldenSplit(items, x, y, w, h) {
   // the score depends only on the aspect ratio, so memoise on (range, aspect): a few thousand calls, not millions
   const pre = [0]; items.forEach(i => pre.push(pre.at(-1) + i.area)); const memo = new Map();
   function best(i, j, asp) {   // asp = w / h of the box holding items[i..j)
-    const key = i + ',' + j + ',' + Math.round(Math.log(asp) * 40); const hit = memo.get(key); if (hit) return hit;
+    const key = i + ',' + j + ',' + Math.round(Math.log(asp) * (items.length > 12 ? 14 : 40)); const hit = memo.get(key); if (hit) return hit;
     let r;
     if (j - i === 1) r = { score: dev(asp, 1), plan: null };
     else { r = null; const tot = pre[j] - pre[i];
@@ -131,7 +131,7 @@ function goldenSplit(items, x, y, w, h) {
 function goldenLayout(items, x, y, w, h) {
   let order = [...items].sort((a, b) => b.area - a.area), cur = goldenSplit(order, x, y, w, h);
   const read = goldenSplit(items, x, y, w, h); if (read.score <= cur.score * 1.05) { order = [...items]; cur = read; }
-  for (let pass = 0; pass < 1; pass++) for (let t = 0; t + 1 < order.length; t++) {
+  for (let pass = 0; pass < (order.length > 12 ? 0 : 1); pass++) for (let t = 0; t + 1 < order.length; t++) {   // big books: the size order alone
     const o = [...order]; [o[t], o[t + 1]] = [o[t + 1], o[t]]; const r = goldenSplit(o, x, y, w, h);
     if (r.score < cur.score - 1e-6) { order = o; cur = r; } }
   return { ...cur, order };
@@ -139,7 +139,10 @@ function goldenLayout(items, x, y, w, h) {
 // the book's own outline may flex (1.0–2.2) if that lets every chapter come out nearer golden; it must leave room for the
 // help card and the launcher above the map's right end (PX − 1900)
 let bookW, bookH, cells;
-{ let bestL = null;
+const SHELF_KEY = 'turnip-almanac-shelf:' + [C.id, Math.round(bookArea), PX, ...parts.map(p => p.title + p.n + p.entries.length)].join('|');
+const shelfSaved = (() => { try { return JSON.parse(localStorage.getItem(SHELF_KEY) || 'null'); } catch { return null; } })();
+if (shelfSaved) { bookW = shelfSaved.w; bookH = shelfSaved.h; const byT = Object.fromEntries([...parts, INTERP].map(p => [p.title, p])); cells = shelfSaved.cells.map(c => ({ ...c, i: byT[c.t] })); }
+else { let bestL = null;
   const w0 = Math.min(Math.sqrt(bookArea * PHI), PX - 2000), order = goldenLayout([...parts, INTERP], 40, BOOK_TOP, w0 - 80, bookArea / w0 - 40).order;
   for (let asp = 1.0; asp <= 2.21; asp += 0.1) {
     const w = Math.min(Math.sqrt(bookArea * asp), PX - 2000), h = bookArea / w;
@@ -147,7 +150,8 @@ let bookW, bookH, cells;
     const sc = L.score + 0.3 * dev(w, h + BOOK_TOP);   // the book itself should be near golden too
     if (!bestL || sc < bestL.sc) bestL = { sc, L, w, h };
   }
-  bookW = Math.round(bestL.w); bookH = Math.round(bestL.h + BOOK_TOP); cells = bestL.L.cells; }
+  bookW = Math.round(bestL.w); bookH = Math.round(bestL.h + BOOK_TOP); cells = bestL.L.cells;
+  try { localStorage.setItem(SHELF_KEY, JSON.stringify({ w: bookW, h: bookH, cells: cells.map(c => ({ t: c.i.title, x: c.x, y: c.y, w: c.w, h: c.h })) })); } catch {} }
 const U0 = Math.min(1, Math.sqrt(bookArea / ((natTotal + INTERP.area) * 1.08)));   // the shelf's overall scale
 const BX = 0, BY = -bookH - 260, CGAP = 40;
 const bk = add(world, 'bk', BX, BY, bookW, bookH, `<div class="bhead"><img src="${BK.icon || 'assets/genre-modern.png'}" alt=""><div><h2>${esc(BK.fullTitle || BK.title)}</h2><div class="t">${esc(BK.sub)} · the rules this campaign runs on</div></div></div>`);
@@ -294,8 +298,14 @@ function fitInto(box, inner, max = 3) {
 }
 const isToken = src => /assets\/tokens\//.test(src || '');
 // fill every section: scale its contents (CSS zoom) until they exactly fill the box, so no sheet carries dead space
+// builder cells: a cell whose fit is cached (this visit or an earlier one) fits now; the rest are fitted in idle moments
+// after the page is up (a first visit to a big rules system measured 6 s of cell fitting at load)
+let cellIdleQ = new Set(), cellIdleT = 0;
+function cellIdle() { cellIdleT = 0; const ric = window.requestIdleCallback || (f => setTimeout(() => f({ timeRemaining: () => 12 }), 60));
+  ric(dl => { for (const c of cellIdleQ) { if (dl.timeRemaining() < 4) break; cellIdleQ.delete(c); if (c.isConnected) fitCell(c); } if (cellIdleQ.size) cellIdleT = setTimeout(cellIdle, 30); }, { timeout: 800 }); }
 function fitSections(box) {
-  box.querySelectorAll('.bstep.cell').forEach(fitCell);
+  box.querySelectorAll('.bstep.cell').forEach(c => { const f = c.querySelector(':scope > .bfit'), n = [...(f?.querySelectorAll('.opts, .rows') || [])].reduce((t, l) => t + l.children.length, 0);
+    if (cellFit.has(STYLE() + ':' + c.dataset.id.split('-').pop() + ':' + n) || state.build?.pc && c.closest(`[data-id="${state.build.pc}"]`)) fitCell(c); else { cellIdleQ.add(c); if (!cellIdleT) cellIdleT = setTimeout(cellIdle, 50); } });
   box.querySelectorAll('.main > section:not(.sP):not(.sS)').forEach(sec => {
     let f = sec.querySelector(':scope > .fit');
     if (!f) { f = document.createElement('div'); f.className = 'fit'; while (sec.firstChild) f.appendChild(sec.firstChild); sec.appendChild(f); }
@@ -1372,6 +1382,7 @@ const artCards = {}; let artY = null;
 function placeArt(a) {
   const src = bookArt[a.id];
   if (a.use === 'map' && a.id === C.mapArt) { const im = mapEl.querySelector('.mapimg'); im.src = src; im.hidden = false; mapEl.querySelector('.mapwait')?.remove(); return; }
+  if (a.use === 'portrait' && !a.for) return;   // a picture the rig reads by itself (a morph's picture as the face): no card
   // a portrait from the book becomes that character's face (unless the table chose one) and joins the portrait choices
   if (a.use === 'portrait' && a.for && pcById[a.for]) { BOOK_PORTRAITS[a.for] = src; renderSheet(pcById[a.for]); renderTable?.(); return; }
   // scenes and pictures: in a strip west of the book (the quiet side), packed tight, each its own size
