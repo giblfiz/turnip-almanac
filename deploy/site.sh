@@ -18,6 +18,7 @@ TABLES=("ssr2:shadowrun" "brp:brp")
 OWN_BOOKS=(books/ssr2-v2.2*.pdf)           # Harry's own rules (and our illustrated edition of them): fine to host (H, 13 Nov)
 D=deploy/dist; rm -rf "$D"; mkdir -p "$D/downloads" "$D/books"
 for t in "${TABLES[@]}"; do sys=${t%%:*}; slug=${t##*:}; ./build.sh "$sys" >/dev/null; done
+./build.sh desk >/dev/null   # the blank desk (no game yet): the desk branch's front page
 cp -r assets "$D/"; mkdir -p "$D/rigs"; cp rigs/*.js "$D/rigs/"; rm -f "$D"/rigs/*-ui.js   # the UI halves are built into the pages
 cp campaign*.js "$D/"; cp books/fingerprints.js "$D/books/"; cp books/*-art.js "$D/books/" 2>/dev/null || true
 for f in "${OWN_BOOKS[@]}"; do cp "$f" "$D/downloads/"; done
@@ -65,8 +66,12 @@ if any(t.startswith('ep2:') for t in tables):
       <span class="go">Open the table →</span>
     </a>
     <!--@MORE-TABLES@-->''', 1).replace('<!--@MORE-NOTES@-->', '<p><b>Eclipse Phase</b> Second Edition © Posthuman Studios, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>; free from the co-author at <a href="https://robboyle.info/">robboyle.info</a>. The table holds page locations, names, mechanics and our own one-line rule summaries; setting text, fiction and art come only from your own copy. Not affiliated with Posthuman Studios.</p>\n    <!--@MORE-NOTES@-->', 1)
+if os.environ.get('TW_HOME'):   # the desk branch: its front page is the blank desk (the orientation, where a game is picked)
+    desk = open('desk.html').read().replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">\n<meta name="robots" content="noindex">\n<script>window.TW_HOME = ' + repr(os.environ['TW_HOME']) + ';</script>', 1)
+    desk = re.sub(r'(src=")((?:books|assets)[^"?]*)"', bust, desk)
+    open(os.path.join(D, 'index.html'), 'w').write(desk); print('front page: the blank desk')
 if os.environ.get('TW_HOME'): landing = landing.replace('<span class="wip">Working in public · early</span>', '<span class="wip">Desk branch · paired with <a href="' + os.environ['TW_HOME'] + '">' + os.environ['TW_HOME'].split('//')[1].rstrip('/') + '</a></span>', 1)
-open(os.path.join(D, 'index.html'), 'w').write(landing)
+if not os.environ.get('TW_HOME'): open(os.path.join(D, 'index.html'), 'w').write(landing)
 print('tables:', ', '.join(t.split(':')[1] for t in tables))
 PY
 find "$D" -name '*.pdf' | grep -v '/downloads/' && { echo "a rulebook PDF slipped into the site: refusing"; exit 1; } || true

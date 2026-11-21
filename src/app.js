@@ -688,13 +688,31 @@ const diceCard = add(world, 'card tablecard', SX + TBW + SGAP, TBY, TBW, TBH, ''
 const logCard = add(world, 'card tablecard logcard', SX + 2 * (TBW + SGAP), TBY, TBW, TBH, '');
 reg('dice', { el: diceCard, title: 'Dice tray', kind: 'table', box: { x: SX + TBW + SGAP, y: TBY, w: TBW, h: TBH } });
 reg('log', { el: logCard, title: 'Log · rolls and chat', kind: 'table', box: { x: SX + 2 * (TBW + SGAP), y: TBY, w: TBW, h: TBH } });
-const helpCard = add(world, 'card helpcard', PX - 1900, -2240, 1800, 1180, `<h3>Getting around</h3><div class="t">
-  <b>Scroll</b> to pan · <b>pinch</b> or <b>ctrl-scroll</b> to zoom · <b>0</b> shows everything · <b>Alt ←</b> goes back<br>
-  <b>/</b> or <b>⌘K</b> opens the quickbar at the top: type a name, a place, a rule, or a command such as ${WORDS.helpCommands}, <i>round order</i><br>
-  <b>Double-click</b> a thing to fly to it, empty space for a note · <b>drop an image</b> on a portrait, or anywhere for art<br>
-  In a builder, <b>Tab</b> and <b>Shift+Tab</b> fly between steps · hover a <b>number</b> to see where it comes from</div>`);
-label(world, 'HELP', PX - 1900, -2240 - 1260, 1150);
-reg('help', { el: helpCard, title: 'Getting around', kind: 'help', box: { x: PX - 1900, y: -2240, w: 1800, h: 1180 } });
+// START HERE (H, 21 Nov): the orientation every desk starts with (src/orient.js), on this table as one paper where the
+// old "Getting around" card stood: this table's game (and the others, to change to), the rulebook, your seat, the
+// Turnip Works link, how the desk works. Its foot stays where the old card's was; it grows upward.
+const GAME_ID = C.book.id.replace(/^book-/, ''), START_X = PX - 2500, START_W = 2400, START_FOOT = -1060;
+const helpCard = add(world, 'card helpcard startcard', START_X, START_FOOT - 1600, START_W, null, '');
+const startLabel = label(world, 'START HERE', START_X, START_FOOT - 1600 - 1260, 1150);
+reg('help', { el: helpCard, title: 'Start here · how the desk works', kind: 'help', box: { x: START_X, y: START_FOOT - 1600, w: START_W, h: 1600 } });
+function renderStart() {
+  const O = window.ORIENT; if (!O) return; let T = null; try { T = tw; } catch {}
+  const role = (() => { try { return localStorage.getItem('turnip-almanac-role') || 'gm'; } catch { return 'gm'; } })();
+  let cs = 'local'; try { cs = copyState; } catch {}   // (declared further down: the first draw comes before it)
+  const copy = cs === 'open' ? 'Your copy of this table’s book is open in this browser.' : cs === 'local' ? '' : 'This table’s book is not open in this browser yet: see the rulebook, above the map.';
+  const c = { where: 'table', game: GAME_ID, role, copy, cmds: WORDS.helpCommands, linked: T?.on ? { tableName: T.tableName, seatName: T.seatName, role: T.role } : null };
+  helpCard.innerHTML = `<div class="ostart"><section>${O.S.pick(c)}</section><section>${O.S.book(c)}</section><section>${O.S.seat(c)}</section><section>${O.S.tw(c)}</section><section><h2>How the desk works</h2>${O.S.how(c)}</section></div>`;
+  requestAnimationFrame(() => { const h = helpCard.offsetHeight, y = START_FOOT - h; place(helpCard, START_X, y, START_W, null); startLabel.style.top = (y - 1260) + 'px'; nodes.help.box = { x: START_X, y, w: START_W, h }; });
+}
+renderStart();
+// a game picked on Start here: that game's table, with the Turnip Works link carried along (and the table told)
+document.addEventListener('click', async ev => { const b = ev.target.closest('.startcard [data-pick]'); if (!b) return;
+  const e = window.ORIENT.GAMES.flatMap(g => g.editions).find(x => x.slug === b.dataset.pick); if (!e || e.slug === window.ORIENT.GAMES.find(g => g.id === GAME_ID)?.editions[0].slug) return;
+  let url = window.ORIENT.tablePage(e), T = null; try { T = tw; } catch {}
+  if (T?.on) { try { await twDo('desk.page', { page: e.slug }); } catch {} url += '#tw=' + btoa(unescape(encodeURIComponent(JSON.stringify({ r: T.relay, c: T.cid, a: T.area, s: T.token, p: T.page })))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  location.assign(url); });
+document.addEventListener('click', ev => { const r = ev.target.closest('.startcard [data-role]'); if (!r) return; try { localStorage.setItem('turnip-almanac-role', r.dataset.role); } catch {} renderStart(); });
+document.addEventListener('click', ev => { if (ev.target.closest('.startcard [data-twnew]')) twOpen(); });
 let turn = { round: 1, at: 0 };
 function toast(rec, at) {
   const t = $('#toast'); t.innerHTML = rec.msg ? `<div class="roll"><b>${esc(rec.msg)}</b>${rec.note ? `<span class="tn">${esc(rec.note)}</span>` : ''}</div>` : rollHtml(rec);
@@ -1780,13 +1798,13 @@ async function twLink(pair) {
   const was = tw.cid; Object.assign(tw, pair); if (was && was !== tw.cid) { tw.pawns = {}; tw.rev = 0; tw.synced = null; }
   const st = await twGet(`/c/${tw.cid}/state`);
   const areas = st.campaign?.areas || [], mine = (x => x?.location || x?.area)(st.campaign?.seats?.find?.(x => x.id === st.you?.id));
-  tw.area = tw.areaHint || mine || areas[0]?.id; tw.seatName = st.you?.name || ''; tw.tableName = st.campaign?.name || '';
+  tw.area = tw.areaHint || mine || areas[0]?.id; tw.seatName = st.you?.name || ''; tw.tableName = st.campaign?.name || ''; tw.role = st.you?.role === 'gm' ? 'gm' : 'player';
   if (!tw.area) throw new Error('No area found in that campaign');
   tw.after = ''; tw.pawns = tw.pawns || {}; tw.on = true; const fresh = tw.fresh; delete tw.fresh; twSave();
   if (fresh) { historyNote('Linked to a Turnip Works table'); toast({ msg: 'Linked to the Turnip Works table', note: 'Rolls and chat now go both ways.' }); }
-  window.name = 'turnip-almanac:' + tw.cid; twPoll(); twSnapshotSoon(); await twStoreSync(true); return st;
+  window.name = 'turnip-almanac:' + tw.cid; renderStart(); twPoll(); twSnapshotSoon(); await twStoreSync(true); return st;
 }
-function twUnlink() { tw.on = false; twSave(); twStatus = 'unlinked'; }
+function twUnlink() { tw.on = false; twSave(); twStatus = 'unlinked'; renderStart(); }
 // a roll, described from the system's own roll markup (label, target line, dice, verdict): one reader for every rig
 function twRollOf(rec) {
   const d = document.createElement('div'); d.innerHTML = rollHtml(rec);
@@ -1870,6 +1888,7 @@ async function twSnapshot() {
   try { await twPostJson(`/c/${tw.cid}/desk`, { app: 'Turnip Almanac', sys: C.book.id.replace(/^book-/, ''), book: C.book.fullTitle || C.book.title, party, sessions, page: location.origin + location.pathname }); } catch (err) { twStatus = 'snapshot: ' + err.message; }
 }
 { const rs = renderSheet; renderSheet = function (pc) { rs(pc); twSnapshotSoon(); }; }
+{ const rc = renderCopyPanel; renderCopyPanel = function () { rc(); renderStart(); }; }
 // THE STORE (item 11; Harry: "keeping everything on the server except for the uploaded book"). Linked, this campaign's
 // saved record (STORE_KEY: characters, notes and their dropped pictures, sessions, log, counts) lives with the TW
 // campaign; this browser is a cache. The book, and anything cut from it, is never in that record (it lives in

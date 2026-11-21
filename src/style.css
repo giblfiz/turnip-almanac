@@ -826,3 +826,36 @@ html, body { touch-action: none; overscroll-behavior: none; }
 #twpanel .st { color: var(--ink-3); font-size: 12px; } #twpanel code { font-size: 11px; }
 #dupnote { position: fixed; inset: 0; z-index: 60; display: grid; place-content: center; gap: 8px; text-align: center; background: #000a; color: #fff; font: 18px var(--f-body, system-ui); }
 #dupnote span { font-size: 14px; opacity: .8; }
+/* ---- orientation (src/orient.js): the blank desk's papers, and "Start here" on a table */
+.opaper { position: absolute; padding: 34px 40px 36px !important; font: 19px/1.55 var(--f-body); color: var(--ink); overflow: visible !important; }
+.opaper h1 { font: 72px/1 var(--f-display); margin: 0 0 18px; letter-spacing: -.01em; }
+.opaper h2 { font: 40px/1.1 var(--f-display); margin: 0 0 14px; }
+.opaper h3 { font: 600 22px/1.2 var(--f-label, var(--f-body)) !important; letter-spacing: .06em; text-transform: uppercase; margin: 30px 0 6px !important; color: var(--ink) !important; border: 0 !important; padding: 0 !important; background: none !important; }
+.opaper h2 { border: 0 !important; padding: 0 !important; background: none !important; color: var(--ink) !important; }
+.opaper p { margin: 0 0 12px; } .opaper ul { margin: 6px 0 14px; padding-left: 1.2em; } .opaper li { margin: 5px 0; }
+.opaper .lede { font-size: 24px; line-height: 1.45; } .opaper .next { font-style: italic; color: var(--ink-2); }
+.opaper .small { font-size: 16px; color: var(--ink-2); } .opaper .keys { font-size: 17px; }
+.opaper .ostate { font-weight: 600; } .opaper .ostate.ok::before { content: '● '; color: #3f8a3a; }
+.ogames { display: grid; gap: 12px; margin: 14px 0 18px; }
+.ogame { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #ffffff38; box-shadow: inset 0 0 0 1px #3b2a1f30; }
+.ogame.cur { box-shadow: inset 0 0 0 2.5px var(--ochre); }
+.ogh b { display: block; font: 26px/1.1 var(--f-display); } .ogh span { font-size: 16px; color: var(--ink-2); }
+.oeds { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.oed { font: 600 16px var(--f-body); padding: 8px 14px; text-align: left; white-space: nowrap; } .oed i { font-weight: 400; opacity: .7; }
+.oed.soon { color: var(--ink-3); padding: 8px 14px; border: 1.5px dashed #3b2a1f40; border-radius: 10px; white-space: nowrap; }
+.odrop { padding: 16px 18px; border: 2.5px dashed #3b2a1f55; border-radius: 14px; font-size: 17px; } .odrop.over { border-color: var(--ochre); background: #ffffff40; }
+.odrop .bad { color: #9a2b1f; } .odrop .good { color: #2f6b2b; }
+.obtn { display: inline-block; font: 600 16px var(--f-body); padding: 6px 12px; margin: 2px 4px; cursor: pointer; }
+.oroles { display: flex; gap: 10px; margin: 4px 0 14px; } .orole { font: 600 17px var(--f-body); padding: 9px 16px; } .orole.on { outline: 3px solid var(--ochre); outline-offset: 2px; }
+.opic { margin: 14px 0 18px; } .opic img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 2px 10px #0005; } .opic.tall img { width: 46%; }
+.opic figcaption { font-size: 14px; font-style: italic; color: var(--ink-3); margin-top: 6px; }
+.olabel { position: absolute; white-space: nowrap; pointer-events: none; }
+.startcard { padding: 40px 46px !important; overflow: visible !important; }
+.startcard .ostart { columns: 3; column-gap: 56px; font: 18px/1.5 var(--f-body); }
+.startcard .ostart section { break-inside: avoid-column; margin-bottom: 30px; }
+.startcard .ostart section:last-child { break-inside: auto; }
+.startcard h2 { font: 34px/1.1 var(--f-display) !important; margin: 0 0 12px !important; border: 0 !important; padding: 0 !important; background: none !important; color: var(--ink) !important; }
+.startcard h3 { font: 600 19px/1.2 var(--f-label, var(--f-body)) !important; letter-spacing: .06em; text-transform: uppercase; margin: 22px 0 6px !important; border: 0 !important; padding: 0 !important; background: none !important; color: var(--ink) !important; }
+.startcard p { margin: 0 0 10px; } .startcard ul { margin: 6px 0 12px; padding-left: 1.2em; }
+.startcard .ogame { grid-template-columns: 1fr; } .startcard .oeds { flex-direction: row; flex-wrap: wrap; }
+.startcard .small { font-size: 15px; color: var(--ink-2); } .startcard .ostate { font-weight: 600; } .startcard .ostate.ok::before { content: '● '; color: #3f8a3a; }

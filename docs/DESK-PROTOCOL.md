@@ -85,3 +85,11 @@ browser: that is the mechanical firewall, the same line as the bridge.
 - The store is never shown to AI seats raw; they read the mechanics snapshot (`/c/{cid}/desk`) as before.
 - Notes' pictures are things people dropped on the table (theirs), so they may be stored; book art is cut at load
   from the reader's own copy and is never in the state.
+
+## v3 (Harry, 21 Nov): the blank desk and orientation
+- **The blank desk** is `desk.html` locally, and the front page of the hosted desk branch. It is the Almanac before a game is picked: a canvas holding the orientation (`src/orient.js`), which covers picking a game and edition, bringing your rulebook, your seat (GM or player), the Turnip Works link, and how the desk works.
+- **Pairing.** It takes `#tw=` like a table does.
+- **Picking a game** dispatches `desk.page {page: slug}` to TW, then opens that table with the pairing carried along.
+- **A rulebook dropped on it** is identified by SHA-256 against `BOOK_PRINTS`. It is stored in IndexedDB under that hash, where the table finds it.
+- **TW's "Open the desk"** with no `deskPage` opens the blank desk (`deskBlankPage()`); with one, it opens that table. The Settings picker defaults to "Pick in the desk".
+- **Every table carries the same orientation** as its **Start here** paper, which replaces "Getting around". Its game list is where you change games.
