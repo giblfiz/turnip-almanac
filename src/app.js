@@ -14,7 +14,9 @@ let FROZEN = false;   // set while going back in history, so nothing on the way 
 const lsSet = (k, v) => { if (!FROZEN) localStorage.setItem(k, v); };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } },
-  set(v) { try { lsSet(STORE_KEY, JSON.stringify(v)); } catch {} },
+  // merge into the saved record: persist() names only its own keys, and must not drop what the other writers keep there
+  // (session notes, pockets, the log); before this, a roll after a note edit lost the note
+  set(v) { try { lsSet(STORE_KEY, JSON.stringify({ ...this.get(), ...v })); } catch {} },
 };
 const saved = store.get();
 const state = { notes: saved.notes || null, pins: saved.pins || ['map', 'now'], live: saved.live || {}, choices: saved.choices || {}, rolls: saved.rolls || {}, extra: saved.extra || [], portraits: saved.portraits || {}, art: saved.art || [], done: saved.done || {}, summons: saved.summons || {}, vis: saved.vis || {}, mapImg: saved.mapImg || '', order: saved.order || null, removed: saved.removed || [], rollCount: saved.rollCount || {}, adv: saved.adv || {}, checks: saved.checks || {}, summonPick: {}, asof: {}, build: null };
