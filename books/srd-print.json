@@ -16404,5 +16404,11985 @@
 43.7
 ],
 "text": "Tips to keep in mind when designing and running combat encounters."
+},
+{
+"id": "srd-magic-items-magic-item-categories",
+"title": "Magic Item Categories",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+61.5,
+135.4,
+228.0,
+72.9
+],
+"text": "Introduces the nine magic item categories and the rules for each"
+},
+{
+"id": "srd-magic-items-magic-item-categories-table",
+"title": "Magic Item Categories",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+61.5,
+215.8,
+228.0,
+166.4
+],
+"text": "Table: the nine item categories (armor, potions, rings and so on) with an example for each"
+},
+{
+"id": "srd-magic-items-armor",
+"title": "Armor",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+61.5,
+386.5,
+230.5,
+118.7
+],
+"text": "Magic armor is a version of normal armor and must be worn to work unless stated otherwise"
+},
+{
+"id": "srd-magic-items-potions",
+"title": "Potions",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+61.5,
+507.1,
+228.0,
+202.7
+],
+"text": "Consumable 1-ounce brews or oils; drinking or applying takes an action; mixing may go wrong",
+"cont": [
+[
+204,
+[
+311.5,
+39.2,
+232.2,
+73.0
+]
+]
+]
+},
+{
+"id": "srd-magic-items-potion-miscibility-table",
+"title": "Potion Miscibility",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+311.5,
+119.8,
+228.0,
+401.2
+],
+"text": "Table: d100 results of mixing potions, from explosion to lost effects up to doubled power"
+},
+{
+"id": "srd-magic-items-rings",
+"title": "Rings",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+311.5,
+525.2,
+228.0,
+58.7
+],
+"text": "Rings only work when on a finger or similar digit, unless noted"
+},
+{
+"id": "srd-magic-items-rods",
+"title": "Rods",
+"chapter": "Magic Items",
+"page": 204,
+"rect": [
+311.5,
+585.9,
+228.0,
+82.7
+],
+"text": "Rods weigh 2 to 5 pounds and can serve as an Arcane Focus unless noted"
+},
+{
+"id": "srd-magic-items-scrolls",
+"title": "Scrolls",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+61.5,
+36.8,
+229.3,
+178.7
+],
+"text": "Scrolls are consumable; Spell Scrolls store one spell and crumble once used"
+},
+{
+"id": "srd-magic-items-staffs",
+"title": "Staffs",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+61.5,
+217.5,
+231.6,
+130.7
+],
+"text": "Staffs weigh 2 to 7 pounds, often work as quarterstaffs and as Arcane or other Focuses"
+},
+{
+"id": "srd-magic-items-wands",
+"title": "Wands",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+61.5,
+350.1,
+228.0,
+94.7
+],
+"text": "Wands run about a foot long and double as an Arcane Focus unless noted"
+},
+{
+"id": "srd-magic-items-weapons",
+"title": "Weapons",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+61.5,
+446.7,
+228.0,
+142.7
+],
+"text": "Magic weapons are enchanted versions of normal weapons; unspecified type is the GM's choice"
+},
+{
+"id": "srd-magic-items-wondrous-items",
+"title": "Wondrous Items",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+61.5,
+591.3,
+228.0,
+70.7
+],
+"text": "Catch-all category: boots, capes, amulets, bags, carpets, horns, figurines and more"
+},
+{
+"id": "srd-magic-items-magic-item-rules",
+"title": "Magic Item Rules",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+311.5,
+41.8,
+228.0,
+331.2
+],
+"text": "Attunement prerequisites, items sized to specific creatures, and unusual anatomy"
+},
+{
+"id": "srd-magic-items-magic-item-rarity",
+"title": "Magic Item Rarity",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+311.5,
+394.4,
+228.8,
+109.6
+],
+"text": "Rarity ranks power from Common up to Artifact, with matching values and availability"
+},
+{
+"id": "srd-magic-items-magic-item-values-by-rarity",
+"title": "Magic Item Values by Rarity",
+"chapter": "Magic Items",
+"page": 205,
+"rect": [
+311.5,
+505.2,
+231.7,
+191.5
+],
+"text": "Where items can be bought by rarity, and how to price them if players may buy",
+"cont": [
+[
+206,
+[
+61.5,
+39.2,
+228.0,
+37.0
+]
+]
+]
+},
+{
+"id": "srd-magic-items-magic-item-rarities-and-values-table",
+"title": "Magic Item Rarities and Values",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+61.5,
+83.8,
+229.7,
+110.0
+],
+"text": "Table: item values by rarity, from 100 GP for Common up to 200,000 GP for Legendary"
+},
+{
+"id": "srd-magic-items-activating-a-magic-item",
+"title": "Activating a Magic Item",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+61.5,
+200.6,
+228.6,
+96.9
+],
+"text": "Activation normally means a Magic action; some items need command words or charges"
+},
+{
+"id": "srd-magic-items-command-word",
+"title": "Command Word",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+61.5,
+299.4,
+228.0,
+83.5
+],
+"text": "A spoken or signed trigger phrase; silence effects stop spoken ones"
+},
+{
+"id": "srd-magic-items-consumable-items",
+"title": "Consumable Items",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+61.5,
+384.0,
+231.7,
+82.7
+],
+"text": "Items used up on activation, such as potions and scrolls, which lose their magic"
+},
+{
+"id": "srd-magic-items-spells-cast-from-items",
+"title": "Spells Cast from Items",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+61.5,
+469.8,
+231.0,
+221.0
+],
+"text": "Item spells use the lowest level and caster level, spend no slots and need no components",
+"cont": [
+[
+206,
+[
+311.5,
+39.2,
+229.0,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-magic-items-charges",
+"title": "Charges",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+67.2,
+228.0,
+89.0
+],
+"text": "Items with charges spend them to function; Identify reveals the count, attuned users know it"
+},
+{
+"id": "srd-magic-items-the-next-dawn",
+"title": "“The Next Dawn”",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+159.4,
+228.0,
+84.9
+],
+"text": "Recharges happen at dawn; the GM decides when on worlds or planes without one"
+},
+{
+"id": "srd-magic-items-cursed-items",
+"title": "Cursed Items",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+247.4,
+231.4,
+97.6
+],
+"text": "Curses rarely show on inspection; attunement can't end until the curse is lifted"
+},
+{
+"id": "srd-magic-items-magic-item-resilience",
+"title": "Magic Item Resilience",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+347.4,
+228.1,
+108.9
+],
+"text": "Magic items are as sturdy as mundane ones; most resist all damage, Artifacts barely break"
+},
+{
+"id": "srd-magic-items-crafting-magic-items",
+"title": "Crafting Magic Items",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+459.4,
+228.0,
+84.9
+],
+"text": "Rules for making magic items other than healing potions and spell scrolls"
+},
+{
+"id": "srd-magic-items-arcana-proficiency",
+"title": "Arcana Proficiency",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+546.2,
+228.0,
+46.7
+],
+"text": "Crafters and assistants all need Arcana proficiency"
+},
+{
+"id": "srd-magic-items-tools",
+"title": "Tools",
+"chapter": "Magic Items",
+"page": 206,
+"rect": [
+311.5,
+594.8,
+230.6,
+94.7
+],
+"text": "Each item category needs a matching tool, and the crafter and helpers must be proficient"
+},
+{
+"id": "srd-magic-items-magic-item-tools-table",
+"title": "Magic Item Tools",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+61.5,
+42.9,
+228.0,
+278.2
+],
+"text": "Table: the tool required to craft each item category, such as Jeweler's Tools for rings"
+},
+{
+"id": "srd-magic-items-spells",
+"title": "Spells",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+61.5,
+325.3,
+228.0,
+58.7
+],
+"text": "If an item casts spells, the crafter must have them prepared every day of crafting"
+},
+{
+"id": "srd-magic-items-time-and-cost",
+"title": "Time and Cost",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+61.5,
+385.9,
+231.1,
+322.7
+],
+"text": "Crafting takes 8 hours of work per day, with time and gold based on rarity"
+},
+{
+"id": "srd-magic-items-magic-item-crafting-time-and-cost-table",
+"title": "Magic Item Crafting Time and Cost",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+37.8,
+230.0,
+130.8
+],
+"text": "Table: crafting time and cost by rarity, from 5 days and 50 GP to 250 days and 100,000 GP"
+},
+{
+"id": "srd-magic-items-sentient-magic-items",
+"title": "Sentient Magic Items",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+175.4,
+232.2,
+192.9
+],
+"text": "Some items have a mind and personality, acting as allies or troublesome companions"
+},
+{
+"id": "srd-magic-items-sentient-magic-item-traits",
+"title": "Sentient Magic Item Traits",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+370.2,
+228.0,
+58.7
+],
+"text": "Build a sentient item's persona like an NPC, adding the traits below"
+},
+{
+"id": "srd-magic-items-abilities",
+"title": "Abilities",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+431.9,
+230.5,
+65.0
+],
+"text": "A sentient item gets Intelligence, Wisdom and Charisma scores, chosen or rolled 4d6 drop lowest"
+},
+{
+"id": "srd-magic-items-alignment",
+"title": "Alignment",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+500.0,
+228.0,
+65.0
+],
+"text": "A sentient item has an alignment, chosen or rolled on a table"
+},
+{
+"id": "srd-magic-items-communication",
+"title": "Communication",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+568.1,
+228.0,
+77.0
+],
+"text": "A sentient item shares feelings, thoughts or speech with its bearer, chosen or rolled"
+},
+{
+"id": "srd-magic-items-senses",
+"title": "Senses",
+"chapter": "Magic Items",
+"page": 207,
+"rect": [
+311.5,
+648.2,
+229.8,
+53.0
+],
+"text": "A sentient item perceives nearby surroundings, chosen or rolled on a table"
+},
+{
+"id": "srd-magic-items-special-purpose",
+"title": "Special Purpose",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+61.5,
+37.4,
+228.4,
+113.0
+],
+"text": "An optional goal the item pursues; it cooperates while the wielder's actions serve it"
+},
+{
+"id": "srd-magic-items-sentient-items-alignment-table",
+"title": "Sentient Item’s Alignment",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+61.5,
+158.0,
+228.0,
+105.6
+],
+"text": "Table: d100 alignment rolls for sentient items, weighted toward good and neutral"
+},
+{
+"id": "srd-magic-items-sentient-items-communication-table",
+"title": "Sentient Item’s Communication",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+61.5,
+273.5,
+228.0,
+112.7
+],
+"text": "Table: d10 for how a sentient item communicates, from emotions to speech and telepathy"
+},
+{
+"id": "srd-magic-items-sentient-items-senses-table",
+"title": "Sentient Item’s Senses",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+61.5,
+396.2,
+228.0,
+90.4
+],
+"text": "Table: d4 for sentient item senses, hearing and vision out to 30, 60 or 120 feet"
+},
+{
+"id": "srd-magic-items-sentient-items-special-purpose-table",
+"title": "Sentient Item’s Special Purpose",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+61.5,
+496.5,
+228.0,
+166.7
+],
+"text": "Table: d10 of sentient item goals, such as Bane, Destroyer, Protector or Lore Seeker",
+"cont": [
+[
+208,
+[
+311.5,
+42.5,
+228.0,
+231.8
+]
+]
+]
+},
+{
+"id": "srd-magic-items-conflict",
+"title": "Conflict",
+"chapter": "Magic Items",
+"page": 208,
+"rect": [
+311.5,
+285.1,
+231.2,
+381.2
+],
+"text": "When bearer and item clash, a Charisma save (DC 12 + item Charisma) decides if the item takes over"
+},
+{
+"id": "srd-item-adamantine-armor",
+"title": "Adamantine Armor",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+61.5,
+147.7,
+228.0,
+92.6
+],
+"text": "Critical Hits against the wearer count as ordinary hits",
+"kind": "item",
+"tag": "Armor · Uncommon"
+},
+{
+"id": "srd-item-ammunition-1-2-or-3",
+"title": "Ammunition, +1, +2, or +3",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+61.5,
+243.4,
+229.2,
+152.6
+],
+"text": "Ammo with +1/+2/+3 to attack and damage by rarity; loses its magic once it hits",
+"kind": "item",
+"tag": "Weapon · Uncommon (+1), rare (+2), very rare (+3)"
+},
+{
+"id": "srd-item-ammunition-of-slaying",
+"title": "Ammunition of Slaying",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+61.5,
+399.1,
+228.0,
+275.0
+],
+"text": "Ammo keyed to one creature type: DC 17 Constitution save, extra 6d10 Force or half; then mundane",
+"kind": "item",
+"tag": "Weapon · Very rare"
+},
+{
+"id": "srd-item-amulet-of-health",
+"title": "Amulet of Health",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+311.5,
+37.4,
+228.0,
+68.6
+],
+"text": "Sets your Constitution to 19 while worn, if it was lower",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-amulet-of-proof-against-detection-and-location",
+"title": "Amulet of Proof against Detection and Location",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+311.5,
+109.0,
+228.0,
+78.6
+],
+"text": "Wearer is immune to Divination targeting and scrying sensors unless they allow it",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-amulet-of-the-planes",
+"title": "Amulet of the Planes",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+311.5,
+190.7,
+228.1,
+370.7
+],
+"text": "DC 15 Arcana check to Plane Shift to a known plane; failure sends you and nearby allies astray",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement"
+},
+{
+"id": "srd-item-animated-shield",
+"title": "Animated Shield",
+"chapter": "Magic Items",
+"page": 209,
+"rect": [
+311.5,
+566.7,
+229.9,
+140.6
+],
+"text": "Bonus Action: Shield hovers and defends you for 1 minute, freeing your hands",
+"kind": "item",
+"tag": "Armor · Very rare · requires attunement"
+},
+{
+"id": "srd-item-apparatus-of-the-crab",
+"title": "Apparatus of the Crab",
+"chapter": "Magic Items",
+"page": 210,
+"rect": [
+61.5,
+37.4,
+253.9,
+676.6
+],
+"text": "Iron barrel vehicle with levers: walks and swims as a lobster, AC 20, HP 200, dives to 900 feet",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-armor-1-2-or-3",
+"title": "Armor, +1, +2, or +3",
+"chapter": "Magic Items",
+"page": 210,
+"rect": [
+311.5,
+37.4,
+229.8,
+68.6
+],
+"text": "Armor granting +1, +2, or +3 AC depending on rarity",
+"kind": "item",
+"tag": "Armor · Rare (+1), very rare (+2), legendary (+3)"
+},
+{
+"id": "srd-item-armor-of-invulnerability",
+"title": "Armor of Invulnerability",
+"chapter": "Magic Items",
+"page": 210,
+"rect": [
+311.5,
+109.0,
+228.0,
+128.6
+],
+"text": "Resist weapon damage; Magic action for 10 minutes of immunity to it, once per dawn",
+"kind": "item",
+"tag": "Armor · Legendary · requires attunement"
+},
+{
+"id": "srd-item-armor-of-resistance",
+"title": "Armor of Resistance",
+"chapter": "Magic Items",
+"page": 210,
+"rect": [
+311.5,
+240.7,
+228.4,
+473.2
+],
+"text": "Resistance to one damage type (rolled or chosen) while worn",
+"kind": "item",
+"tag": "Armor · Rare · requires attunement"
+},
+{
+"id": "srd-item-armor-of-vulnerability",
+"title": "Armor of Vulnerability",
+"chapter": "Magic Items",
+"page": 211,
+"rect": [
+61.5,
+37.4,
+230.5,
+188.6
+],
+"text": "Cursed: resists Bludgeoning, Piercing, or Slashing but you become vulnerable to the other two",
+"kind": "item",
+"tag": "Armor · Rare · requires attunement"
+},
+{
+"id": "srd-item-arrow-catching-shield",
+"title": "Arrow-Catching Shield",
+"chapter": "Magic Items",
+"page": 211,
+"rect": [
+61.5,
+229.0,
+228.0,
+104.6
+],
+"text": "+2 AC against ranged attacks; Reaction to take hits aimed at allies within 5 feet",
+"kind": "item",
+"tag": "Armor · Rare · requires attunement"
+},
+{
+"id": "srd-item-bag-of-beans",
+"title": "Bag of Beans",
+"chapter": "Magic Items",
+"page": 211,
+"rect": [
+61.5,
+336.7,
+228.9,
+371.0
+],
+"text": "3d4 beans; dumped ones explode (DC 15 Dexterity, 5d4 Force), planted ones sprout a random effect",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+211,
+[
+311.5,
+42.5,
+228.0,
+616.7
+]
+]
+]
+},
+{
+"id": "srd-item-bag-of-devouring",
+"title": "Bag of Devouring",
+"chapter": "Magic Items",
+"page": 212,
+"rect": [
+61.5,
+37.4,
+231.7,
+344.6
+],
+"text": "Bag of Holding lookalike that is a monster's mouth: eats contents, may pull in creatures",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-bag-of-holding",
+"title": "Bag of Holding",
+"chapter": "Magic Items",
+"page": 212,
+"rect": [
+61.5,
+385.0,
+228.6,
+308.6
+],
+"text": "Extradimensional bag: 500 pounds, 64 cubic feet, always weighs 5 pounds; ruined if overloaded",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-bag-of-tricks",
+"title": "Bag of Tricks",
+"chapter": "Magic Items",
+"page": 212,
+"rect": [
+311.5,
+37.4,
+229.1,
+571.3
+],
+"text": "Pull a fuzzy object and throw it to summon a friendly beast from a color-based table until dawn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-bead-of-force",
+"title": "Bead of Force",
+"chapter": "Magic Items",
+"page": 212,
+"rect": [
+311.5,
+614.1,
+228.0,
+104.6
+],
+"text": "Thrown 60 feet: 10 feet explosion, DC 15 Dexterity or 5d4 Force, then traps failures in a force sphere",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+213,
+[
+61.5,
+39.2,
+230.8,
+181.0
+]
+]
+]
+},
+{
+"id": "srd-item-bead-of-nourishment",
+"title": "Bead of Nourishment",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+61.5,
+223.2,
+228.0,
+68.6
+],
+"text": "Dissolving bead that feeds you as much as a day of Rations",
+"kind": "item",
+"tag": "Wondrous Item · Common"
+},
+{
+"id": "srd-item-belt-of-dwarvenkind",
+"title": "Belt of Dwarvenkind",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+61.5,
+294.9,
+231.4,
+276.8
+],
+"text": "+2 Constitution (max 20), Dwarvish, dwarf rapport; non-dwarves also get Darkvision and poison resistance",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-belt-of-giant-strength",
+"title": "Belt of Giant Strength",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+61.5,
+574.8,
+228.0,
+92.6
+],
+"text": "Sets Strength to 21-29 by giant type (hill to storm), if it was lower",
+"kind": "item",
+"tag": "Wondrous Item · Rarity varies · requires attunement",
+"cont": [
+[
+213,
+[
+311.5,
+42.5,
+228.0,
+102.1
+]
+]
+]
+},
+{
+"id": "srd-item-berserker-axe",
+"title": "Berserker Axe",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+311.5,
+150.0,
+232.2,
+392.6
+],
+"text": "+1 axe with extra HP per level, but cursed: rage when hurt, and you won't part with it",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement"
+},
+{
+"id": "srd-item-boots-of-elvenkind",
+"title": "Boots of Elvenkind",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+311.5,
+545.7,
+228.0,
+80.6
+],
+"text": "Silent steps and Advantage on Stealth checks",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-boots-of-levitation",
+"title": "Boots of Levitation",
+"chapter": "Magic Items",
+"page": 213,
+"rect": [
+311.5,
+629.3,
+228.0,
+56.6
+],
+"text": "Cast Levitate on yourself at will",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-boots-of-speed",
+"title": "Boots of Speed",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+61.5,
+37.4,
+228.0,
+140.6
+],
+"text": "Bonus Action to double Speed and hinder Opportunity Attacks; 10 minutes total per Long Rest",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-boots-of-striding-and-springing",
+"title": "Boots of Striding and Springing",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+61.5,
+181.0,
+228.7,
+104.6
+],
+"text": "Speed at least 30 feet, ignores load penalties, and cheap 30-foot jumps once per turn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-boots-of-the-winterlands",
+"title": "Boots of the Winterlands",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+61.5,
+288.7,
+228.2,
+128.6
+],
+"text": "Cold resistance, comfort in freezing weather, and ignore ice and snow Difficult Terrain",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-bowl-of-commanding-water-elementals",
+"title": "Bowl of Commanding Water Elementals",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+61.5,
+420.4,
+228.3,
+176.6
+],
+"text": "Filled with water, summons an obedient Water Elemental for 1 hour, once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-bracers-of-archery",
+"title": "Bracers of Archery",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+61.5,
+600.1,
+228.0,
+68.6
+],
+"text": "Proficiency with longbows and shortbows, plus +2 damage with them",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-bracers-of-defense",
+"title": "Bracers of Defense",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+311.5,
+37.4,
+230.8,
+68.6
+],
+"text": "+2 AC when you wear no armor and carry no Shield",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-brazier-of-commanding-fire-elementals",
+"title": "Brazier of Commanding Fire Elementals",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+311.5,
+109.0,
+232.2,
+140.6
+],
+"text": "Summons an obedient Fire Elemental for 1 hour, once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-brooch-of-shielding",
+"title": "Brooch of Shielding",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+311.5,
+252.7,
+228.0,
+69.4
+],
+"text": "Immune to Magic Missile and takes reduced Force damage (resistance)",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-broom-of-flying",
+"title": "Broom of Flying",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+311.5,
+324.4,
+230.9,
+200.6
+],
+"text": "Rideable broom with Fly Speed 50 feet (30 if heavily loaded); can fly to you from 1 mile",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-candle-of-invocation",
+"title": "Candle of Invocation",
+"chapter": "Magic Items",
+"page": 214,
+"rect": [
+311.5,
+528.1,
+228.0,
+200.6
+],
+"text": "Lit up to 4 hours: Advantage on D20 Tests, free level 1 spells for Clerics/Druids, or Gate",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement",
+"cont": [
+[
+215,
+[
+61.5,
+39.2,
+228.0,
+162.6
+]
+]
+]
+},
+{
+"id": "srd-item-cape-of-the-mountebank",
+"title": "Cape of the Mountebank",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+61.5,
+207.2,
+228.0,
+128.6
+],
+"text": "Cast Dimension Door once per dawn, leaving a smoke cloud behind",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-carpet-of-flying",
+"title": "Carpet of Flying",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+61.5,
+338.8,
+231.6,
+229.4
+],
+"text": "Command-word flying carpet; size sets capacity (200-800 lb) and Fly Speed (30-80 feet)",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-censer-of-controlling-air-elementals",
+"title": "Censer of Controlling Air Elementals",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+61.5,
+573.6,
+228.0,
+140.6
+],
+"text": "Summons an obedient Air Elemental for 1 hour, once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-chime-of-opening",
+"title": "Chime of Opening",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+37.4,
+229.1,
+116.6
+],
+"text": "Strike to cast Knock; 10 uses, then it cracks",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-circlet-of-blasting",
+"title": "Circlet of Blasting",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+157.0,
+232.2,
+68.6
+],
+"text": "Cast Scorching Ray (+5 to hit) once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-cloak-of-arachnida",
+"title": "Cloak of Arachnida",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+228.7,
+230.2,
+224.6
+],
+"text": "Poison resistance, spider climbing, web immunity, and a bigger Web spell (DC 13) once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement"
+},
+{
+"id": "srd-item-cloak-of-displacement",
+"title": "Cloak of Displacement",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+456.4,
+229.0,
+116.6
+],
+"text": "Illusory double imposes Disadvantage on attacks against you; pauses after you take damage",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-cloak-of-elvenkind",
+"title": "Cloak of Elvenkind",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+576.1,
+228.0,
+80.6
+],
+"text": "Advantage on Stealth and Disadvantage for others to Perceive you",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-cloak-of-invisibility",
+"title": "Cloak of Invisibility",
+"chapter": "Magic Items",
+"page": 215,
+"rect": [
+311.5,
+659.8,
+230.7,
+68.6
+],
+"text": "3 charges: pull the hood up and spend 1 to turn Invisible for 1 hour",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement",
+"cont": [
+[
+216,
+[
+61.5,
+39.2,
+230.1,
+49.0
+]
+]
+]
+},
+{
+"id": "srd-item-cloak-of-protection",
+"title": "Cloak of Protection",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+91.2,
+228.0,
+56.6
+],
+"text": "+1 to AC and all saving throws",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-cloak-of-the-bat",
+"title": "Cloak of the Bat",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+150.9,
+229.5,
+188.6
+],
+"text": "Stealth Advantage, 40 feet flight in dim light or dark, and a once-a-dawn bat Polymorph",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-cloak-of-the-manta-ray",
+"title": "Cloak of the Manta Ray",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+342.6,
+229.5,
+56.6
+],
+"text": "Breathe underwater and swim at 60 feet",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-crystal-ball",
+"title": "Crystal Ball",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+402.2,
+231.7,
+56.6
+],
+"text": "Cast Scrying (DC 17) while touching it",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement"
+},
+{
+"id": "srd-item-crystal-ball-of-mind-reading",
+"title": "Crystal Ball of Mind Reading",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+461.9,
+231.7,
+117.4
+],
+"text": "Scrying (DC 17) plus a sustained Detect Thoughts on creatures near the sensor",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-crystal-ball-of-telepathy",
+"title": "Crystal Ball of Telepathy",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+61.5,
+581.6,
+229.8,
+140.6
+],
+"text": "Scrying (DC 17), telepathy near the sensor, and a once-per-dawn Suggestion",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-crystal-ball-of-true-seeing",
+"title": "Crystal Ball of True Seeing",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+311.5,
+37.4,
+232.2,
+80.6
+],
+"text": "Scrying (DC 17) plus Truesight to 120 feet around the sensor",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-cube-of-force",
+"title": "Cube of Force",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+311.5,
+121.0,
+229.0,
+245.0
+],
+"text": "10 charges buy spells by cube face (Mage Armor, Shield, Tiny Hut...), DC 17; regains 1d6",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-cubic-gate",
+"title": "Cubic Gate",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+311.5,
+371.5,
+230.6,
+212.6
+],
+"text": "3 charges to cast Gate or Plane Shift to the plane keyed to a cube face",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-dagger-of-venom",
+"title": "Dagger of Venom",
+"chapter": "Magic Items",
+"page": 216,
+"rect": [
+311.5,
+587.1,
+231.1,
+140.6
+],
+"text": "+1 dagger; once per dawn coat it in poison: DC 15 Constitution save or 2d10 Poison and Poisoned",
+"kind": "item",
+"tag": "Weapon · Rare"
+},
+{
+"id": "srd-item-dancing-sword",
+"title": "Dancing Sword",
+"chapter": "Magic Items",
+"page": 217,
+"rect": [
+61.5,
+37.4,
+229.3,
+272.6
+],
+"text": "Toss it to hover and fight by itself at your attack bonus, staying close to you",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-decanter-of-endless-water",
+"title": "Decanter of Endless Water",
+"chapter": "Magic Items",
+"page": 217,
+"rect": [
+61.5,
+313.0,
+230.9,
+290.0
+],
+"text": "Pours fresh or salt water on command: from a splash to a geyser blast",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-deck-of-illusions",
+"title": "Deck of Illusions",
+"chapter": "Magic Items",
+"page": 217,
+"rect": [
+61.5,
+606.1,
+228.0,
+116.6
+],
+"text": "34-card deck; draw and throw a card to conjure an illusion of the creature shown",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+217,
+[
+311.5,
+39.2,
+229.3,
+676.6
+]
+],
+[
+218,
+[
+61.5,
+42.5,
+230.1,
+130.4
+]
+]
+]
+},
+{
+"id": "srd-item-defender",
+"title": "Defender",
+"chapter": "Magic Items",
+"page": 218,
+"rect": [
+61.5,
+179.7,
+230.3,
+164.6
+],
+"text": "+3 sword whose bonus can shift into AC each turn",
+"kind": "item",
+"tag": "Weapon · Legendary · requires attunement"
+},
+{
+"id": "srd-item-demon-armor",
+"title": "Demon Armor",
+"chapter": "Magic Items",
+"page": 218,
+"rect": [
+61.5,
+347.4,
+229.5,
+200.6
+],
+"text": "+1 AC, clawed gauntlets for 1d8 Slashing unarmed strikes; cursed so you can't remove it",
+"kind": "item",
+"tag": "Armor · Very rare · requires attunement"
+},
+{
+"id": "srd-item-dimensional-shackles",
+"title": "Dimensional Shackles",
+"chapter": "Magic Items",
+"page": 218,
+"rect": [
+61.5,
+551.0,
+228.0,
+176.6
+],
+"text": "Bind an Incapacitated creature so it can't teleport or plane-shift",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+218,
+[
+311.5,
+39.2,
+231.7,
+37.0
+]
+]
+]
+},
+{
+"id": "srd-item-dragon-orb",
+"title": "Dragon Orb",
+"chapter": "Magic Items",
+"page": 218,
+"rect": [
+311.5,
+79.2,
+231.1,
+587.9
+],
+"text": "Artifact crystal globe for scrying and dominating dragons; DC 15 Charisma save or it charms you",
+"kind": "item",
+"tag": "Wondrous Item · Artifact · requires attunement"
+},
+{
+"id": "srd-item-dragon-scale-mail",
+"title": "Dragon Scale Mail",
+"chapter": "Magic Items",
+"page": 218,
+"rect": [
+311.5,
+669.4,
+228.0,
+56.6
+],
+"text": "+1 AC, Advantage against dragon breath, and resistance to the scale color's damage type",
+"kind": "item",
+"tag": "Armor · Very rare · requires attunement",
+"cont": [
+[
+219,
+[
+61.5,
+39.2,
+229.2,
+261.0
+]
+]
+]
+},
+{
+"id": "srd-item-dragon-slayer",
+"title": "Dragon Slayer",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+61.5,
+305.5,
+229.2,
+80.6
+],
+"text": "+1 weapon dealing an extra 3d6 damage to Dragons",
+"kind": "item",
+"tag": "Weapon · Rare"
+},
+{
+"id": "srd-item-dust-of-disappearance",
+"title": "Dust of Disappearance",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+61.5,
+389.2,
+231.0,
+152.6
+],
+"text": "Thrown dust makes you and everyone in 10 feet Invisible for 2d4 minutes",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-dust-of-dryness",
+"title": "Dust of Dryness",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+61.5,
+544.9,
+230.7,
+176.6
+],
+"text": "Pinches shrink water into pellets; smash a pellet to release it again",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+219,
+[
+311.5,
+36.7,
+229.4,
+63.5
+]
+]
+]
+},
+{
+"id": "srd-item-dust-of-sneezing-and-choking",
+"title": "Dust of Sneezing and Choking",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+311.5,
+103.2,
+231.9,
+213.4
+],
+"text": "Thrown dust: DC 15 Constitution save or helpless sneezing and choking in 30 feet, hits you too",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-dwarven-plate",
+"title": "Dwarven Plate",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+311.5,
+318.9,
+228.0,
+92.6
+],
+"text": "+2 AC half plate or plate; Reaction to cut forced ground movement by 10 feet",
+"kind": "item",
+"tag": "Armor · Very rare"
+},
+{
+"id": "srd-item-dwarven-thrower",
+"title": "Dwarven Thrower",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+311.5,
+414.6,
+232.2,
+152.6
+],
+"text": "+3 warhammer, thrown 20/60 feet, extra Force damage (2d8 against Giants), returns to hand",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement by a Dwarf or a Creature Attuned to a Belt of Dwarvenkind"
+},
+{
+"id": "srd-item-efficient-quiver",
+"title": "Efficient Quiver",
+"chapter": "Magic Items",
+"page": 219,
+"rect": [
+311.5,
+570.2,
+231.7,
+152.6
+],
+"text": "Three compartments hold 60 arrows, 18 javelins, and 6 long items; weighs 2 pounds",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-efreeti-bottle",
+"title": "Efreeti Bottle",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+61.5,
+37.4,
+230.7,
+328.3
+],
+"text": "Uncork to release an Efreeti; a roll decides if it attacks, serves, or grants wishes",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-elemental-gem",
+"title": "Elemental Gem",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+61.5,
+371.0,
+229.6,
+253.4
+],
+"text": "Break it to summon an obedient elemental for 1 hour; single use",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-elixir-of-health",
+"title": "Elixir of Health",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+61.5,
+629.8,
+228.0,
+92.6
+],
+"text": "Cures magical contagions and ends Blinded, Deafened, Paralyzed, and Poisoned",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-elven-chain",
+"title": "Elven Chain",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+311.5,
+37.4,
+230.9,
+80.6
+],
+"text": "+1 AC chain mail or shirt that anyone can wear proficiently",
+"kind": "item",
+"tag": "Armor · Rare"
+},
+{
+"id": "srd-item-energy-bow",
+"title": "Energy Bow",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+311.5,
+121.0,
+231.3,
+476.6
+],
+"text": "+1 stringless bow firing Force-damage arrows of golden energy that shed light",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-eversmoking-bottle",
+"title": "Eversmoking Bottle",
+"chapter": "Magic Items",
+"page": 220,
+"rect": [
+311.5,
+600.7,
+228.0,
+128.6
+],
+"text": "Uncork to billow smoke that heavily obscures a 60-120 foot area, growing each minute",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+221,
+[
+61.5,
+39.2,
+228.0,
+49.8
+]
+]
+]
+},
+{
+"id": "srd-item-eyes-of-charming",
+"title": "Eyes of Charming",
+"chapter": "Magic Items",
+"page": 221,
+"rect": [
+61.5,
+91.2,
+228.0,
+116.6
+],
+"text": "3 charges to cast Charm Person (DC 13), upcast by spending extra charges",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-eyes-of-minute-seeing",
+"title": "Eyes of Minute Seeing",
+"chapter": "Magic Items",
+"page": 221,
+"rect": [
+61.5,
+210.9,
+230.5,
+104.6
+],
+"text": "Darkvision and Investigation Advantage on things within 1 foot",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-eyes-of-the-eagle",
+"title": "Eyes of the Eagle",
+"chapter": "Magic Items",
+"page": 221,
+"rect": [
+61.5,
+318.6,
+228.0,
+104.6
+],
+"text": "Advantage on sight-based Perception; spot details of distant things",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-feather-token",
+"title": "Feather Token",
+"chapter": "Magic Items",
+"page": 221,
+"rect": [
+61.5,
+426.2,
+231.7,
+296.6
+],
+"text": "One-shot feather with a type-based effect, such as anchor, bird, fan, whip, or tree",
+"kind": "item",
+"tag": "Wondrous Item · Rarity varies",
+"cont": [
+[
+221,
+[
+311.5,
+36.7,
+232.1,
+563.9
+]
+]
+]
+},
+{
+"id": "srd-item-figurine-of-wondrous-power",
+"title": "Figurine of Wondrous Power",
+"chapter": "Magic Items",
+"page": 221,
+"rect": [
+311.5,
+605.9,
+228.1,
+116.6
+],
+"text": "Throw the statuette to turn it into a living creature for a limited time",
+"kind": "item",
+"tag": "Wondrous Item · Rarity varies",
+"cont": [
+[
+222,
+[
+61.5,
+39.2,
+231.7,
+688.3
+]
+],
+[
+222,
+[
+311.5,
+39.2,
+231.3,
+667.2
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-fly",
+"title": "Giant Fly",
+"chapter": "Magic Items",
+"page": 222,
+"rect": [
+61.5,
+345.0,
+228.0,
+156.2
+],
+"text": "Large Beast · CR 0 · AC 11 · HP 19",
+"kind": "monster",
+"home": "Monsters A–Z"
+},
+{
+"id": "srd-item-flame-tongue",
+"title": "Flame Tongue",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+61.5,
+37.4,
+228.0,
+152.6
+],
+"text": "Bonus Action to ignite blade: extra 2d6 Fire damage and bright light",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement"
+},
+{
+"id": "srd-item-folding-boat",
+"title": "Folding Boat",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+61.5,
+193.0,
+231.7,
+284.2
+],
+"text": "Box that opens into a rowboat or keelboat on command, and folds back up",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-frost-brand",
+"title": "Frost Brand",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+61.5,
+479.5,
+229.7,
+188.6
+],
+"text": "Extra 1d6 Cold damage, Fire resistance, and drawing it can douse mundane fires nearby",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-gauntlets-of-ogre-power",
+"title": "Gauntlets of Ogre Power",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+311.5,
+37.4,
+228.0,
+68.6
+],
+"text": "Sets Strength to 19 while worn, if it was lower",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-gem-of-brightness",
+"title": "Gem of Brightness",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+311.5,
+109.0,
+230.6,
+343.4
+],
+"text": "50 charges: light on command, or burn charges to blind creatures with a beam",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-gem-of-seeing",
+"title": "Gem of Seeing",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+311.5,
+455.5,
+232.1,
+104.6
+],
+"text": "3 charges; each gives 10 minutes of Truesight to 120 feet through the gem",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-giant-slayer",
+"title": "Giant Slayer",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+311.5,
+563.2,
+232.1,
+104.6
+],
+"text": "+1 weapon; extra 2d6 damage to Giants, who also make a DC 15 Strength save or fall Prone",
+"kind": "item",
+"tag": "Weapon · Rare"
+},
+{
+"id": "srd-item-glamoured-studded-leather",
+"title": "Glamoured Studded Leather",
+"chapter": "Magic Items",
+"page": 223,
+"rect": [
+311.5,
+670.9,
+228.0,
+56.6
+],
+"text": "+1 AC studded leather that can look like ordinary clothes or other armor",
+"kind": "item",
+"tag": "Armor · Rare",
+"cont": [
+[
+224,
+[
+61.5,
+39.2,
+229.9,
+73.0
+]
+]
+]
+},
+{
+"id": "srd-item-gloves-of-missile-snaring",
+"title": "Gloves of Missile Snaring",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+61.5,
+115.2,
+231.4,
+116.6
+],
+"text": "Reaction to cut ranged damage by 1d10 plus Dexterity, and maybe catch the missile",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-gloves-of-swimming-and-climbing",
+"title": "Gloves of Swimming and Climbing",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+61.5,
+234.9,
+231.0,
+80.6
+],
+"text": "Climb and swim at your Speed, and +5 to Athletics checks for either",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-gloves-of-thievery",
+"title": "Gloves of Thievery",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+61.5,
+318.6,
+228.0,
+68.6
+],
+"text": "Invisible gloves giving +5 to Sleight of Hand",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-goggles-of-night",
+"title": "Goggles of Night",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+61.5,
+390.2,
+228.0,
+68.6
+],
+"text": "Darkvision 60 feet; adds another 60 if you already have it",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-hammer-of-thunderbolts",
+"title": "Hammer of Thunderbolts",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+61.5,
+461.9,
+229.2,
+260.6
+],
+"text": "+1 maul or warhammer with 5 charges for thrown thunderclap strikes (DC 17 Constitution)",
+"kind": "item",
+"tag": "Weapon · Legendary · requires attunement",
+"cont": [
+[
+224,
+[
+311.5,
+36.7,
+230.7,
+88.3
+]
+]
+]
+},
+{
+"id": "srd-item-handy-haversack",
+"title": "Handy Haversack",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+311.5,
+127.2,
+231.4,
+416.6
+],
+"text": "Pack with three extradimensional pouches (200, 200, and 500 pounds), weighing 5 pounds",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-hat-of-disguise",
+"title": "Hat of Disguise",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+311.5,
+546.9,
+228.0,
+57.4
+],
+"text": "Cast Disguise Self while wearing it",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-hat-of-many-spells",
+"title": "Hat of Many Spells",
+"chapter": "Magic Items",
+"page": 224,
+"rect": [
+311.5,
+606.6,
+231.9,
+116.6
+],
+"text": "Wizard focus that lets you gamble on casting unknown Wizard spells, with a risk of mishap",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement by a Wizard",
+"cont": [
+[
+225,
+[
+61.5,
+36.7,
+230.8,
+659.8
+]
+],
+[
+225,
+[
+311.5,
+42.5,
+228.0,
+184.2
+]
+]
+]
+},
+{
+"id": "srd-item-headband-of-intellect",
+"title": "Headband of Intellect",
+"chapter": "Magic Items",
+"page": 225,
+"rect": [
+311.5,
+232.1,
+228.0,
+68.6
+],
+"text": "Sets Intelligence to 19 while worn, if it was lower",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-helm-of-brilliance",
+"title": "Helm of Brilliance",
+"chapter": "Magic Items",
+"page": 225,
+"rect": [
+311.5,
+303.7,
+232.2,
+416.6
+],
+"text": "Gem-studded helm with light, fire, and radiant powers that fade as gems are lost",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement",
+"cont": [
+[
+226,
+[
+61.5,
+39.2,
+228.0,
+85.0
+]
+]
+]
+},
+{
+"id": "srd-item-helm-of-comprehending-languages",
+"title": "Helm of Comprehending Languages",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+61.5,
+127.2,
+228.0,
+57.4
+],
+"text": "Cast Comprehend Languages from the helm",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-helm-of-telepathy",
+"title": "Helm of Telepathy",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+61.5,
+186.9,
+228.0,
+92.6
+],
+"text": "30-foot telepathy, plus Detect Thoughts or Suggestion (DC 13) once each per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-helm-of-teleportation",
+"title": "Helm of Teleportation",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+61.5,
+282.6,
+228.0,
+68.6
+],
+"text": "3 charges to cast Teleport; regains 1d3 daily",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-holy-avenger",
+"title": "Holy Avenger",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+61.5,
+354.2,
+230.4,
+176.6
+],
+"text": "+3 weapon for Paladins: extra 2d10 Radiant against Fiends and Undead, spell-saving aura",
+"kind": "item",
+"tag": "Weapon · Legendary · requires attunement by a Paladin"
+},
+{
+"id": "srd-item-horn-of-blasting",
+"title": "Horn of Blasting",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+61.5,
+533.9,
+228.5,
+152.6
+],
+"text": "30 feet Cone blast: DC 15 Constitution save, 5d8 Thunder and Deafened, half on success",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+226,
+[
+311.5,
+39.2,
+228.0,
+49.0
+]
+]
+]
+},
+{
+"id": "srd-item-horn-of-valhalla",
+"title": "Horn of Valhalla",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+311.5,
+91.2,
+231.2,
+386.9
+],
+"text": "Summons Berserker spirits for 1 hour; once per 7 days, stronger horns call tougher warriors",
+"kind": "item",
+"tag": "Wondrous Item · Rare, very rare, legendary"
+},
+{
+"id": "srd-item-horseshoes-of-a-zephyr",
+"title": "Horseshoes of a Zephyr",
+"chapter": "Magic Items",
+"page": 226,
+"rect": [
+311.5,
+483.5,
+228.0,
+200.6
+],
+"text": "Set of four lets a mount float just above any surface, crossing water and ground freely",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-horseshoes-of-speed",
+"title": "Horseshoes of Speed",
+"chapter": "Magic Items",
+"page": 227,
+"rect": [
+61.5,
+37.4,
+228.0,
+116.6
+],
+"text": "Set of four adds 30 feet to a mount's Speed",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-immovable-rod",
+"title": "Immovable Rod",
+"chapter": "Magic Items",
+"page": 227,
+"rect": [
+61.5,
+157.0,
+231.4,
+152.6
+],
+"text": "Button locks it in place in midair; holds 8,000 pounds, DC 30 Athletics to move it",
+"kind": "item",
+"tag": "Rod · Uncommon"
+},
+{
+"id": "srd-item-instant-fortress",
+"title": "Instant Fortress",
+"chapter": "Magic Items",
+"page": 227,
+"rect": [
+61.5,
+312.7,
+228.0,
+404.6
+],
+"text": "Statuette that grows into a 20 feet-square adamantine tower on command",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-ioun-stone",
+"title": "Ioun Stone",
+"chapter": "Magic Items",
+"page": 227,
+"rect": [
+311.5,
+37.4,
+231.9,
+680.6
+],
+"text": "Orbiting stone granting a benefit by type; up to three at once",
+"kind": "item",
+"tag": "Wondrous Item · Rarity varies · requires attunement",
+"cont": [
+[
+228,
+[
+61.5,
+36.7,
+229.7,
+375.5
+]
+]
+]
+},
+{
+"id": "srd-item-iron-bands",
+"title": "Iron Bands",
+"chapter": "Magic Items",
+"page": 228,
+"rect": [
+61.5,
+415.2,
+231.3,
+296.6
+],
+"text": "Thrown sphere: ranged attack to Restrain a target up to Huge size",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-iron-flask",
+"title": "Iron Flask",
+"chapter": "Magic Items",
+"page": 228,
+"rect": [
+311.5,
+37.4,
+232.1,
+368.6
+],
+"text": "Traps a creature from another plane in the flask (DC 17 Wisdom save) for you to command",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-javelin-of-lightning",
+"title": "Javelin of Lightning",
+"chapter": "Magic Items",
+"page": 228,
+"rect": [
+311.5,
+409.0,
+228.7,
+212.6
+],
+"text": "Javelin that can hurl itself as a lightning bolt in a 120-foot line",
+"kind": "item",
+"tag": "Weapon · Uncommon"
+},
+{
+"id": "srd-item-lantern-of-revealing",
+"title": "Lantern of Revealing",
+"chapter": "Magic Items",
+"page": 228,
+"rect": [
+311.5,
+624.7,
+231.3,
+92.6
+],
+"text": "Hooded lantern whose bright light reveals Invisible creatures and objects",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+229,
+[
+61.5,
+39.2,
+231.7,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-item-luck-blade",
+"title": "Luck Blade",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+61.5,
+67.2,
+230.9,
+224.6
+],
+"text": "+1 weapon with +1 to saves and a once-per-dawn reroll of a failed D20 Test",
+"kind": "item",
+"tag": "Weapon · Legendary · requires attunement"
+},
+{
+"id": "srd-item-mace-of-disruption",
+"title": "Mace of Disruption",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+61.5,
+294.9,
+229.2,
+152.6
+],
+"text": "Extra 2d6 Radiant against Fiends and Undead, which may be destroyed outright at 25 HP or less",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement"
+},
+{
+"id": "srd-item-mace-of-smiting",
+"title": "Mace of Smiting",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+61.5,
+450.6,
+228.0,
+140.6
+],
+"text": "+1 mace (+3 against Constructs); natural 20 adds big Bludgeoning damage and can destroy Constructs",
+"kind": "item",
+"tag": "Weapon · Rare"
+},
+{
+"id": "srd-item-mace-of-terror",
+"title": "Mace of Terror",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+61.5,
+594.2,
+228.0,
+116.6
+],
+"text": "3 charges: Magic action to Frighten creatures within 30 feet (DC 15 Wisdom save)",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement",
+"cont": [
+[
+229,
+[
+311.5,
+39.2,
+228.6,
+109.0
+]
+]
+]
+},
+{
+"id": "srd-item-mantle-of-spell-resistance",
+"title": "Mantle of Spell Resistance",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+311.5,
+151.2,
+231.3,
+56.6
+],
+"text": "Saves against spells are made with Advantage",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-manual-of-bodily-health",
+"title": "Manual of Bodily Health",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+311.5,
+210.9,
+228.0,
+116.6
+],
+"text": "Study 48 hours to raise Constitution by 2 (max 30); loses magic for a century",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-manual-of-gainful-exercise",
+"title": "Manual of Gainful Exercise",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+311.5,
+330.6,
+229.5,
+104.6
+],
+"text": "Study 48 hours to raise Strength by 2 (max 30); loses magic for a century",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-manual-of-golems",
+"title": "Manual of Golems",
+"chapter": "Magic Items",
+"page": 229,
+"rect": [
+311.5,
+438.2,
+232.2,
+260.6
+],
+"text": "Instructions for building one type of golem; only spellcasters can read it without harm",
+"kind": "item",
+"tag": "Wondrous Item · Very rare",
+"cont": [
+[
+230,
+[
+61.5,
+42.4,
+228.0,
+74.6
+]
+]
+]
+},
+{
+"id": "srd-item-manual-of-quickness-of-action",
+"title": "Manual of Quickness of Action",
+"chapter": "Magic Items",
+"page": 230,
+"rect": [
+61.5,
+122.5,
+228.0,
+116.6
+],
+"text": "Study 48 hours to raise Dexterity by 2 (max 30); loses magic for a century",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-marvelous-pigments",
+"title": "Marvelous Pigments",
+"chapter": "Magic Items",
+"page": 230,
+"rect": [
+61.5,
+242.1,
+231.1,
+380.6
+],
+"text": "Paint real 3D objects and terrain within a 20-foot cube; they become real",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-medallion-of-thoughts",
+"title": "Medallion of Thoughts",
+"chapter": "Magic Items",
+"page": 230,
+"rect": [
+61.5,
+625.8,
+231.1,
+80.6
+],
+"text": "5 charges to cast Detect Thoughts (DC 13); regains 1d4 daily",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-mirror-of-life-trapping",
+"title": "Mirror of Life Trapping",
+"chapter": "Magic Items",
+"page": 230,
+"rect": [
+311.5,
+37.4,
+230.6,
+680.6
+],
+"text": "Mirror that traps creatures in cells inside it (DC 15 Charisma save)",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-mithral-armor",
+"title": "Mithral Armor",
+"chapter": "Magic Items",
+"page": 231,
+"rect": [
+61.5,
+37.4,
+230.6,
+104.6
+],
+"text": "Light, flexible armor without Stealth Disadvantage or Strength requirement",
+"kind": "item",
+"tag": "Armor · Uncommon"
+},
+{
+"id": "srd-item-mysterious-deck",
+"title": "Mysterious Deck",
+"chapter": "Magic Items",
+"page": 231,
+"rect": [
+61.5,
+145.0,
+230.7,
+574.5
+],
+"text": "Deck of 13 or 22 cards, each a boon or curse; you declare your draws beforehand",
+"kind": "item",
+"tag": "Wondrous Item · Legendary",
+"cont": [
+[
+231,
+[
+311.5,
+42.5,
+231.9,
+674.0
+]
+],
+[
+232,
+[
+61.5,
+36.7,
+231.7,
+639.5
+]
+],
+[
+232,
+[
+311.5,
+36.7,
+232.5,
+571.1
+]
+]
+]
+},
+{
+"id": "srd-item-necklace-of-adaptation",
+"title": "Necklace of Adaptation",
+"chapter": "Magic Items",
+"page": 232,
+"rect": [
+311.5,
+609.4,
+231.0,
+80.6
+],
+"text": "Breathe in any environment; Advantage on saves against Poisoned",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-necklace-of-fireballs",
+"title": "Necklace of Fireballs",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+61.5,
+37.4,
+229.7,
+140.6
+],
+"text": "Beads thrown as DC 15 Fireballs; extra beads add 1d6 each up to 12d6",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-necklace-of-prayer-beads",
+"title": "Necklace of Prayer Beads",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+61.5,
+181.0,
+231.1,
+356.8
+],
+"text": "Magic beads for blessing, curing, favor, smiting, summoning, or wind walking",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement by a Cleric, Druid, or Paladin"
+},
+{
+"id": "srd-item-nine-lives-stealer",
+"title": "Nine Lives Stealer",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+61.5,
+543.3,
+229.6,
+188.6
+],
+"text": "+2 weapon whose natural 20s can slay foes under 100 HP (DC 15 Constitution) using charges",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-oathbow",
+"title": "Oathbow",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+311.5,
+37.4,
+230.8,
+260.6
+],
+"text": "Bow that marks a sworn enemy for 7 days, giving big bonus damage against it",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-oil-of-etherealness",
+"title": "Oil of Etherealness",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+311.5,
+301.0,
+230.6,
+128.6
+],
+"text": "10 minutes to apply; target gains Etherealness for 1 hour",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-oil-of-sharpness",
+"title": "Oil of Sharpness",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+311.5,
+432.7,
+230.1,
+152.6
+],
+"text": "Turns a nonmagical slashing or piercing weapon or 20 ammo into a +3 version",
+"kind": "item",
+"tag": "Potion · Very rare"
+},
+{
+"id": "srd-item-oil-of-slipperiness",
+"title": "Oil of Slipperiness",
+"chapter": "Magic Items",
+"page": 233,
+"rect": [
+311.5,
+588.4,
+230.6,
+128.6
+],
+"text": "Grants Freedom of Movement for 8 hours, or spills as a grease slick",
+"kind": "item",
+"tag": "Potion · Uncommon",
+"cont": [
+[
+234,
+[
+61.5,
+36.7,
+229.8,
+51.5
+]
+]
+]
+},
+{
+"id": "srd-item-pearl-of-power",
+"title": "Pearl of Power",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+91.2,
+228.0,
+92.6
+],
+"text": "Spellcasters regain one expended slot up to level 3, once per dawn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-periapt-of-health",
+"title": "Periapt of Health",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+186.9,
+229.1,
+104.6
+],
+"text": "Heal 2d4 + 2 HP once per dawn; Advantage on saves against Poisoned",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-periapt-of-proof-against-poison",
+"title": "Periapt of Proof against Poison",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+294.6,
+231.1,
+68.6
+],
+"text": "Total immunity to poison, both the Poisoned condition and Poison damage",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-periapt-of-wound-closure",
+"title": "Periapt of Wound Closure",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+366.2,
+228.2,
+128.6
+],
+"text": "Turn failed Death Saves of 9 or less into successes; Hit Dice heal double",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-philter-of-love",
+"title": "Philter of Love",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+497.9,
+228.1,
+104.6
+],
+"text": "You become Charmed by the first creature you see in 10 minutes, for 1 hour",
+"kind": "item",
+"tag": "Potion · Uncommon"
+},
+{
+"id": "srd-item-pipes-of-haunting",
+"title": "Pipes of Haunting",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+61.5,
+605.6,
+230.8,
+116.6
+],
+"text": "3 charges: playing them Frightens creatures within 30 feet (DC 15 Wisdom)",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+234,
+[
+311.5,
+39.2,
+228.0,
+49.0
+]
+]
+]
+},
+{
+"id": "srd-item-pipes-of-the-sewers",
+"title": "Pipes of the Sewers",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+311.5,
+91.2,
+229.9,
+404.6
+],
+"text": "Rats ignore you; charges call swarms of rats to fight for you",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-plate-armor-of-etherealness",
+"title": "Plate Armor of Etherealness",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+311.5,
+498.9,
+230.0,
+116.6
+],
+"text": "Command word grants Etherealness, usable once per dawn",
+"kind": "item",
+"tag": "Armor · Legendary · requires attunement"
+},
+{
+"id": "srd-item-portable-hole",
+"title": "Portable Hole",
+"chapter": "Magic Items",
+"page": 234,
+"rect": [
+311.5,
+618.6,
+228.0,
+105.4
+],
+"text": "Cloth that unfolds into a 10-foot-deep extradimensional hole; fatal to mix with other bags",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+235,
+[
+61.5,
+39.2,
+231.6,
+337.0
+]
+]
+]
+},
+{
+"id": "srd-item-potion-of-animal-friendship",
+"title": "Potion of Animal Friendship",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+61.5,
+379.2,
+230.0,
+92.6
+],
+"text": "Cast level 3 Animal Friendship (DC 13) on drinking",
+"kind": "item",
+"tag": "Potion · Uncommon"
+},
+{
+"id": "srd-item-potion-of-clairvoyance",
+"title": "Potion of Clairvoyance",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+61.5,
+474.9,
+228.0,
+80.6
+],
+"text": "Grants Clairvoyance without Concentration",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-climbing",
+"title": "Potion of Climbing",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+61.5,
+558.6,
+231.6,
+116.6
+],
+"text": "Climb at your normal Speed and Advantage on climbing Athletics checks, 1 hour",
+"kind": "item",
+"tag": "Potion · Common"
+},
+{
+"id": "srd-item-potion-of-diminution",
+"title": "Potion of Diminution",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+311.5,
+37.4,
+228.0,
+116.6
+],
+"text": "Shrink as with Enlarge/Reduce for 1d4 hours",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-flying",
+"title": "Potion of Flying",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+311.5,
+157.0,
+228.0,
+116.6
+],
+"text": "Fly at your normal Speed with hover for 1 hour; you fall if it ends midair",
+"kind": "item",
+"tag": "Potion · Very rare"
+},
+{
+"id": "srd-item-potion-of-gaseous-form",
+"title": "Potion of Gaseous Form",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+311.5,
+276.7,
+229.3,
+104.6
+],
+"text": "Become gaseous for 1 hour without Concentration; ends early with a Bonus Action",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-giant-strength",
+"title": "Potion of Giant Strength",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+311.5,
+384.4,
+231.8,
+221.1
+],
+"text": "Sets Strength to 21-29 for 1 hour by giant type, if it was lower",
+"kind": "item",
+"tag": "Potion · Rarity varies"
+},
+{
+"id": "srd-item-potion-of-growth",
+"title": "Potion of Growth",
+"chapter": "Magic Items",
+"page": 235,
+"rect": [
+311.5,
+610.9,
+230.7,
+116.6
+],
+"text": "Grow as with Enlarge/Reduce for 10 minutes",
+"kind": "item",
+"tag": "Potion · Uncommon"
+},
+{
+"id": "srd-item-potions-of-healing",
+"title": "Potions of Healing",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+61.5,
+37.4,
+228.0,
+206.9
+],
+"text": "Restore HP: 2d4+2, 4d4+4, 8d4+8, or 10d4+20 by potion grade",
+"kind": "item",
+"tag": "Potion · Rarity varies"
+},
+{
+"id": "srd-item-potion-of-heroism",
+"title": "Potion of Heroism",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+61.5,
+249.7,
+229.2,
+104.6
+],
+"text": "10 Temporary HP and Bless effect for 1 hour",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-invisibility",
+"title": "Potion of Invisibility",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+61.5,
+357.4,
+228.0,
+92.6
+],
+"text": "Invisible for 1 hour, ending early if you attack, deal damage, or cast",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-invulnerability",
+"title": "Potion of Invulnerability",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+61.5,
+453.0,
+228.0,
+80.6
+],
+"text": "Resistance to all damage for 1 minute",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-longevity",
+"title": "Potion of Longevity",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+61.5,
+536.7,
+231.6,
+128.6
+],
+"text": "Younger by 1d6 + 6 years; repeat doses risk aging you instead",
+"kind": "item",
+"tag": "Potion · Very rare"
+},
+{
+"id": "srd-item-potion-of-mind-reading",
+"title": "Potion of Mind Reading",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+37.4,
+228.0,
+92.6
+],
+"text": "Detect Thoughts (DC 13) lasting 10 minutes, no Concentration needed",
+"kind": "item",
+"tag": "Potion · Rare"
+},
+{
+"id": "srd-item-potion-of-poison",
+"title": "Potion of Poison",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+133.0,
+228.6,
+116.6
+],
+"text": "Disguised as a healing potion: 4d6 Poison damage and DC 13 Constitution save or Poisoned for 1 hour",
+"kind": "item",
+"tag": "Potion · Uncommon"
+},
+{
+"id": "srd-item-potion-of-resistance",
+"title": "Potion of Resistance",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+252.7,
+228.2,
+172.6
+],
+"text": "Resistance to one damage type for 1 hour",
+"kind": "item",
+"tag": "Potion · Uncommon"
+},
+{
+"id": "srd-item-potion-of-speed",
+"title": "Potion of Speed",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+430.7,
+228.0,
+104.6
+],
+"text": "Haste for 1 minute with no Concentration and no lethargy afterward",
+"kind": "item",
+"tag": "Potion · Very rare"
+},
+{
+"id": "srd-item-potion-of-vitality",
+"title": "Potion of Vitality",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+538.4,
+230.8,
+116.6
+],
+"text": "Removes Exhaustion and Poisoned; Hit Dice heal their maximum for 24 hours",
+"kind": "item",
+"tag": "Potion · Very rare"
+},
+{
+"id": "srd-item-potion-of-water-breathing",
+"title": "Potion of Water Breathing",
+"chapter": "Magic Items",
+"page": 236,
+"rect": [
+311.5,
+658.1,
+228.0,
+56.6
+],
+"text": "Underwater breathing lasts a full day",
+"kind": "item",
+"tag": "Potion · Uncommon",
+"cont": [
+[
+237,
+[
+61.5,
+39.2,
+228.0,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-item-quarterstaff-of-the-acrobat",
+"title": "Quarterstaff of the Acrobat",
+"chapter": "Magic Items",
+"page": 237,
+"rect": [
+61.5,
+67.2,
+231.1,
+380.6
+],
+"text": "+2 staff that glows, shifts into a rod or pole, and aids agile tumbling",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-animal-influence",
+"title": "Ring of Animal Influence",
+"chapter": "Magic Items",
+"page": 237,
+"rect": [
+61.5,
+450.9,
+228.0,
+122.8
+],
+"text": "3 charges for Animal Friendship, Fear (Beasts only), or Speak with Animals (DC 13)",
+"kind": "item",
+"tag": "Ring · Rare"
+},
+{
+"id": "srd-item-ring-of-djinni-summoning",
+"title": "Ring of Djinni Summoning",
+"chapter": "Magic Items",
+"page": 237,
+"rect": [
+61.5,
+576.0,
+231.7,
+152.6
+],
+"text": "Summon a specific Djinni to obey you for up to 1 hour of Concentration",
+"kind": "item",
+"tag": "Ring · Legendary · requires attunement",
+"cont": [
+[
+237,
+[
+311.5,
+39.2,
+231.6,
+73.0
+]
+]
+]
+},
+{
+"id": "srd-item-ring-of-elemental-command",
+"title": "Ring of Elemental Command",
+"chapter": "Magic Items",
+"page": 237,
+"rect": [
+311.5,
+115.2,
+231.5,
+606.2
+],
+"text": "Elemental bane, spells and resistances tied to one Elemental Plane, and Elemental summoning",
+"kind": "item",
+"tag": "Ring · Legendary · requires attunement",
+"cont": [
+[
+238,
+[
+61.5,
+42.5,
+228.0,
+161.9
+]
+]
+]
+},
+{
+"id": "srd-item-ring-of-evasion",
+"title": "Ring of Evasion",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+209.8,
+228.2,
+92.6
+],
+"text": "3 charges: Reaction to turn a failed Dexterity save into a success",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-feather-falling",
+"title": "Ring of Feather Falling",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+305.5,
+228.0,
+56.6
+],
+"text": "Fall slowly, 60 feet per round, with no damage on landing",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-free-action",
+"title": "Ring of Free Action",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+365.1,
+228.0,
+80.6
+],
+"text": "Ignore Difficult Terrain costs; magic can't slow you, Paralyze you, or Restrain you",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-invisibility",
+"title": "Ring of Invisibility",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+448.8,
+231.7,
+80.6
+],
+"text": "Magic action to turn Invisible until you end it with a Bonus Action or remove the ring",
+"kind": "item",
+"tag": "Ring · Legendary · requires attunement"
+},
+{
+"id": "srd-item-ring-of-jumping",
+"title": "Ring of Jumping",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+532.5,
+228.0,
+56.6
+],
+"text": "Cast Jump on yourself from the ring",
+"kind": "item",
+"tag": "Ring · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-ring-of-mind-shielding",
+"title": "Ring of Mind Shielding",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+61.5,
+592.2,
+228.1,
+128.6
+],
+"text": "Immune to thought reading, lie detection and alignment/type sensing; can hide the ring",
+"kind": "item",
+"tag": "Ring · Uncommon · requires attunement",
+"cont": [
+[
+238,
+[
+311.5,
+39.2,
+229.8,
+97.0
+]
+]
+]
+},
+{
+"id": "srd-item-ring-of-protection",
+"title": "Ring of Protection",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+311.5,
+139.2,
+228.0,
+56.6
+],
+"text": "+1 bonus to AC and all saving throws",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-regeneration",
+"title": "Ring of Regeneration",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+311.5,
+198.9,
+229.4,
+104.6
+],
+"text": "Regain 1d6 HP every 10 minutes; lost body parts regrow in 1d6 + 1 days",
+"kind": "item",
+"tag": "Ring · Very rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-resistance",
+"title": "Ring of Resistance",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+311.5,
+306.6,
+230.1,
+248.6
+],
+"text": "Resist one damage type, set by the gem (GM choice or d10 roll)",
+"kind": "item",
+"tag": "Ring · Rare"
+},
+{
+"id": "srd-item-ring-of-shooting-stars",
+"title": "Ring of Shooting Stars",
+"chapter": "Magic Items",
+"page": 238,
+"rect": [
+311.5,
+560.6,
+228.0,
+164.6
+],
+"text": "6 charges: Faerie Fire (1) or lightning spheres (2, DC 15 Dexterity); free Light and Dancing Lights",
+"kind": "item",
+"tag": "Ring · Very rare · requires attunement",
+"cont": [
+[
+239,
+[
+61.5,
+39.2,
+229.7,
+341.9
+]
+]
+]
+},
+{
+"id": "srd-item-ring-of-spell-storing",
+"title": "Ring of Spell Storing",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+61.5,
+384.1,
+231.2,
+236.6
+],
+"text": "Stores up to 5 spell levels cast into it; wearer casts them later",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-spell-turning",
+"title": "Ring of Spell Turning",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+61.5,
+623.8,
+231.2,
+104.6
+],
+"text": "Advantage on saves against spells; level 7 or lower spells that pass can be reflected back",
+"kind": "item",
+"tag": "Ring · Legendary · requires attunement",
+"cont": [
+[
+239,
+[
+311.5,
+39.2,
+228.0,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-item-ring-of-swimming",
+"title": "Ring of Swimming",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+67.2,
+232.2,
+56.6
+],
+"text": "Grants a 40-foot Swim Speed",
+"kind": "item",
+"tag": "Ring · Uncommon"
+},
+{
+"id": "srd-item-ring-of-telekinesis",
+"title": "Ring of Telekinesis",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+126.9,
+228.0,
+56.6
+],
+"text": "Cast Telekinesis from the ring",
+"kind": "item",
+"tag": "Ring · Very rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-the-ram",
+"title": "Ring of the Ram",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+186.6,
+232.2,
+212.6
+],
+"text": "3 charges: ranged +7 attack, 2d10 Force and 5-foot push per charge; or break objects",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement"
+},
+{
+"id": "srd-item-ring-of-three-wishes",
+"title": "Ring of Three Wishes",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+402.2,
+228.0,
+68.6
+],
+"text": "Cast Wish using one of 3 charges; becomes mundane after the last",
+"kind": "item",
+"tag": "Ring · Legendary"
+},
+{
+"id": "srd-item-ring-of-warmth",
+"title": "Ring of Warmth",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+473.9,
+231.4,
+92.6
+],
+"text": "Cuts Cold damage by 2d8 and shields you from temperatures of 0 degrees or colder",
+"kind": "item",
+"tag": "Ring · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-ring-of-water-walking",
+"title": "Ring of Water Walking",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+569.6,
+228.0,
+56.6
+],
+"text": "Cast Water Walk on yourself from the ring",
+"kind": "item",
+"tag": "Ring · Uncommon"
+},
+{
+"id": "srd-item-ring-of-x-ray-vision",
+"title": "Ring of X-ray Vision",
+"chapter": "Magic Items",
+"page": 239,
+"rect": [
+311.5,
+629.3,
+228.0,
+92.6
+],
+"text": "See through 1 feet stone or 3 feet wood out to 30 feet, 1 minute; reuse risks exhaustion",
+"kind": "item",
+"tag": "Ring · Rare · requires attunement",
+"cont": [
+[
+240,
+[
+61.5,
+39.2,
+231.4,
+73.0
+]
+]
+]
+},
+{
+"id": "srd-item-robe-of-eyes",
+"title": "Robe of Eyes",
+"chapter": "Magic Items",
+"page": 240,
+"rect": [
+61.5,
+115.2,
+231.5,
+187.4
+],
+"text": "Advantage on sight Perception; 120-foot Darkvision and Truesight; Light or Daylight blinds you",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-item-robe-of-scintillating-colors",
+"title": "Robe of Scintillating Colors",
+"chapter": "Magic Items",
+"page": 240,
+"rect": [
+61.5,
+305.7,
+229.8,
+188.6
+],
+"text": "3 charges: glare for a round gives attackers Disadvantage; DC 15 Wisdom or Stunned",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement"
+},
+{
+"id": "srd-item-robe-of-stars",
+"title": "Robe of Stars",
+"chapter": "Magic Items",
+"page": 240,
+"rect": [
+61.5,
+497.4,
+229.0,
+224.6
+],
+"text": "+1 to saves; pluck a star to cast a level 5 Magic Missile; stars return at dusk",
+"kind": "item",
+"tag": "Wondrous Item · Very rare · requires attunement"
+},
+{
+"id": "srd-item-robe-of-the-archmagi",
+"title": "Robe of the Archmagi",
+"chapter": "Magic Items",
+"page": 240,
+"rect": [
+311.5,
+37.4,
+230.1,
+152.6
+],
+"text": "Base AC 15 + Dexterity, Advantage on saves against magic, and +2 to spell DC and spell attacks",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement by a Sorcerer, Warlock, or Wizard"
+},
+{
+"id": "srd-item-robe-of-useful-items",
+"title": "Robe of Useful Items",
+"chapter": "Magic Items",
+"page": 240,
+"rect": [
+311.5,
+193.0,
+229.1,
+491.3
+],
+"text": "Detach patches to create items or a creature, such as rope, a lantern or a boat",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon",
+"cont": [
+[
+241,
+[
+61.5,
+42.5,
+228.0,
+84.5
+]
+]
+]
+},
+{
+"id": "srd-item-rod-of-absorption",
+"title": "Rod of Absorption",
+"chapter": "Magic Items",
+"page": 241,
+"rect": [
+61.5,
+132.4,
+231.2,
+368.6
+],
+"text": "Reaction: absorb a single-target spell; bank up to 50 levels to fuel your own casting",
+"kind": "item",
+"tag": "Rod · Very rare · requires attunement"
+},
+{
+"id": "srd-item-rod-of-alertness",
+"title": "Rod of Alertness",
+"chapter": "Magic Items",
+"page": 241,
+"rect": [
+61.5,
+504.1,
+229.3,
+223.4
+],
+"text": "Advantage on Perception and Initiative; detection spells; planted rod gives a 120-foot aura",
+"kind": "item",
+"tag": "Rod · Very rare · requires attunement",
+"cont": [
+[
+241,
+[
+311.5,
+39.2,
+228.0,
+97.0
+]
+]
+]
+},
+{
+"id": "srd-item-rod-of-lordly-might",
+"title": "Rod of Lordly Might",
+"chapter": "Magic Items",
+"page": 241,
+"rect": [
+311.5,
+139.2,
+231.2,
+578.0
+],
+"text": "+3 mace with six buttons: weapon forms, drain, paralyze, fear, plus ladder and climbing tools",
+"kind": "item",
+"tag": "Rod · Legendary · requires attunement",
+"cont": [
+[
+242,
+[
+61.5,
+39.2,
+229.7,
+330.4
+]
+]
+]
+},
+{
+"id": "srd-item-rod-of-resurrection",
+"title": "Rod of Resurrection",
+"chapter": "Magic Items",
+"page": 242,
+"rect": [
+61.5,
+372.6,
+229.0,
+104.6
+],
+"text": "5 charges: cast Heal (1) or Resurrection (5); recovers 1 charge daily",
+"kind": "item",
+"tag": "Rod · Legendary · requires attunement"
+},
+{
+"id": "srd-item-rod-of-rulership",
+"title": "Rod of Rulership",
+"chapter": "Magic Items",
+"page": 242,
+"rect": [
+61.5,
+480.3,
+230.4,
+164.6
+],
+"text": "Once per day, Charm creatures within 120 feet for 8 hours (DC 15 Wisdom)",
+"kind": "item",
+"tag": "Rod · Rare · requires attunement"
+},
+{
+"id": "srd-item-rod-of-security",
+"title": "Rod of Security",
+"chapter": "Magic Items",
+"page": 242,
+"rect": [
+61.5,
+648.0,
+228.7,
+80.6
+],
+"text": "Whisk up to 200 willing creatures to a private demiplane for 200 days, with food and healing",
+"kind": "item",
+"tag": "Rod · Very rare",
+"cont": [
+[
+242,
+[
+311.5,
+39.2,
+231.6,
+265.0
+]
+]
+]
+},
+{
+"id": "srd-item-rope-of-climbing",
+"title": "Rope of Climbing",
+"chapter": "Magic Items",
+"page": 242,
+"rect": [
+311.5,
+307.2,
+232.2,
+260.6
+],
+"text": "60-foot rope holding 3,000 pounds that moves on command to climb, fasten or knot itself",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-rope-of-entanglement",
+"title": "Rope of Entanglement",
+"chapter": "Magic Items",
+"page": 242,
+"rect": [
+311.5,
+570.9,
+229.3,
+152.6
+],
+"text": "30-foot rope that lashes a creature within 20 feet: DC 15 Dexterity or Restrained",
+"kind": "item",
+"tag": "Wondrous Item · Rare",
+"cont": [
+[
+243,
+[
+61.5,
+39.2,
+230.8,
+145.0
+]
+]
+]
+},
+{
+"id": "srd-item-scarab-of-protection",
+"title": "Scarab of Protection",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+61.5,
+187.2,
+230.4,
+176.6
+],
+"text": "+1 AC; 12 charges turn failed saves against necromancy or undead into successes; resists spells",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-scimitar-of-speed",
+"title": "Scimitar of Speed",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+61.5,
+366.9,
+231.2,
+80.6
+],
+"text": "+2 scimitar; make one extra attack with it every turn using your Bonus Action",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-sending-stones",
+"title": "Sending Stones",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+61.5,
+450.6,
+230.1,
+164.6
+],
+"text": "Paired stones: touch one to cast Sending to the other's bearer; once until next dawn",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-sentinel-shield",
+"title": "Sentinel Shield",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+61.5,
+618.2,
+228.0,
+68.6
+],
+"text": "Shield that gives Advantage on Initiative and Perception checks",
+"kind": "item",
+"tag": "Armor · Uncommon"
+},
+{
+"id": "srd-item-shield-1-2-or-3",
+"title": "Shield, +1, +2, or +3",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+311.5,
+37.4,
+228.0,
+80.6
+],
+"text": "Shield with an extra +1, +2 or +3 AC on top of its normal bonus",
+"kind": "item",
+"tag": "Armor · Uncommon (+1), rare (+2), very rare (+3)"
+},
+{
+"id": "srd-item-shield-of-missile-attraction",
+"title": "Shield of Missile Attraction",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+311.5,
+121.0,
+228.0,
+140.6
+],
+"text": "Resist ranged weapon damage, but cursed: ranged attacks on nearby allies hit you instead",
+"kind": "item",
+"tag": "Armor · Rare · requires attunement"
+},
+{
+"id": "srd-item-shield-of-the-cavalier",
+"title": "Shield of the Cavalier",
+"chapter": "Magic Items",
+"page": 243,
+"rect": [
+311.5,
+264.7,
+232.2,
+416.6
+],
+"text": "+2 AC; shield bash attack with extra Force damage and shove; Reaction to impose Disadvantage",
+"kind": "item",
+"tag": "Armor · Very rare · requires attunement"
+},
+{
+"id": "srd-item-slippers-of-spider-climbing",
+"title": "Slippers of Spider Climbing",
+"chapter": "Magic Items",
+"page": 244,
+"rect": [
+61.5,
+37.4,
+228.0,
+104.6
+],
+"text": "Walk up walls and across ceilings hands-free at your normal speed (not on slick surfaces)",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-sovereign-glue",
+"title": "Sovereign Glue",
+"chapter": "Magic Items",
+"page": 244,
+"rect": [
+61.5,
+145.0,
+231.3,
+165.4
+],
+"text": "Permanent adhesive: an ounce bonds a 1-foot square; sets in 1 minute, solvent needed to undo",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-spellguard-shield",
+"title": "Spellguard Shield",
+"chapter": "Magic Items",
+"page": 244,
+"rect": [
+61.5,
+312.7,
+228.0,
+80.6
+],
+"text": "Advantage on saves against spells and magic; spell attacks against you have Disadvantage",
+"kind": "item",
+"tag": "Armor · Very rare · requires attunement"
+},
+{
+"id": "srd-item-spell-scroll",
+"title": "Spell Scroll",
+"chapter": "Magic Items",
+"page": 244,
+"rect": [
+61.5,
+396.4,
+230.8,
+313.4
+],
+"text": "Single-use scroll of one spell; read it to cast if on your list, with level-based DC limits",
+"kind": "item",
+"tag": "Scroll · Rarity varies",
+"cont": [
+[
+244,
+[
+311.5,
+42.5,
+228.3,
+201.8
+]
+]
+]
+},
+{
+"id": "srd-item-sphere-of-annihilation",
+"title": "Sphere of Annihilation",
+"chapter": "Magic Items",
+"page": 244,
+"rect": [
+311.5,
+246.6,
+232.2,
+440.6
+],
+"text": "2-foot black hole that destroys all matter it touches; you steer it with an Arcana check",
+"kind": "item",
+"tag": "Wondrous Item · Legendary",
+"cont": [
+[
+245,
+[
+61.5,
+42.5,
+228.0,
+96.7
+]
+]
+]
+},
+{
+"id": "srd-item-staff-of-charming",
+"title": "Staff of Charming",
+"chapter": "Magic Items",
+"page": 245,
+"rect": [
+61.5,
+144.6,
+231.4,
+283.4
+],
+"text": "10 charges: Charm Person, Command, Comprehend Languages; Reaction turns Enchantments back",
+"kind": "item",
+"tag": "Staff · Rare · requires attunement by a Bard, Cleric, Druid, Sorcerer, Warlock, or Wizard"
+},
+{
+"id": "srd-item-staff-of-fire",
+"title": "Staff of Fire",
+"chapter": "Magic Items",
+"page": 245,
+"rect": [
+61.5,
+431.0,
+230.9,
+241.5
+],
+"text": "10 charges: Burning Hands (1), Fireball (3), Wall of Fire (4); Fire resistance while held",
+"kind": "item",
+"tag": "Staff · Very rare · requires attunement by a Druid, Sorcerer, Warlock, or Wizard"
+},
+{
+"id": "srd-item-staff-of-frost",
+"title": "Staff of Frost",
+"chapter": "Magic Items",
+"page": 245,
+"rect": [
+311.5,
+37.4,
+231.9,
+241.5
+],
+"text": "10 charges: Fog Cloud (1), Ice Storm or Wall of Ice (4), Cone of Cold (5); Cold resistance",
+"kind": "item",
+"tag": "Staff · Very rare · requires attunement by a Druid, Sorcerer, Warlock, or Wizard"
+},
+{
+"id": "srd-item-staff-of-healing",
+"title": "Staff of Healing",
+"chapter": "Magic Items",
+"page": 245,
+"rect": [
+311.5,
+281.9,
+230.8,
+247.0
+],
+"text": "10 charges: Cure Wounds (1 per level), Lesser Restoration (2), mass healing (5)",
+"kind": "item",
+"tag": "Staff · Rare · requires attunement by a Bard, Cleric, or Druid"
+},
+{
+"id": "srd-item-staff-of-power",
+"title": "Staff of Power",
+"chapter": "Magic Items",
+"page": 245,
+"rect": [
+311.5,
+531.9,
+232.2,
+152.6
+],
+"text": "20 charges, +2 quarterstaff, AC, saves and spell attacks; Fireball, Cone of Cold and more",
+"kind": "item",
+"tag": "Staff · Very rare · requires attunement by a Sorcerer, Warlock, or Wizard",
+"cont": [
+[
+246,
+[
+61.5,
+42.5,
+229.6,
+396.9
+]
+]
+]
+},
+{
+"id": "srd-item-staff-of-striking",
+"title": "Staff of Striking",
+"chapter": "Magic Items",
+"page": 246,
+"rect": [
+61.5,
+442.4,
+228.0,
+164.6
+],
+"text": "+3 quarterstaff; burn up to three charges on a hit for +1d6 Force damage each",
+"kind": "item",
+"tag": "Staff · Very rare · requires attunement"
+},
+{
+"id": "srd-item-staff-of-swarming-insects",
+"title": "Staff of Swarming Insects",
+"chapter": "Magic Items",
+"page": 246,
+"rect": [
+61.5,
+610.1,
+228.0,
+116.6
+],
+"text": "10 charges: insect cloud obscures a 30-foot Emanation; or spend charges on a stinging swarm",
+"kind": "item",
+"tag": "Staff · Rare · requires attunement by a Bard, Cleric, Druid, Sorcerer, Warlock, or Wizard",
+"cont": [
+[
+246,
+[
+311.5,
+39.2,
+230.0,
+209.9
+]
+]
+]
+},
+{
+"id": "srd-item-staff-of-the-magi",
+"title": "Staff of the Magi",
+"chapter": "Magic Items",
+"page": 246,
+"rect": [
+311.5,
+252.1,
+232.2,
+469.8
+],
+"text": "50 charges, +2 quarterstaff; absorbs spells, casts many spells, can explode when broken",
+"kind": "item",
+"tag": "Staff · Legendary · requires attunement by a Sorcerer, Warlock, or Wizard",
+"cont": [
+[
+247,
+[
+61.5,
+42.5,
+231.4,
+342.5
+]
+]
+]
+},
+{
+"id": "srd-item-staff-of-the-python",
+"title": "Staff of the Python",
+"chapter": "Magic Items",
+"page": 247,
+"rect": [
+61.5,
+388.0,
+231.0,
+284.6
+],
+"text": "Throw it to turn it into an allied Giant Constrictor Snake that reverts when slain or dismissed",
+"kind": "item",
+"tag": "Staff · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-staff-of-the-woodlands",
+"title": "Staff of the Woodlands",
+"chapter": "Magic Items",
+"page": 247,
+"rect": [
+311.5,
+37.4,
+232.2,
+476.7
+],
+"text": "6 charges, +2 quarterstaff and spell attacks; nature spells; can turn into a tree",
+"kind": "item",
+"tag": "Staff · Rare · requires attunement by a Druid"
+},
+{
+"id": "srd-item-staff-of-thunder-and-lightning",
+"title": "Staff of Thunder and Lightning",
+"chapter": "Magic Items",
+"page": 247,
+"rect": [
+311.5,
+517.1,
+231.8,
+200.6
+],
+"text": "+2 quarterstaff with daily lightning, thunder-stun and combined blasts; casts spells",
+"kind": "item",
+"tag": "Staff · Very rare · requires attunement",
+"cont": [
+[
+248,
+[
+61.5,
+36.7,
+229.5,
+243.5
+]
+]
+]
+},
+{
+"id": "srd-item-staff-of-withering",
+"title": "Staff of Withering",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+61.5,
+283.2,
+228.0,
+152.6
+],
+"text": "3 charges: extra 2d10 Necrotic on a hit, and a Constitution save or Disadvantage on Strength/Constitution checks",
+"kind": "item",
+"tag": "Staff · Rare · requires attunement"
+},
+{
+"id": "srd-item-stone-of-controlling-earth-elementals",
+"title": "Stone of Controlling Earth Elementals",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+61.5,
+438.9,
+231.6,
+140.6
+],
+"text": "Magic action summons an Earth Elemental that obeys you; works once per day",
+"kind": "item",
+"tag": "Wondrous Item · Rare"
+},
+{
+"id": "srd-item-stone-of-good-luck-luckstone",
+"title": "Stone of Good Luck (Luckstone)",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+61.5,
+582.6,
+228.0,
+56.6
+],
+"text": "Adds +1 to all your ability checks and saves",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-sun-blade",
+"title": "Sun Blade",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+61.5,
+642.2,
+228.0,
+80.6
+],
+"text": "Radiant hilt-blade: +2 finesse longsword, extra 1d8 against Undead, sheds sunlight",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement",
+"cont": [
+[
+248,
+[
+311.5,
+39.2,
+228.0,
+193.0
+]
+]
+]
+},
+{
+"id": "srd-item-sword-of-life-stealing",
+"title": "Sword of Life Stealing",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+311.5,
+235.2,
+231.3,
+116.6
+],
+"text": "On a natural 20 hit, deals extra 15 Necrotic and gives you matching Temporary HP",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement"
+},
+{
+"id": "srd-item-sword-of-sharpness",
+"title": "Sword of Sharpness",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+311.5,
+354.9,
+229.2,
+128.6
+],
+"text": "Maximizes damage against objects; natural 20 adds 14 Slashing and can lop off a limb",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-sword-of-wounding",
+"title": "Sword of Wounding",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+311.5,
+486.6,
+232.2,
+128.6
+],
+"text": "Extra 2d6 Necrotic per hit; DC 15 Constitution save or no healing and ongoing wounds",
+"kind": "item",
+"tag": "Weapon · Rare · requires attunement"
+},
+{
+"id": "srd-item-talisman-of-pure-good",
+"title": "Talisman of Pure Good",
+"chapter": "Magic Items",
+"page": 248,
+"rect": [
+311.5,
+618.2,
+230.1,
+104.6
+],
+"text": "Burns Fiends and Undead who touch it for 8d6 Radiant; holy symbol; can bury evil creatures",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement by a Cleric or Paladin",
+"cont": [
+[
+249,
+[
+61.5,
+36.7,
+230.7,
+219.5
+]
+]
+]
+},
+{
+"id": "srd-item-talisman-of-the-sphere",
+"title": "Talisman of the Sphere",
+"chapter": "Magic Items",
+"page": 249,
+"rect": [
+61.5,
+259.2,
+229.5,
+128.6
+],
+"text": "Advantage controlling a Sphere of Annihilation and lets you move it farther each turn",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-talisman-of-ultimate-evil",
+"title": "Talisman of Ultimate Evil",
+"chapter": "Magic Items",
+"page": 249,
+"rect": [
+61.5,
+390.9,
+231.1,
+308.6
+],
+"text": "Burns non-evil touchers for 8d6 Necrotic; holy symbol; can banish good creatures downward",
+"kind": "item",
+"tag": "Wondrous Item · Legendary · requires attunement"
+},
+{
+"id": "srd-item-thunderous-greatclub",
+"title": "Thunderous Greatclub",
+"chapter": "Magic Items",
+"page": 249,
+"rect": [
+311.5,
+37.4,
+232.2,
+452.6
+],
+"text": "Your Strength becomes 20; extra 1d8 Thunder; thunder clap and earthquake powers",
+"kind": "item",
+"tag": "Weapon · Very rare · requires attunement"
+},
+{
+"id": "srd-item-tome-of-clear-thought",
+"title": "Tome of Clear Thought",
+"chapter": "Magic Items",
+"page": 249,
+"rect": [
+311.5,
+493.0,
+229.9,
+116.6
+],
+"text": "After 48 hours of study, Intelligence rises by 2 (max 30); book then vanishes",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-tome-of-leadership-and-influence",
+"title": "Tome of Leadership and Influence",
+"chapter": "Magic Items",
+"page": 249,
+"rect": [
+311.5,
+612.7,
+229.5,
+92.6
+],
+"text": "After 48 hours of study, Charisma rises by 2 (max 30); book then vanishes",
+"kind": "item",
+"tag": "Wondrous Item · Very rare",
+"cont": [
+[
+250,
+[
+61.5,
+40.3,
+228.0,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-item-tome-of-understanding",
+"title": "Tome of Understanding",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+61.5,
+68.3,
+228.0,
+116.6
+],
+"text": "After 48 hours of study, Wisdom rises by 2 (max 30); book then vanishes",
+"kind": "item",
+"tag": "Wondrous Item · Very rare"
+},
+{
+"id": "srd-item-trident-of-fish-command",
+"title": "Trident of Fish Command",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+61.5,
+188.0,
+228.0,
+92.6
+],
+"text": "3 charges: cast Dominate Beast (DC 15) on a Beast that can swim",
+"kind": "item",
+"tag": "Weapon · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-universal-solvent",
+"title": "Universal Solvent",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+61.5,
+283.7,
+229.5,
+117.4
+],
+"text": "Dissolves any adhesive, including Sovereign Glue, one square foot per ounce",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-vicious-weapon",
+"title": "Vicious Weapon",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+61.5,
+403.4,
+228.0,
+68.6
+],
+"text": "Each hit adds 2d6 more damage of the weapon's own type",
+"kind": "item",
+"tag": "Weapon · Rare"
+},
+{
+"id": "srd-item-vorpal-sword",
+"title": "Vorpal Sword",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+61.5,
+475.0,
+230.4,
+236.6
+],
+"text": "+3 sword ignoring Slashing resistance; a natural 20 can behead a creature",
+"kind": "item",
+"tag": "Weapon · Legendary · requires attunement"
+},
+{
+"id": "srd-item-wand-of-binding",
+"title": "Wand of Binding",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+311.5,
+37.9,
+228.0,
+205.5
+],
+"text": "7 charges: Hold Person (2) or Hold Monster (5) at DC 17, plus escape-based reactions",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement"
+},
+{
+"id": "srd-item-wand-of-enemy-detection",
+"title": "Wand of Enemy Detection",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+311.5,
+246.4,
+229.4,
+176.6
+],
+"text": "1 charge: sense direction of the nearest hostile within 60 feet for 1 minute",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement"
+},
+{
+"id": "srd-item-wand-of-fear",
+"title": "Wand of Fear",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+311.5,
+426.1,
+228.0,
+205.5
+],
+"text": "7 charges: Command flee or grovel (1) or 60-foot Fear cone (3), DC 15 Wisdom",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement"
+},
+{
+"id": "srd-item-wand-of-fireballs",
+"title": "Wand of Fireballs",
+"chapter": "Magic Items",
+"page": 250,
+"rect": [
+311.5,
+634.7,
+232.0,
+92.6
+],
+"text": "7 charges: Fireball DC 15; 1 charge for level 3, +1 level per extra charge up to 3",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement by a Spellcaster",
+"cont": [
+[
+251,
+[
+61.5,
+37.8,
+228.0,
+51.5
+]
+]
+]
+},
+{
+"id": "srd-item-wand-of-lightning-bolts",
+"title": "Wand of Lightning Bolts",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+61.5,
+92.3,
+228.0,
+152.6
+],
+"text": "7 charges: Lightning Bolt DC 15; 1 charge for level 3, +1 level per extra charge up to 3",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-wand-of-magic-detection",
+"title": "Wand of Magic Detection",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+61.5,
+248.0,
+228.0,
+68.6
+],
+"text": "3 charges: cast Detect Magic",
+"kind": "item",
+"tag": "Wand · Uncommon"
+},
+{
+"id": "srd-item-wand-of-magic-missiles",
+"title": "Wand of Magic Missiles",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+61.5,
+319.7,
+230.2,
+140.6
+],
+"text": "7 charges: Magic Missile, level 1 for 1 charge, +1 level per extra charge up to 3",
+"kind": "item",
+"tag": "Wand · Uncommon"
+},
+{
+"id": "srd-item-wand-of-paralysis",
+"title": "Wand of Paralysis",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+61.5,
+463.4,
+229.7,
+176.6
+],
+"text": "1 charge: ray at 60 feet, DC 15 Constitution save or Paralyzed for 1 minute",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-wand-of-polymorph",
+"title": "Wand of Polymorph",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+311.5,
+37.9,
+228.0,
+128.6
+],
+"text": "1 charge: cast Polymorph (DC 15)",
+"kind": "item",
+"tag": "Wand · Very rare · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-wand-of-secrets",
+"title": "Wand of Secrets",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+311.5,
+169.6,
+228.7,
+92.6
+],
+"text": "3 charges: pulses toward the nearest secret door or trap within 60 feet",
+"kind": "item",
+"tag": "Wand · Uncommon"
+},
+{
+"id": "srd-item-wand-of-the-war-mage-1-2-or-3",
+"title": "Wand of the War Mage, +1, +2, or +3",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+311.5,
+265.3,
+228.0,
+92.6
+],
+"text": "+1, +2 or +3 to spell attack rolls and ignores Half Cover",
+"kind": "item",
+"tag": "Wand · Uncommon (+1), rare (+2), very rare (+3) · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-wand-of-web",
+"title": "Wand of Web",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+311.5,
+360.9,
+228.0,
+116.6
+],
+"text": "1 charge: cast Web (DC 13)",
+"kind": "item",
+"tag": "Wand · Uncommon · requires attunement by a Spellcaster"
+},
+{
+"id": "srd-item-wand-of-wonder",
+"title": "Wand of Wonder",
+"chapter": "Magic Items",
+"page": 251,
+"rect": [
+311.5,
+480.6,
+228.1,
+212.6
+],
+"text": "1 charge: chaotic random effect rolled from a table, centered up to 120 feet away",
+"kind": "item",
+"tag": "Wand · Rare · requires attunement",
+"cont": [
+[
+252,
+[
+61.5,
+38.2,
+228.5,
+619.2
+]
+],
+[
+252,
+[
+311.5,
+42.5,
+228.5,
+660.3
+]
+]
+]
+},
+{
+"id": "srd-item-weapon-1-2-or-3",
+"title": "Weapon, +1, +2, or +3",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+61.5,
+37.9,
+230.5,
+80.6
+],
+"text": "Weapon with +1, +2 or +3 to attack and damage rolls by rarity",
+"kind": "item",
+"tag": "Weapon · Uncommon (+1), rare (+2), very rare (+3)"
+},
+{
+"id": "srd-item-weapon-of-warning",
+"title": "Weapon of Warning",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+61.5,
+121.6,
+231.1,
+152.6
+],
+"text": "Wakes you and nearby allies as combat starts, and boosts everyone's Initiative",
+"kind": "item",
+"tag": "Weapon · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-well-of-many-worlds",
+"title": "Well of Many Worlds",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+61.5,
+277.3,
+228.7,
+200.6
+],
+"text": "Cloth that unfolds into a 6-foot portal to a GM-chosen place; reusable after 1d8 hours",
+"kind": "item",
+"tag": "Wondrous Item · Legendary"
+},
+{
+"id": "srd-item-wind-fan",
+"title": "Wind Fan",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+311.5,
+37.9,
+228.0,
+92.6
+],
+"text": "Cast Gust of Wind (DC 13); each reuse before dawn has a growing 20 percent chance to ruin it",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon"
+},
+{
+"id": "srd-item-winged-boots",
+"title": "Winged Boots",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+311.5,
+133.6,
+228.0,
+104.6
+],
+"text": "4 charges: 30-foot Fly Speed for 1 hour per charge",
+"kind": "item",
+"tag": "Wondrous Item · Uncommon · requires attunement"
+},
+{
+"id": "srd-item-wings-of-flying",
+"title": "Wings of Flying",
+"chapter": "Magic Items",
+"page": 253,
+"rect": [
+311.5,
+241.3,
+230.5,
+116.6
+],
+"text": "Cloak becomes wings for up to 1 hour: 60-foot Fly Speed; then 1d12 hours before reuse",
+"kind": "item",
+"tag": "Wondrous Item · Rare · requires attunement"
+},
+{
+"id": "srd-monsters-stat-block-overview",
+"title": "Stat Block Overview",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+61.5,
+70.0,
+230.4,
+306.3
+],
+"text": "A stat block's parts: identity, defenses, speeds, abilities, traits, actions and more"
+},
+{
+"id": "srd-monsters-parts-of-a-stat-block",
+"title": "Parts of a Stat Block",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+61.5,
+379.4,
+229.3,
+49.6
+],
+"text": "Guide to reading each part of a stat block, from name and size to actions"
+},
+{
+"id": "srd-monsters-size",
+"title": "Size",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+61.5,
+430.2,
+228.0,
+70.7
+],
+"text": "Six size categories from Tiny to Gargantuan; choose when a stat block offers options"
+},
+{
+"id": "srd-monsters-creature-type",
+"title": "Creature Type",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+61.5,
+502.8,
+231.7,
+220.1
+],
+"text": "The type tag (such as Beast or Undead) decides how spells and effects treat the monster",
+"cont": [
+[
+254,
+[
+311.5,
+36.7,
+231.1,
+231.5
+]
+]
+]
+},
+{
+"id": "srd-monsters-descriptive-tags",
+"title": "Descriptive Tags",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+311.5,
+271.2,
+229.5,
+65.0
+],
+"text": "Parenthetical tags add extra categories that carry no rules themselves"
+},
+{
+"id": "srd-monsters-alignment",
+"title": "Alignment",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+311.5,
+338.2,
+231.1,
+142.7
+],
+"text": "A monster's alignment is only a roleplaying default; change it freely"
+},
+{
+"id": "srd-monsters-armor-class",
+"title": "Armor Class",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+311.5,
+482.8,
+228.0,
+58.7
+],
+"text": "Monster AC reflects natural armor, Dexterity, equipment and other defenses"
+},
+{
+"id": "srd-monsters-initiative",
+"title": "Initiative",
+"chapter": "Monsters",
+"page": 254,
+"rect": [
+311.5,
+543.4,
+229.5,
+167.5
+],
+"text": "Gives the monster's Initiative bonus and a fixed score; roll with the bonus"
+},
+{
+"id": "srd-monsters-hit-points",
+"title": "Hit Points",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+36.8,
+231.7,
+142.7
+],
+"text": "HP shown as an average number plus Hit Dice; use either the number or roll the dice"
+},
+{
+"id": "srd-monsters-hit-dice-by-size-table",
+"title": "Hit Dice by Size",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+187.1,
+228.0,
+120.3
+],
+"text": "Table: monster Hit Die by size, from d4 for Tiny up to d20 for Gargantuan"
+},
+{
+"id": "srd-monsters-speed",
+"title": "Speed",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+389.1,
+229.7,
+71.5
+],
+"text": "Monster Speed entry, including any Burrow, Climb, Fly or Swim speeds"
+},
+{
+"id": "srd-monsters-ability-scores",
+"title": "Ability Scores",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+461.7,
+228.0,
+71.5
+],
+"text": "Monsters have six ability scores with modifiers and saving throw bonuses"
+},
+{
+"id": "srd-monsters-skills",
+"title": "Skills",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+534.3,
+229.8,
+106.7
+],
+"text": "Skill proficiencies a monster has, as ability modifier plus Proficiency Bonus"
+},
+{
+"id": "srd-monsters-resistances-and-vulnerabilities",
+"title": "Resistances and Vulnerabilities",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+61.5,
+643.0,
+228.0,
+58.7
+],
+"text": "Lists damage types a monster resists or takes extra from"
+},
+{
+"id": "srd-monsters-running-a-monster",
+"title": "Running a Monster",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+311.5,
+40.2,
+228.0,
+204.3
+],
+"text": "Use limited-use powers ASAP, otherwise Multiattack, and always use bonus, reaction, legendary"
+},
+{
+"id": "srd-monsters-immunities",
+"title": "Immunities",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+311.5,
+253.9,
+228.4,
+70.7
+],
+"text": "Damage immunities are listed first, then condition immunities"
+},
+{
+"id": "srd-monsters-gear",
+"title": "Gear",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+311.5,
+326.5,
+231.2,
+214.7
+],
+"text": "Monsters are proficient with listed gear, which may be taken as loot"
+},
+{
+"id": "srd-monsters-ammunition-and-ranged-attacks",
+"title": "Ammunition and Ranged Attacks",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+311.5,
+544.2,
+228.0,
+41.0
+],
+"text": "Ranged attackers are assumed to carry enough ammunition"
+},
+{
+"id": "srd-monsters-equipping-a-monster-with-other-items",
+"title": "Equipping a Monster with Other Items",
+"chapter": "Monsters",
+"page": 255,
+"rect": [
+311.5,
+588.3,
+228.0,
+137.0
+],
+"text": "Add any gear you like, and decide what can be recovered after a fight",
+"cont": [
+[
+256,
+[
+61.5,
+39.2,
+228.0,
+25.0
+]
+]
+]
+},
+{
+"id": "srd-monsters-senses",
+"title": "Senses",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+66.1,
+228.0,
+71.5
+],
+"text": "Passive Perception plus any special senses a monster has"
+},
+{
+"id": "srd-monsters-languages",
+"title": "Languages",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+138.7,
+228.0,
+82.7
+],
+"text": "Languages a monster speaks or merely understands; 'None' means it comprehends no language"
+},
+{
+"id": "srd-monsters-telepathy",
+"title": "Telepathy",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+224.4,
+228.0,
+65.0
+],
+"text": "Magical mind-to-mind communication within a stated range"
+},
+{
+"id": "srd-monsters-challenge-rating",
+"title": "Challenge Rating",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+291.4,
+228.0,
+58.7
+],
+"text": "CR measures a monster's threat level; see the Glossary and encounter-building guidance"
+},
+{
+"id": "srd-monsters-experience-points",
+"title": "Experience Points",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+353.1,
+230.3,
+113.0
+],
+"text": "XP value comes from CR and is awarded for defeating or neutralizing the monster"
+},
+{
+"id": "srd-monsters-experience-points-by-challenge-rating-table",
+"title": "Experience Points by Challenge Rating",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+61.5,
+473.8,
+228.0,
+241.4
+],
+"text": "Table: XP by CR, from 0 or 10 for CR 0 up to 155,000 for CR 30",
+"cont": [
+[
+256,
+[
+311.5,
+42.5,
+228.0,
+59.0
+]
+]
+]
+},
+{
+"id": "srd-monsters-proficiency-bonus",
+"title": "Proficiency Bonus",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+108.6,
+228.0,
+77.0
+],
+"text": "Proficiency Bonus follows the monster's CR and applies to its saves and skills"
+},
+{
+"id": "srd-monsters-proficiency-bonus-by-challenge-rating-table",
+"title": "Proficiency Bonus by Challenge Rating",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+193.3,
+228.0,
+90.1
+],
+"text": "Table: monster proficiency bonus by CR, from +2 at CR 0-4 up to +9 at CR 29-30"
+},
+{
+"id": "srd-monsters-traits",
+"title": "Traits",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+289.4,
+228.0,
+46.7
+],
+"text": "Traits are features that are always active or work in set situations"
+},
+{
+"id": "srd-monsters-actions",
+"title": "Actions",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+338.0,
+228.0,
+58.7
+],
+"text": "Actions a monster can take, besides the standard actions every creature has"
+},
+{
+"id": "srd-monsters-attack-notation",
+"title": "Attack Notation",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+399.7,
+232.2,
+197.8
+],
+"text": "How attack entries list melee or ranged, attack bonus, reach or range, and hit effects"
+},
+{
+"id": "srd-monsters-saving-throw-effect-notation",
+"title": "Saving Throw Effect Notation",
+"chapter": "Monsters",
+"page": 256,
+"rect": [
+311.5,
+599.8,
+229.1,
+125.0
+],
+"text": "How effects state the save type, DC, who rolls, and results of failing or succeeding"
+},
+{
+"id": "srd-monsters-damage-notation",
+"title": "Damage Notation",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+61.5,
+37.4,
+231.3,
+77.0
+],
+"text": "Damage shows an average and a dice expression; use one or the other, never both"
+},
+{
+"id": "srd-monsters-multiattack",
+"title": "Multiattack",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+61.5,
+117.4,
+228.0,
+89.0
+],
+"text": "Entry spelling out the set of strikes made with one Attack action"
+},
+{
+"id": "srd-monsters-spellcasting",
+"title": "Spellcasting",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+61.5,
+209.5,
+230.9,
+317.0
+],
+"text": "Lists a monster's spells, casting ability, save DC and spell attack bonus"
+},
+{
+"id": "srd-monsters-bonus-action",
+"title": "Bonus Action",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+61.5,
+528.5,
+228.0,
+58.7
+],
+"text": "Bonus Action options a monster has"
+},
+{
+"id": "srd-monsters-reactions",
+"title": "Reactions",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+311.5,
+36.8,
+231.1,
+58.7
+],
+"text": "Reaction options a monster has, with their triggers"
+},
+{
+"id": "srd-monsters-legendary-actions",
+"title": "Legendary Actions",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+311.5,
+97.5,
+228.0,
+178.7
+],
+"text": "Extra actions taken between other turns, one at a time, from a pool that refills each round"
+},
+{
+"id": "srd-monsters-limited-usage",
+"title": "Limited Usage",
+"chapter": "Monsters",
+"page": 257,
+"rect": [
+311.5,
+278.1,
+230.4,
+328.1
+],
+"text": "Usage limits: X/Day, Recharge X-Y on a d6, and recharging on short or long rests"
+},
+{
+"id": "srd-mon-aboleth",
+"title": "Aboleth",
+"chapter": "Monsters A–Z",
+"page": 258,
+"rect": [
+61.5,
+94.3,
+231.1,
+626.3
+],
+"text": "Large Aberration · CR 10 · AC 17 · HP 150 · Tentacle, Consume Memories, Dominate Mind",
+"kind": "monster",
+"cont": [
+[
+258,
+[
+311.5,
+38.2,
+229.2,
+316.9
+]
+]
+]
+},
+{
+"id": "srd-mon-air-elemental",
+"title": "Air Elemental",
+"chapter": "Monsters A–Z",
+"page": 258,
+"rect": [
+311.5,
+381.2,
+228.0,
+339.8
+],
+"text": "Large Elemental · CR 5 · AC 15 · HP 90 · Thunderous Slam, Whirlwind",
+"kind": "monster",
+"cont": [
+[
+259,
+[
+61.5,
+38.2,
+230.6,
+74.4
+]
+]
+]
+},
+{
+"id": "srd-mon-animated-armor",
+"title": "Animated Armor",
+"chapter": "Monsters A–Z",
+"page": 259,
+"rect": [
+61.5,
+138.6,
+230.9,
+244.7
+],
+"text": "Medium Construct · CR 1 · AC 18 · HP 33 · Slam",
+"kind": "monster"
+},
+{
+"id": "srd-mon-animated-flying-sword",
+"title": "Animated Flying Sword",
+"chapter": "Monsters A–Z",
+"page": 259,
+"rect": [
+61.5,
+386.7,
+231.9,
+228.2
+],
+"text": "Small Construct · CR 1/4 · AC 17 · HP 14 · Slash",
+"kind": "monster"
+},
+{
+"id": "srd-mon-animated-rug-of-smothering",
+"title": "Animated Rug of Smothering",
+"chapter": "Monsters A–Z",
+"page": 259,
+"rect": [
+61.5,
+618.3,
+228.0,
+74.8
+],
+"text": "Large Construct · CR 2 · AC 12 · HP 27 · Smother",
+"kind": "monster",
+"cont": [
+[
+259,
+[
+311.5,
+40.2,
+231.9,
+260.5
+]
+]
+]
+},
+{
+"id": "srd-mon-ankheg",
+"title": "Ankheg",
+"chapter": "Monsters A–Z",
+"page": 259,
+"rect": [
+311.5,
+326.7,
+232.6,
+351.8
+],
+"text": "Large Monstrosity · CR 2 · AC 14 · HP 45 · Bite, Acid Spray",
+"kind": "monster"
+},
+{
+"id": "srd-mon-assassin",
+"title": "Assassin",
+"chapter": "Monsters A–Z",
+"page": 260,
+"rect": [
+61.5,
+60.1,
+229.5,
+463.4
+],
+"text": "Medium or Small Humanoid · CR 8 · AC 16 · HP 97 · Shortsword, Light Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-awakened-shrub",
+"title": "Awakened Shrub",
+"chapter": "Monsters A–Z",
+"page": 260,
+"rect": [
+61.5,
+549.5,
+228.0,
+74.8
+],
+"text": "Small Plant · CR 0 · AC 9 · HP 10 · Rake",
+"kind": "monster",
+"cont": [
+[
+260,
+[
+311.5,
+40.2,
+228.0,
+152.5
+]
+]
+]
+},
+{
+"id": "srd-mon-awakened-tree",
+"title": "Awakened Tree",
+"chapter": "Monsters A–Z",
+"page": 260,
+"rect": [
+311.5,
+196.1,
+228.0,
+228.2
+],
+"text": "Huge Plant · CR 2 · AC 13 · HP 59 · Slam",
+"kind": "monster"
+},
+{
+"id": "srd-mon-axe-beak",
+"title": "Axe Beak",
+"chapter": "Monsters A–Z",
+"page": 260,
+"rect": [
+311.5,
+450.3,
+231.3,
+204.2
+],
+"text": "Large Monstrosity · CR 1/4 · AC 11 · HP 19 · Beak",
+"kind": "monster"
+},
+{
+"id": "srd-mon-azer-sentinel",
+"title": "Azer Sentinel",
+"chapter": "Monsters A–Z",
+"page": 261,
+"rect": [
+61.5,
+60.1,
+228.7,
+327.8
+],
+"text": "Medium Elemental · CR 2 · AC 17 · HP 39 · Burning Hammer",
+"kind": "monster"
+},
+{
+"id": "srd-mon-balor",
+"title": "Balor",
+"chapter": "Monsters A–Z",
+"page": 261,
+"rect": [
+61.5,
+413.9,
+231.2,
+300.2
+],
+"text": "Huge Fiend (Demon) · CR 19 · AC 19 · HP 287 · Flame Whip, Lightning Blade",
+"kind": "monster",
+"cont": [
+[
+261,
+[
+311.5,
+38.2,
+232.1,
+318.6
+]
+]
+]
+},
+{
+"id": "srd-mon-bandit",
+"title": "Bandit",
+"chapter": "Monsters A–Z",
+"page": 261,
+"rect": [
+311.5,
+382.8,
+228.0,
+244.7
+],
+"text": "Medium or Small Humanoid · CR 1/8 · AC 12 · HP 11 · Scimitar, Light Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-bandit-captain",
+"title": "Bandit Captain",
+"chapter": "Monsters A–Z",
+"page": 261,
+"rect": [
+311.5,
+630.9,
+228.0,
+74.8
+],
+"text": "Medium or Small Humanoid · CR 2 · AC 15 · HP 52 · Scimitar, Pistol",
+"kind": "monster",
+"cont": [
+[
+262,
+[
+61.5,
+40.2,
+228.0,
+268.6
+]
+]
+]
+},
+{
+"id": "srd-mon-barbed-devil",
+"title": "Barbed Devil",
+"chapter": "Monsters A–Z",
+"page": 262,
+"rect": [
+61.5,
+334.8,
+231.3,
+392.3
+],
+"text": "Medium Fiend (Devil) · CR 5 · AC 15 · HP 110 · Claws, Tail, Hurl Flame",
+"kind": "monster",
+"cont": [
+[
+262,
+[
+311.5,
+38.2,
+231.6,
+119.4
+]
+]
+]
+},
+{
+"id": "srd-mon-basilisk",
+"title": "Basilisk",
+"chapter": "Monsters A–Z",
+"page": 262,
+"rect": [
+311.5,
+183.6,
+232.0,
+323.3
+],
+"text": "Medium Monstrosity · CR 3 · AC 15 · HP 52 · Bite, Petrifying Gaze",
+"kind": "monster"
+},
+{
+"id": "srd-mon-bearded-devil",
+"title": "Bearded Devil",
+"chapter": "Monsters A–Z",
+"page": 262,
+"rect": [
+311.5,
+532.9,
+228.0,
+192.2
+],
+"text": "Medium Fiend (Devil) · CR 3 · AC 13 · HP 58 · Beard, Infernal Glaive",
+"kind": "monster",
+"cont": [
+[
+263,
+[
+61.5,
+37.6,
+231.2,
+280.3
+]
+]
+]
+},
+{
+"id": "srd-mon-behir",
+"title": "Behir",
+"chapter": "Monsters A–Z",
+"page": 263,
+"rect": [
+61.5,
+343.9,
+230.5,
+373.7
+],
+"text": "Huge Monstrosity · CR 11 · AC 17 · HP 168 · Bite, Constrict, Lightning Breath, Swallow",
+"kind": "monster",
+"cont": [
+[
+263,
+[
+311.5,
+37.6,
+230.5,
+212.2
+]
+]
+]
+},
+{
+"id": "srd-mon-berserker",
+"title": "Berserker",
+"chapter": "Monsters A–Z",
+"page": 263,
+"rect": [
+311.5,
+275.8,
+228.0,
+263.3
+],
+"text": "Medium or Small Humanoid · CR 2 · AC 13 · HP 67 · Greataxe",
+"kind": "monster"
+},
+{
+"id": "srd-mon-black-dragon-wyrmling",
+"title": "Black Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 263,
+"rect": [
+311.5,
+565.2,
+228.0,
+74.8
+],
+"text": "Medium Dragon (Chromatic) · CR 2 · AC 17 · HP 33 · Rend, Acid Breath",
+"kind": "monster",
+"cont": [
+[
+264,
+[
+61.5,
+40.2,
+231.8,
+268.6
+]
+]
+]
+},
+{
+"id": "srd-mon-young-black-dragon",
+"title": "Young Black Dragon",
+"chapter": "Monsters A–Z",
+"page": 264,
+"rect": [
+61.5,
+312.2,
+228.0,
+344.3
+],
+"text": "Large Dragon (Chromatic) · CR 7 · AC 18 · HP 127 · Rend, Acid Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-black-dragon",
+"title": "Adult Black Dragon",
+"chapter": "Monsters A–Z",
+"page": 264,
+"rect": [
+311.5,
+36.6,
+232.7,
+696.4
+],
+"text": "Huge Dragon (Chromatic) · CR 14 · AC 19 · HP 195 · Rend, Acid Breath, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ancient-black-dragon",
+"title": "Ancient Black Dragon",
+"chapter": "Monsters A–Z",
+"page": 265,
+"rect": [
+61.5,
+36.6,
+232.2,
+691.9
+],
+"text": "Gargantuan Dragon (Chromatic) · CR 21 · AC 22 · HP 367 · Rend, Acid Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+265,
+[
+311.5,
+38.2,
+228.0,
+26.4
+]
+]
+]
+},
+{
+"id": "srd-mon-black-pudding",
+"title": "Black Pudding",
+"chapter": "Monsters A–Z",
+"page": 265,
+"rect": [
+311.5,
+90.6,
+232.4,
+619.4
+],
+"text": "Large Ooze · CR 4 · AC 7 · HP 68 · Dissolving Pseudopod",
+"kind": "monster",
+"cont": [
+[
+266,
+[
+61.5,
+38.3,
+228.0,
+26.3
+]
+]
+]
+},
+{
+"id": "srd-mon-blink-dog",
+"title": "Blink Dog",
+"chapter": "Monsters A–Z",
+"page": 266,
+"rect": [
+61.5,
+90.6,
+228.0,
+275.3
+],
+"text": "Medium Fey · CR 1/4 · AC 13 · HP 22 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-blue-dragon-wyrmling",
+"title": "Blue Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 266,
+"rect": [
+61.5,
+391.9,
+228.7,
+309.2
+],
+"text": "Medium Dragon (Chromatic) · CR 3 · AC 17 · HP 65 · Rend, Lightning Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-young-blue-dragon",
+"title": "Young Blue Dragon",
+"chapter": "Monsters A–Z",
+"page": 266,
+"rect": [
+311.5,
+36.6,
+228.0,
+309.2
+],
+"text": "Large Dragon (Chromatic) · CR 9 · AC 18 · HP 152 · Rend, Lightning Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-blue-dragon",
+"title": "Adult Blue Dragon",
+"chapter": "Monsters A–Z",
+"page": 266,
+"rect": [
+311.5,
+349.2,
+228.0,
+368.3
+],
+"text": "Huge Dragon (Chromatic) · CR 16 · AC 19 · HP 212 · Rend, Lightning Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+267,
+[
+61.5,
+38.2,
+228.6,
+265.9
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-blue-dragon",
+"title": "Ancient Blue Dragon",
+"chapter": "Monsters A–Z",
+"page": 267,
+"rect": [
+61.5,
+307.6,
+232.1,
+392.3
+],
+"text": "Gargantuan Dragon (Chromatic) · CR 23 · AC 22 · HP 481 · Rend, Lightning Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+267,
+[
+311.5,
+38.2,
+229.1,
+249.5
+]
+]
+]
+},
+{
+"id": "srd-mon-bone-devil",
+"title": "Bone Devil",
+"chapter": "Monsters A–Z",
+"page": 267,
+"rect": [
+311.5,
+313.7,
+232.2,
+408.8
+],
+"text": "Large Fiend (Devil) · CR 9 · AC 16 · HP 161 · Claw, Infernal Sting",
+"kind": "monster",
+"cont": [
+[
+268,
+[
+61.5,
+38.3,
+231.8,
+38.3
+]
+]
+]
+},
+{
+"id": "srd-mon-brass-dragon-wyrmling",
+"title": "Brass Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 268,
+"rect": [
+61.5,
+102.6,
+231.5,
+381.2
+],
+"text": "Medium Dragon (Metallic) · CR 1 · AC 15 · HP 22 · Rend, Fire Breath, Sleep Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-young-brass-dragon",
+"title": "Young Brass Dragon",
+"chapter": "Monsters A–Z",
+"page": 268,
+"rect": [
+61.5,
+487.2,
+228.0,
+240.2
+],
+"text": "Large Dragon (Metallic) · CR 6 · AC 17 · HP 110 · Rend, Fire Breath, Sleep Breath",
+"kind": "monster",
+"cont": [
+[
+268,
+[
+311.5,
+38.1,
+232.0,
+167.4
+]
+]
+]
+},
+{
+"id": "srd-mon-adult-brass-dragon",
+"title": "Adult Brass Dragon",
+"chapter": "Monsters A–Z",
+"page": 268,
+"rect": [
+311.5,
+208.9,
+232.0,
+480.8
+],
+"text": "Huge Dragon (Metallic) · CR 13 · AC 18 · HP 172 · Rend, Fire Breath, Sleep Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+269,
+[
+61.5,
+38.2,
+228.0,
+309.5
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-brass-dragon",
+"title": "Ancient Brass Dragon",
+"chapter": "Monsters A–Z",
+"page": 269,
+"rect": [
+61.5,
+351.1,
+231.2,
+351.8
+],
+"text": "Gargantuan Dragon (Metallic) · CR 20 · AC 20 · HP 332 · Rend, Fire Breath, Sleep Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+269,
+[
+311.5,
+38.2,
+232.0,
+450.5
+]
+]
+]
+},
+{
+"id": "srd-mon-bronze-dragon-wyrmling",
+"title": "Bronze Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 269,
+"rect": [
+311.5,
+514.7,
+228.0,
+192.2
+],
+"text": "Medium Dragon (Metallic) · CR 2 · AC 15 · HP 39 · Rend, Lightning Breath, Repulsion Breath",
+"kind": "monster",
+"cont": [
+[
+270,
+[
+61.5,
+37.6,
+231.8,
+200.9
+]
+]
+]
+},
+{
+"id": "srd-mon-young-bronze-dragon",
+"title": "Young Bronze Dragon",
+"chapter": "Monsters A–Z",
+"page": 270,
+"rect": [
+61.5,
+241.8,
+231.8,
+408.8
+],
+"text": "Large Dragon (Metallic) · CR 8 · AC 17 · HP 142 · Rend, Lightning Breath, Repulsion Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-bronze-dragon",
+"title": "Adult Bronze Dragon",
+"chapter": "Monsters A–Z",
+"page": 270,
+"rect": [
+61.5,
+654.1,
+228.0,
+74.8
+],
+"text": "Huge Dragon (Metallic) · CR 15 · AC 18 · HP 212 · Rend, Lightning Breath, Repulsion Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+270,
+[
+311.5,
+40.2,
+232.3,
+685.2
+]
+],
+[
+271,
+[
+61.5,
+38.3,
+228.0,
+26.3
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-bronze-dragon",
+"title": "Ancient Bronze Dragon",
+"chapter": "Monsters A–Z",
+"page": 271,
+"rect": [
+61.5,
+68.0,
+231.8,
+614.2
+],
+"text": "Gargantuan Dragon (Metallic) · CR 22 · AC 22 · HP 444 · Rend, Lightning Breath, Repulsion Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+271,
+[
+311.5,
+37.6,
+228.9,
+179.8
+]
+]
+]
+},
+{
+"id": "srd-mon-bugbear-stalker",
+"title": "Bugbear Stalker",
+"chapter": "Monsters A–Z",
+"page": 271,
+"rect": [
+311.5,
+243.3,
+231.6,
+415.4
+],
+"text": "Medium Fey (Goblinoid) · CR 3 · AC 15 · HP 65 · Javelin, Morningstar, Quick Grapple",
+"kind": "monster"
+},
+{
+"id": "srd-mon-bugbear-warrior",
+"title": "Bugbear Warrior",
+"chapter": "Monsters A–Z",
+"page": 272,
+"rect": [
+61.5,
+36.6,
+231.1,
+351.8
+],
+"text": "Medium Fey (Goblinoid) · CR 1 · AC 14 · HP 33 · Grab, Light Hammer",
+"kind": "monster"
+},
+{
+"id": "srd-mon-bulette",
+"title": "Bulette",
+"chapter": "Monsters A–Z",
+"page": 272,
+"rect": [
+61.5,
+414.4,
+229.4,
+309.2
+],
+"text": "Large Monstrosity · CR 5 · AC 17 · HP 94 · Bite, Deadly Leap",
+"kind": "monster",
+"cont": [
+[
+272,
+[
+311.5,
+38.2,
+228.0,
+85.4
+]
+]
+]
+},
+{
+"id": "srd-mon-centaur-trooper",
+"title": "Centaur Trooper",
+"chapter": "Monsters A–Z",
+"page": 272,
+"rect": [
+311.5,
+149.7,
+232.4,
+392.3
+],
+"text": "Large Fey · CR 2 · AC 16 · HP 45 · Pike, Longbow, Trampling Charge",
+"kind": "monster"
+},
+{
+"id": "srd-mon-chain-devil",
+"title": "Chain Devil",
+"chapter": "Monsters A–Z",
+"page": 272,
+"rect": [
+311.5,
+568.0,
+228.0,
+74.8
+],
+"text": "Medium Fiend (Devil) · CR 8 · AC 15 · HP 85 · Chain, Conjure Infernal Chain",
+"kind": "monster",
+"cont": [
+[
+273,
+[
+61.5,
+40.2,
+230.4,
+548.2
+]
+]
+]
+},
+{
+"id": "srd-mon-chimera",
+"title": "Chimera",
+"chapter": "Monsters A–Z",
+"page": 273,
+"rect": [
+61.5,
+614.4,
+228.0,
+74.8
+],
+"text": "Large Monstrosity · CR 6 · AC 14 · HP 114 · Bite, Claw, Ram, Fire Breath",
+"kind": "monster",
+"cont": [
+[
+273,
+[
+311.5,
+40.2,
+231.4,
+302.5
+]
+]
+]
+},
+{
+"id": "srd-mon-chuul",
+"title": "Chuul",
+"chapter": "Monsters A–Z",
+"page": 273,
+"rect": [
+311.5,
+368.7,
+232.6,
+356.3
+],
+"text": "Large Aberration · CR 4 · AC 16 · HP 76 · Pincer, Paralyzing Tentacles",
+"kind": "monster",
+"cont": [
+[
+274,
+[
+61.5,
+38.1,
+231.6,
+74.4
+]
+]
+]
+},
+{
+"id": "srd-mon-clay-golem",
+"title": "Clay Golem",
+"chapter": "Monsters A–Z",
+"page": 274,
+"rect": [
+61.5,
+138.5,
+228.6,
+532.4
+],
+"text": "Large Construct · CR 9 · AC 14 · HP 123 · Slam",
+"kind": "monster"
+},
+{
+"id": "srd-mon-cloaker",
+"title": "Cloaker",
+"chapter": "Monsters A–Z",
+"page": 274,
+"rect": [
+311.5,
+60.1,
+232.0,
+599.9
+],
+"text": "Large Aberration · CR 8 · AC 14 · HP 91 · Attach, Tail, Moan",
+"kind": "monster"
+},
+{
+"id": "srd-mon-cloud-giant",
+"title": "Cloud Giant",
+"chapter": "Monsters A–Z",
+"page": 275,
+"rect": [
+61.5,
+60.1,
+232.1,
+461.3
+],
+"text": "Huge Giant · CR 9 · AC 14 · HP 200 · Thunderous Mace, Thundercloud, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-cockatrice",
+"title": "Cockatrice",
+"chapter": "Monsters A–Z",
+"page": 275,
+"rect": [
+61.5,
+547.4,
+228.0,
+168.2
+],
+"text": "Small Monstrosity · CR 1/2 · AC 11 · HP 22 · Petrifying Bite",
+"kind": "monster",
+"cont": [
+[
+275,
+[
+311.5,
+37.6,
+228.3,
+128.2
+]
+]
+]
+},
+{
+"id": "srd-mon-commoner",
+"title": "Commoner",
+"chapter": "Monsters A–Z",
+"page": 275,
+"rect": [
+311.5,
+191.8,
+230.7,
+275.3
+],
+"text": "Medium or Small Humanoid · CR 0 · AC 10 · HP 4 · Club",
+"kind": "monster"
+},
+{
+"id": "srd-mon-copper-dragon-wyrmling",
+"title": "Copper Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 275,
+"rect": [
+311.5,
+493.2,
+228.0,
+192.2
+],
+"text": "Medium Dragon (Metallic) · CR 1 · AC 16 · HP 22 · Rend, Acid Breath, Slowing Breath",
+"kind": "monster",
+"cont": [
+[
+276,
+[
+61.5,
+37.6,
+231.5,
+161.2
+]
+]
+]
+},
+{
+"id": "srd-mon-young-copper-dragon",
+"title": "Young Copper Dragon",
+"chapter": "Monsters A–Z",
+"page": 276,
+"rect": [
+61.5,
+202.2,
+231.5,
+385.7
+],
+"text": "Large Dragon (Metallic) · CR 7 · AC 17 · HP 119 · Rend, Acid Breath, Slowing Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-copper-dragon",
+"title": "Adult Copper Dragon",
+"chapter": "Monsters A–Z",
+"page": 276,
+"rect": [
+61.5,
+591.4,
+228.0,
+74.8
+],
+"text": "Huge Dragon (Metallic) · CR 14 · AC 18 · HP 184 · Rend, Acid Breath, Slowing Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+276,
+[
+311.5,
+40.2,
+232.0,
+688.2
+]
+],
+[
+277,
+[
+61.5,
+38.2,
+228.0,
+26.4
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-copper-dragon",
+"title": "Ancient Copper Dragon",
+"chapter": "Monsters A–Z",
+"page": 277,
+"rect": [
+61.5,
+68.0,
+231.5,
+585.7
+],
+"text": "Gargantuan Dragon (Metallic) · CR 21 · AC 21 · HP 367 · Rend, Acid Breath, Slowing Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+277,
+[
+311.5,
+37.6,
+231.0,
+215.7
+]
+]
+]
+},
+{
+"id": "srd-mon-couatl",
+"title": "Couatl",
+"chapter": "Monsters A–Z",
+"page": 277,
+"rect": [
+311.5,
+279.3,
+232.4,
+444.8
+],
+"text": "Medium Celestial · CR 4 · AC 19 · HP 60 · Bite, Constrict, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+278,
+[
+61.5,
+38.3,
+228.0,
+109.4
+]
+]
+]
+},
+{
+"id": "srd-mon-swarm-of-crawling-claws",
+"title": "Swarm of Crawling Claws",
+"chapter": "Monsters A–Z",
+"page": 278,
+"rect": [
+61.5,
+173.7,
+228.0,
+371.3
+],
+"text": "Medium Swarm of Tiny Undead · CR 3 · AC 12 · HP 49 · Swarm of Grasping Hands",
+"kind": "monster"
+},
+{
+"id": "srd-mon-cultist",
+"title": "Cultist",
+"chapter": "Monsters A–Z",
+"page": 278,
+"rect": [
+61.5,
+571.0,
+228.0,
+74.8
+],
+"text": "Medium or Small Humanoid · CR 1/8 · AC 12 · HP 9 · Ritual Sickle",
+"kind": "monster",
+"cont": [
+[
+278,
+[
+311.5,
+40.2,
+228.0,
+152.5
+]
+]
+]
+},
+{
+"id": "srd-mon-cultist-fanatic",
+"title": "Cultist Fanatic",
+"chapter": "Monsters A–Z",
+"page": 278,
+"rect": [
+311.5,
+196.1,
+231.9,
+380.3
+],
+"text": "Medium or Small Humanoid · CR 2 · AC 13 · HP 44 · Pact Blade, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-darkmantle",
+"title": "Darkmantle",
+"chapter": "Monsters A–Z",
+"page": 278,
+"rect": [
+311.5,
+602.4,
+228.0,
+74.8
+],
+"text": "Small Aberration · CR 1/2 · AC 11 · HP 22 · Crush",
+"kind": "monster",
+"cont": [
+[
+279,
+[
+61.5,
+40.2,
+232.1,
+361.0
+]
+]
+]
+},
+{
+"id": "srd-mon-death-dog",
+"title": "Death Dog",
+"chapter": "Monsters A–Z",
+"page": 279,
+"rect": [
+61.5,
+427.2,
+231.7,
+292.7
+],
+"text": "Medium Monstrosity · CR 1 · AC 12 · HP 39 · Bite",
+"kind": "monster",
+"cont": [
+[
+279,
+[
+311.5,
+38.3,
+230.2,
+62.3
+]
+]
+]
+},
+{
+"id": "srd-mon-deva",
+"title": "Deva",
+"chapter": "Monsters A–Z",
+"page": 279,
+"rect": [
+311.5,
+126.6,
+231.8,
+532.4
+],
+"text": "Medium Celestial (Angel) · CR 10 · AC 17 · HP 229 · Holy Mace, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-djinni",
+"title": "Djinni",
+"chapter": "Monsters A–Z",
+"page": 280,
+"rect": [
+61.5,
+60.1,
+231.4,
+657.8
+],
+"text": "Large Elemental (Genie) · CR 11 · AC 17 · HP 218 · Storm Blade, Storm Bolt, Create Whirlwind, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+280,
+[
+311.5,
+38.3,
+229.5,
+131.3
+]
+]
+]
+},
+{
+"id": "srd-mon-doppelganger",
+"title": "Doppelganger",
+"chapter": "Monsters A–Z",
+"page": 280,
+"rect": [
+311.5,
+195.6,
+232.5,
+480.8
+],
+"text": "Medium Monstrosity · CR 3 · AC 14 · HP 52 · Slam, Unsettling Visage",
+"kind": "monster"
+},
+{
+"id": "srd-mon-dragon-turtle",
+"title": "Dragon Turtle",
+"chapter": "Monsters A–Z",
+"page": 281,
+"rect": [
+61.5,
+60.1,
+232.1,
+408.8
+],
+"text": "Gargantuan Dragon · CR 17 · AC 20 · HP 356 · Bite, Tail, Steam Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-dretch",
+"title": "Dretch",
+"chapter": "Monsters A–Z",
+"page": 281,
+"rect": [
+61.5,
+494.9,
+228.0,
+192.2
+],
+"text": "Small Fiend (Demon) · CR 1/4 · AC 11 · HP 18 · Rend, Fetid Cloud",
+"kind": "monster",
+"cont": [
+[
+281,
+[
+311.5,
+37.6,
+232.6,
+120.8
+]
+]
+]
+},
+{
+"id": "srd-mon-drider",
+"title": "Drider",
+"chapter": "Monsters A–Z",
+"page": 281,
+"rect": [
+311.5,
+184.3,
+231.7,
+472.4
+],
+"text": "Large Monstrosity · CR 6 · AC 19 · HP 123 · Foreleg, Poison Burst",
+"kind": "monster"
+},
+{
+"id": "srd-mon-druid",
+"title": "Druid",
+"chapter": "Monsters A–Z",
+"page": 282,
+"rect": [
+61.5,
+60.1,
+232.2,
+378.2
+],
+"text": "Medium or Small Humanoid (Druid) · CR 2 · AC 13 · HP 44 · Vine Staff, Verdant Wisp, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-dryad",
+"title": "Dryad",
+"chapter": "Monsters A–Z",
+"page": 282,
+"rect": [
+61.5,
+464.3,
+228.0,
+256.7
+],
+"text": "Medium Fey · CR 1 · AC 16 · HP 22 · Vine Lash, Thorn Burst, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+282,
+[
+311.5,
+37.6,
+232.7,
+277.4
+]
+]
+]
+},
+{
+"id": "srd-mon-earth-elemental",
+"title": "Earth Elemental",
+"chapter": "Monsters A–Z",
+"page": 282,
+"rect": [
+311.5,
+340.9,
+228.0,
+380.3
+],
+"text": "Large Elemental · CR 5 · AC 17 · HP 147 · Slam, Rock Launch",
+"kind": "monster",
+"cont": [
+[
+283,
+[
+61.5,
+38.1,
+229.8,
+38.4
+]
+]
+]
+},
+{
+"id": "srd-mon-efreeti",
+"title": "Efreeti",
+"chapter": "Monsters A–Z",
+"page": 283,
+"rect": [
+61.5,
+102.5,
+231.8,
+566.3
+],
+"text": "Large Elemental (Genie) · CR 11 · AC 17 · HP 212 · Heated Blade, Hurl Flame, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-erinyes",
+"title": "Erinyes",
+"chapter": "Monsters A–Z",
+"page": 283,
+"rect": [
+311.5,
+60.1,
+232.4,
+616.4
+],
+"text": "Medium Fiend (Devil) · CR 12 · AC 18 · HP 178 · Withering Sword, Entangling Rope (Requires Magic Rope)",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ettercap",
+"title": "Ettercap",
+"chapter": "Monsters A–Z",
+"page": 284,
+"rect": [
+61.5,
+60.1,
+232.1,
+544.4
+],
+"text": "Medium Monstrosity · CR 2 · AC 13 · HP 44 · Bite, Claw, Web Strand",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ettin",
+"title": "Ettin",
+"chapter": "Monsters A–Z",
+"page": 284,
+"rect": [
+61.5,
+630.5,
+228.0,
+74.8
+],
+"text": "Large Giant · CR 4 · AC 12 · HP 85 · Battleaxe, Morningstar",
+"kind": "monster",
+"cont": [
+[
+284,
+[
+311.5,
+40.2,
+228.0,
+269.5
+]
+]
+]
+},
+{
+"id": "srd-mon-fire-elemental",
+"title": "Fire Elemental",
+"chapter": "Monsters A–Z",
+"page": 284,
+"rect": [
+311.5,
+335.7,
+232.7,
+357.2
+],
+"text": "Large Elemental · CR 5 · AC 13 · HP 93 · Burn",
+"kind": "monster",
+"cont": [
+[
+285,
+[
+61.5,
+38.2,
+231.8,
+114.0
+]
+]
+]
+},
+{
+"id": "srd-mon-fire-giant",
+"title": "Fire Giant",
+"chapter": "Monsters A–Z",
+"page": 285,
+"rect": [
+61.5,
+178.2,
+232.1,
+345.2
+],
+"text": "Huge Giant · CR 9 · AC 18 · HP 162 · Flame Sword, Hammer Throw",
+"kind": "monster"
+},
+{
+"id": "srd-mon-flesh-golem",
+"title": "Flesh Golem",
+"chapter": "Monsters A–Z",
+"page": 285,
+"rect": [
+61.5,
+549.4,
+228.0,
+74.8
+],
+"text": "Medium Construct · CR 5 · AC 9 · HP 127 · Slam",
+"kind": "monster",
+"cont": [
+[
+285,
+[
+311.5,
+40.2,
+232.3,
+498.1
+]
+]
+]
+},
+{
+"id": "srd-mon-frost-giant",
+"title": "Frost Giant",
+"chapter": "Monsters A–Z",
+"page": 285,
+"rect": [
+311.5,
+564.3,
+228.0,
+74.8
+],
+"text": "Huge Giant · CR 8 · AC 15 · HP 149 · Frost Axe, Great Bow",
+"kind": "monster",
+"cont": [
+[
+286,
+[
+61.5,
+40.2,
+230.9,
+304.6
+]
+]
+]
+},
+{
+"id": "srd-mon-shrieker-fungus",
+"title": "Shrieker Fungus",
+"chapter": "Monsters A–Z",
+"page": 286,
+"rect": [
+61.5,
+370.8,
+228.0,
+240.2
+],
+"text": "Medium Plant · CR 0 · AC 5 · HP 13",
+"kind": "monster"
+},
+{
+"id": "srd-mon-violet-fungus",
+"title": "Violet Fungus",
+"chapter": "Monsters A–Z",
+"page": 286,
+"rect": [
+61.5,
+614.4,
+228.0,
+74.8
+],
+"text": "Medium Plant · CR 1/4 · AC 5 · HP 18 · Rotting Touch",
+"kind": "monster",
+"cont": [
+[
+286,
+[
+311.5,
+40.2,
+228.0,
+169.0
+]
+]
+]
+},
+{
+"id": "srd-mon-gargoyle",
+"title": "Gargoyle",
+"chapter": "Monsters A–Z",
+"page": 286,
+"rect": [
+311.5,
+235.2,
+231.8,
+291.8
+],
+"text": "Medium Elemental · CR 2 · AC 15 · HP 67 · Claw",
+"kind": "monster"
+},
+{
+"id": "srd-mon-gelatinous-cube",
+"title": "Gelatinous Cube",
+"chapter": "Monsters A–Z",
+"page": 286,
+"rect": [
+311.5,
+553.0,
+228.0,
+74.8
+],
+"text": "Large Ooze · CR 2 · AC 6 · HP 63 · Pseudopod, Engulf",
+"kind": "monster",
+"cont": [
+[
+287,
+[
+61.5,
+40.2,
+232.1,
+580.6
+]
+]
+]
+},
+{
+"id": "srd-mon-ghast",
+"title": "Ghast",
+"chapter": "Monsters A–Z",
+"page": 287,
+"rect": [
+61.5,
+646.8,
+228.0,
+74.8
+],
+"text": "Medium Undead · CR 2 · AC 13 · HP 36 · Bite, Claw",
+"kind": "monster",
+"cont": [
+[
+287,
+[
+311.5,
+40.2,
+232.6,
+300.1
+]
+]
+]
+},
+{
+"id": "srd-mon-ghost",
+"title": "Ghost",
+"chapter": "Monsters A–Z",
+"page": 287,
+"rect": [
+311.5,
+366.3,
+230.2,
+316.7
+],
+"text": "Medium Undead · CR 4 · AC 11 · HP 45 · Withering Touch, Horrific Visage, Possession",
+"kind": "monster",
+"cont": [
+[
+288,
+[
+61.5,
+37.6,
+230.6,
+446.2
+]
+]
+]
+},
+{
+"id": "srd-mon-ghoul",
+"title": "Ghoul",
+"chapter": "Monsters A–Z",
+"page": 288,
+"rect": [
+61.5,
+509.8,
+228.0,
+204.2
+],
+"text": "Medium Undead · CR 1 · AC 12 · HP 22 · Bite, Claw",
+"kind": "monster",
+"cont": [
+[
+288,
+[
+311.5,
+38.2,
+228.0,
+102.9
+]
+]
+]
+},
+{
+"id": "srd-mon-gibbering-mouther",
+"title": "Gibbering Mouther",
+"chapter": "Monsters A–Z",
+"page": 288,
+"rect": [
+311.5,
+167.1,
+231.7,
+528.8
+],
+"text": "Medium Aberration · CR 2 · AC 9 · HP 52 · Bite, Blinding Spittle",
+"kind": "monster"
+},
+{
+"id": "srd-mon-glabrezu",
+"title": "Glabrezu",
+"chapter": "Monsters A–Z",
+"page": 289,
+"rect": [
+61.5,
+60.1,
+231.7,
+501.8
+],
+"text": "Large Fiend (Demon) · CR 9 · AC 17 · HP 189 · Pincer, Pummel, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-gladiator",
+"title": "Gladiator",
+"chapter": "Monsters A–Z",
+"page": 289,
+"rect": [
+61.5,
+587.9,
+228.0,
+74.8
+],
+"text": "Medium or Small Humanoid · CR 5 · AC 16 · HP 112 · Spear, Shield Bash",
+"kind": "monster",
+"cont": [
+[
+289,
+[
+311.5,
+40.2,
+229.7,
+304.6
+]
+]
+]
+},
+{
+"id": "srd-mon-gnoll-warrior",
+"title": "Gnoll Warrior",
+"chapter": "Monsters A–Z",
+"page": 289,
+"rect": [
+311.5,
+370.8,
+232.3,
+291.8
+],
+"text": "Medium Fiend · CR 1/2 · AC 15 · HP 27 · Rend, Bone Bow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-goblin-minion",
+"title": "Goblin Minion",
+"chapter": "Monsters A–Z",
+"page": 290,
+"rect": [
+61.5,
+60.1,
+231.3,
+275.3
+],
+"text": "Small Fey (Goblinoid) · CR 1/8 · AC 12 · HP 7 · Dagger",
+"kind": "monster"
+},
+{
+"id": "srd-mon-goblin-warrior",
+"title": "Goblin Warrior",
+"chapter": "Monsters A–Z",
+"page": 290,
+"rect": [
+61.5,
+338.8,
+228.0,
+327.8
+],
+"text": "Small Fey (Goblinoid) · CR 1/4 · AC 15 · HP 10 · Scimitar, Shortbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-goblin-boss",
+"title": "Goblin Boss",
+"chapter": "Monsters A–Z",
+"page": 290,
+"rect": [
+311.5,
+36.6,
+228.1,
+439.4
+],
+"text": "Small Fey (Goblinoid) · CR 1 · AC 17 · HP 21 · Scimitar, Shortbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-gold-dragon-wyrmling",
+"title": "Gold Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 290,
+"rect": [
+311.5,
+502.0,
+228.0,
+192.2
+],
+"text": "Medium Dragon (Metallic) · CR 3 · AC 17 · HP 60 · Rend, Fire Breath, Weakening Breath",
+"kind": "monster",
+"cont": [
+[
+291,
+[
+61.5,
+37.6,
+230.6,
+224.8
+]
+]
+]
+},
+{
+"id": "srd-mon-young-gold-dragon",
+"title": "Young Gold Dragon",
+"chapter": "Monsters A–Z",
+"page": 291,
+"rect": [
+61.5,
+265.8,
+231.2,
+432.8
+],
+"text": "Large Dragon (Metallic) · CR 10 · AC 18 · HP 178 · Rend, Fire Breath, Weakening Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-gold-dragon",
+"title": "Adult Gold Dragon",
+"chapter": "Monsters A–Z",
+"page": 291,
+"rect": [
+311.5,
+36.6,
+231.1,
+638.3
+],
+"text": "Huge Dragon (Metallic) · CR 17 · AC 19 · HP 243 · Rend, Fire Breath, Spellcasting, Weakening Breath",
+"kind": "monster",
+"cont": [
+[
+292,
+[
+61.5,
+37.6,
+231.7,
+227.7
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-gold-dragon",
+"title": "Ancient Gold Dragon",
+"chapter": "Monsters A–Z",
+"page": 292,
+"rect": [
+61.5,
+268.7,
+229.4,
+449.3
+],
+"text": "Gargantuan Dragon (Metallic) · CR 24 · AC 22 · HP 546 · Fire Breath, Spellcasting, Weakening Breath",
+"kind": "monster",
+"cont": [
+[
+292,
+[
+311.5,
+38.3,
+232.2,
+433.9
+]
+]
+]
+},
+{
+"id": "srd-mon-gorgon",
+"title": "Gorgon",
+"chapter": "Monsters A–Z",
+"page": 292,
+"rect": [
+311.5,
+498.2,
+228.0,
+180.2
+],
+"text": "Large Construct · CR 5 · AC 19 · HP 114 · Gore, Petrifying Breath, Trample",
+"kind": "monster",
+"cont": [
+[
+293,
+[
+61.5,
+37.6,
+231.9,
+227.9
+]
+]
+]
+},
+{
+"id": "srd-mon-gray-ooze",
+"title": "Gray Ooze",
+"chapter": "Monsters A–Z",
+"page": 293,
+"rect": [
+61.5,
+291.4,
+230.4,
+388.7
+],
+"text": "Medium Ooze · CR 1/2 · AC 9 · HP 22 · Pseudopod",
+"kind": "monster",
+"cont": [
+[
+293,
+[
+311.5,
+37.6,
+230.9,
+92.3
+]
+]
+]
+},
+{
+"id": "srd-mon-green-dragon-wyrmling",
+"title": "Green Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 293,
+"rect": [
+311.5,
+155.8,
+231.2,
+332.3
+],
+"text": "Medium Dragon (Chromatic) · CR 2 · AC 17 · HP 38 · Rend, Poison Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-young-green-dragon",
+"title": "Young Green Dragon",
+"chapter": "Monsters A–Z",
+"page": 293,
+"rect": [
+311.5,
+491.6,
+228.0,
+228.2
+],
+"text": "Large Dragon (Chromatic) · CR 8 · AC 18 · HP 136 · Rend, Poison Breath",
+"kind": "monster",
+"cont": [
+[
+294,
+[
+61.5,
+37.6,
+232.1,
+101.3
+]
+]
+]
+},
+{
+"id": "srd-mon-adult-green-dragon",
+"title": "Adult Green Dragon",
+"chapter": "Monsters A–Z",
+"page": 294,
+"rect": [
+61.5,
+142.2,
+232.1,
+567.4
+],
+"text": "Huge Dragon (Chromatic) · CR 15 · AC 19 · HP 207 · Rend, Poison Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+294,
+[
+311.5,
+38.2,
+231.1,
+114.9
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-green-dragon",
+"title": "Ancient Green Dragon",
+"chapter": "Monsters A–Z",
+"page": 294,
+"rect": [
+311.5,
+156.5,
+232.6,
+477.8
+],
+"text": "Gargantuan Dragon (Chromatic) · CR 22 · AC 21 · HP 402 · Rend, Poison Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+295,
+[
+61.5,
+37.6,
+228.3,
+203.7
+]
+]
+]
+},
+{
+"id": "srd-mon-green-hag",
+"title": "Green Hag",
+"chapter": "Monsters A–Z",
+"page": 295,
+"rect": [
+61.5,
+267.3,
+231.3,
+449.3
+],
+"text": "Medium Fey · CR 3 · AC 17 · HP 82 · Claw, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+295,
+[
+311.5,
+38.3,
+228.0,
+78.8
+]
+]
+]
+},
+{
+"id": "srd-mon-grick",
+"title": "Grick",
+"chapter": "Monsters A–Z",
+"page": 295,
+"rect": [
+311.5,
+143.1,
+231.9,
+297.2
+],
+"text": "Medium Aberration · CR 2 · AC 14 · HP 54 · Beak, Tentacles",
+"kind": "monster"
+},
+{
+"id": "srd-mon-griffon",
+"title": "Griffon",
+"chapter": "Monsters A–Z",
+"page": 295,
+"rect": [
+311.5,
+466.3,
+232.4,
+256.7
+],
+"text": "Large Monstrosity · CR 2 · AC 12 · HP 59 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-grimlock",
+"title": "Grimlock",
+"chapter": "Monsters A–Z",
+"page": 296,
+"rect": [
+61.5,
+60.1,
+228.0,
+228.2
+],
+"text": "Medium Aberration · CR 1/4 · AC 11 · HP 11 · Bone Cudgel",
+"kind": "monster"
+},
+{
+"id": "srd-mon-guardian-naga",
+"title": "Guardian Naga",
+"chapter": "Monsters A–Z",
+"page": 296,
+"rect": [
+61.5,
+314.3,
+231.2,
+392.3
+],
+"text": "Large Celestial · CR 10 · AC 18 · HP 136 · Bite, Poisonous Spittle, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+296,
+[
+311.5,
+38.2,
+231.9,
+78.9
+]
+]
+]
+},
+{
+"id": "srd-mon-guard",
+"title": "Guard",
+"chapter": "Monsters A–Z",
+"page": 296,
+"rect": [
+311.5,
+143.1,
+228.0,
+228.2
+],
+"text": "Medium or Small Humanoid · CR 1/8 · AC 16 · HP 11 · Spear",
+"kind": "monster"
+},
+{
+"id": "srd-mon-guard-captain",
+"title": "Guard Captain",
+"chapter": "Monsters A–Z",
+"page": 296,
+"rect": [
+311.5,
+374.7,
+231.9,
+285.2
+],
+"text": "Medium or Small Humanoid · CR 4 · AC 18 · HP 75 · Javelin, Longsword",
+"kind": "monster"
+},
+{
+"id": "srd-mon-half-dragon",
+"title": "Half-Dragon",
+"chapter": "Monsters A–Z",
+"page": 297,
+"rect": [
+61.5,
+60.1,
+232.1,
+451.4
+],
+"text": "Medium Dragon · CR 5 · AC 18 · HP 105 · Claw, Dragon’s Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-harpy",
+"title": "Harpy",
+"chapter": "Monsters A–Z",
+"page": 297,
+"rect": [
+61.5,
+537.5,
+228.0,
+156.2
+],
+"text": "Medium Monstrosity · CR 1 · AC 11 · HP 38 · Claw, Luring Song",
+"kind": "monster",
+"cont": [
+[
+297,
+[
+311.5,
+37.6,
+232.6,
+252.7
+]
+]
+]
+},
+{
+"id": "srd-mon-hell-hound",
+"title": "Hell Hound",
+"chapter": "Monsters A–Z",
+"page": 297,
+"rect": [
+311.5,
+316.3,
+228.0,
+356.3
+],
+"text": "Medium Fiend · CR 3 · AC 15 · HP 58 · Bite, Fire Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hezrou",
+"title": "Hezrou",
+"chapter": "Monsters A–Z",
+"page": 298,
+"rect": [
+61.5,
+60.1,
+232.1,
+443.9
+],
+"text": "Large Fiend (Demon) · CR 8 · AC 18 · HP 157 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hill-giant",
+"title": "Hill Giant",
+"chapter": "Monsters A–Z",
+"page": 298,
+"rect": [
+61.5,
+530.0,
+228.0,
+168.2
+],
+"text": "Huge Giant · CR 5 · AC 13 · HP 105 · Tree Club, Trash Lob",
+"kind": "monster",
+"cont": [
+[
+298,
+[
+311.5,
+37.6,
+228.0,
+137.3
+]
+]
+]
+},
+{
+"id": "srd-mon-hippogriff",
+"title": "Hippogriff",
+"chapter": "Monsters A–Z",
+"page": 298,
+"rect": [
+311.5,
+200.8,
+231.6,
+279.8
+],
+"text": "Large Monstrosity · CR 1 · AC 11 · HP 26 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hobgoblin-warrior",
+"title": "Hobgoblin Warrior",
+"chapter": "Monsters A–Z",
+"page": 298,
+"rect": [
+311.5,
+506.7,
+228.0,
+168.2
+],
+"text": "Medium Fey (Goblinoid) · CR 1/2 · AC 18 · HP 11 · Longsword, Longbow",
+"kind": "monster",
+"cont": [
+[
+299,
+[
+61.5,
+37.6,
+229.0,
+155.9
+]
+]
+]
+},
+{
+"id": "srd-mon-hobgoblin-captain",
+"title": "Hobgoblin Captain",
+"chapter": "Monsters A–Z",
+"page": 299,
+"rect": [
+61.5,
+196.8,
+228.0,
+368.3
+],
+"text": "Medium Fey (Goblinoid) · CR 3 · AC 17 · HP 58 · Greatsword, Longbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-homunculus",
+"title": "Homunculus",
+"chapter": "Monsters A–Z",
+"page": 299,
+"rect": [
+61.5,
+591.2,
+228.0,
+74.8
+],
+"text": "Tiny Construct · CR 0 · AC 13 · HP 4 · Bite",
+"kind": "monster",
+"cont": [
+[
+299,
+[
+311.5,
+40.2,
+231.8,
+283.6
+]
+]
+]
+},
+{
+"id": "srd-mon-horned-devil",
+"title": "Horned Devil",
+"chapter": "Monsters A–Z",
+"page": 299,
+"rect": [
+311.5,
+349.8,
+230.9,
+351.8
+],
+"text": "Large Fiend (Devil) · CR 11 · AC 18 · HP 199 · Searing Fork, Hurl Flame, Infernal Tail",
+"kind": "monster",
+"cont": [
+[
+300,
+[
+61.5,
+38.2,
+228.8,
+191.4
+]
+]
+]
+},
+{
+"id": "srd-mon-hydra",
+"title": "Hydra",
+"chapter": "Monsters A–Z",
+"page": 300,
+"rect": [
+61.5,
+255.6,
+231.1,
+444.8
+],
+"text": "Huge Monstrosity · CR 8 · AC 15 · HP 184 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ice-devil",
+"title": "Ice Devil",
+"chapter": "Monsters A–Z",
+"page": 300,
+"rect": [
+311.5,
+60.1,
+232.5,
+497.3
+],
+"text": "Large Fiend (Devil) · CR 14 · AC 18 · HP 228 · Ice Spear, Tail",
+"kind": "monster"
+},
+{
+"id": "srd-mon-imp",
+"title": "Imp",
+"chapter": "Monsters A–Z",
+"page": 300,
+"rect": [
+311.5,
+583.4,
+228.0,
+74.8
+],
+"text": "Tiny Fiend (Devil) · CR 1 · AC 13 · HP 21 · Sting",
+"kind": "monster",
+"cont": [
+[
+301,
+[
+61.5,
+40.2,
+230.7,
+340.6
+]
+]
+]
+},
+{
+"id": "srd-mon-incubus",
+"title": "Incubus",
+"chapter": "Monsters A–Z",
+"page": 301,
+"rect": [
+61.5,
+406.8,
+228.4,
+311.3
+],
+"text": "Medium Fiend · CR 4 · AC 15 · HP 66 · Restless Touch, Spellcasting, Nightmare",
+"kind": "monster",
+"cont": [
+[
+301,
+[
+311.5,
+38.2,
+228.0,
+238.5
+]
+]
+]
+},
+{
+"id": "srd-mon-invisible-stalker",
+"title": "Invisible Stalker",
+"chapter": "Monsters A–Z",
+"page": 301,
+"rect": [
+311.5,
+302.7,
+230.2,
+420.8
+],
+"text": "Large Elemental · CR 6 · AC 14 · HP 97 · Wind Swipe, Vortex",
+"kind": "monster",
+"cont": [
+[
+302,
+[
+61.5,
+38.3,
+231.7,
+26.3
+]
+]
+]
+},
+{
+"id": "srd-mon-iron-golem",
+"title": "Iron Golem",
+"chapter": "Monsters A–Z",
+"page": 302,
+"rect": [
+61.5,
+90.6,
+228.0,
+453.8
+],
+"text": "Large Construct · CR 16 · AC 20 · HP 252 · Bladed Arm, Fiery Bolt, Poison Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-knight",
+"title": "Knight",
+"chapter": "Monsters A–Z",
+"page": 302,
+"rect": [
+61.5,
+570.4,
+228.0,
+74.8
+],
+"text": "Medium or Small Humanoid · CR 3 · AC 18 · HP 52 · Greatsword, Heavy Crossbow",
+"kind": "monster",
+"cont": [
+[
+302,
+[
+311.5,
+40.2,
+229.8,
+280.6
+]
+]
+]
+},
+{
+"id": "srd-mon-kobold-warrior",
+"title": "Kobold Warrior",
+"chapter": "Monsters A–Z",
+"page": 302,
+"rect": [
+311.5,
+346.8,
+231.8,
+315.8
+],
+"text": "Small Dragon · CR 1/8 · AC 14 · HP 7 · Dagger",
+"kind": "monster"
+},
+{
+"id": "srd-mon-kraken",
+"title": "Kraken",
+"chapter": "Monsters A–Z",
+"page": 303,
+"rect": [
+61.5,
+60.1,
+228.4,
+662.3
+],
+"text": "Gargantuan Monstrosity (Titan) · CR 23 · AC 18 · HP 481 · Tentacle, Fling, Lightning Strike, Swallow",
+"kind": "monster",
+"cont": [
+[
+303,
+[
+311.5,
+38.3,
+230.9,
+264.4
+]
+]
+]
+},
+{
+"id": "srd-mon-lamia",
+"title": "Lamia",
+"chapter": "Monsters A–Z",
+"page": 303,
+"rect": [
+311.5,
+328.7,
+232.5,
+390.2
+],
+"text": "Large Fiend · CR 4 · AC 13 · HP 97 · Claw, Corrupting Touch, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+304,
+[
+61.5,
+37.6,
+228.0,
+44.3
+]
+]
+]
+},
+{
+"id": "srd-mon-lemure",
+"title": "Lemure",
+"chapter": "Monsters A–Z",
+"page": 304,
+"rect": [
+61.5,
+107.8,
+228.5,
+311.3
+],
+"text": "Medium Fiend (Devil) · CR 0 · AC 9 · HP 9 · Vile Slime",
+"kind": "monster"
+},
+{
+"id": "srd-mon-lich",
+"title": "Lich",
+"chapter": "Monsters A–Z",
+"page": 304,
+"rect": [
+61.5,
+445.2,
+228.5,
+276.2
+],
+"text": "Medium Undead (Wizard) · CR 21 · AC 20 · HP 315 · Eldritch Burst, Paralyzing Touch, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+304,
+[
+311.5,
+38.2,
+231.9,
+597.2
+]
+]
+]
+},
+{
+"id": "srd-mon-mage",
+"title": "Mage",
+"chapter": "Monsters A–Z",
+"page": 305,
+"rect": [
+61.5,
+60.1,
+230.4,
+455.9
+],
+"text": "Medium or Small Humanoid (Wizard) · CR 6 · AC 15 · HP 81 · Arcane Burst, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-archmage",
+"title": "Archmage",
+"chapter": "Monsters A–Z",
+"page": 305,
+"rect": [
+61.5,
+519.4,
+228.0,
+192.2
+],
+"text": "Medium or Small Humanoid (Wizard) · CR 12 · AC 17 · HP 170 · Arcane Burst, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+305,
+[
+311.5,
+37.6,
+230.8,
+343.1
+]
+]
+]
+},
+{
+"id": "srd-mon-magmin",
+"title": "Magmin",
+"chapter": "Monsters A–Z",
+"page": 305,
+"rect": [
+311.5,
+406.6,
+232.3,
+299.3
+],
+"text": "Small Elemental · CR 1/2 · AC 14 · HP 13 · Touch",
+"kind": "monster",
+"cont": [
+[
+306,
+[
+61.5,
+37.6,
+228.0,
+68.3
+]
+]
+]
+},
+{
+"id": "srd-mon-manticore",
+"title": "Manticore",
+"chapter": "Monsters A–Z",
+"page": 306,
+"rect": [
+61.5,
+131.8,
+231.1,
+261.2
+],
+"text": "Large Monstrosity · CR 3 · AC 14 · HP 68 · Rend, Tail Spike",
+"kind": "monster"
+},
+{
+"id": "srd-mon-marilith",
+"title": "Marilith",
+"chapter": "Monsters A–Z",
+"page": 306,
+"rect": [
+61.5,
+419.1,
+228.5,
+292.7
+],
+"text": "Large Fiend (Demon) · CR 16 · AC 16 · HP 220 · Pact Blade, Constrict",
+"kind": "monster",
+"cont": [
+[
+306,
+[
+311.5,
+38.2,
+231.0,
+284.7
+]
+]
+]
+},
+{
+"id": "srd-mon-medusa",
+"title": "Medusa",
+"chapter": "Monsters A–Z",
+"page": 306,
+"rect": [
+311.5,
+348.9,
+228.0,
+325.7
+],
+"text": "Medium Monstrosity · CR 6 · AC 15 · HP 127 · Claw, Snake Hair, Poison Ray, Petrifying Gaze (Recharge",
+"kind": "monster",
+"cont": [
+[
+307,
+[
+61.5,
+37.6,
+228.2,
+116.2
+]
+]
+]
+},
+{
+"id": "srd-mon-dust-mephit",
+"title": "Dust Mephit",
+"chapter": "Monsters A–Z",
+"page": 307,
+"rect": [
+61.5,
+179.8,
+230.7,
+404.3
+],
+"text": "Small Elemental · CR 1/2 · AC 12 · HP 17 · Claw, Blinding Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ice-mephit",
+"title": "Ice Mephit",
+"chapter": "Monsters A–Z",
+"page": 307,
+"rect": [
+61.5,
+587.6,
+228.0,
+74.8
+],
+"text": "Small Elemental · CR 1/2 · AC 11 · HP 21 · Claw, Frost Breath",
+"kind": "monster",
+"cont": [
+[
+307,
+[
+311.5,
+40.2,
+231.7,
+316.6
+]
+]
+]
+},
+{
+"id": "srd-mon-magma-mephit",
+"title": "Magma Mephit",
+"chapter": "Monsters A–Z",
+"page": 307,
+"rect": [
+311.5,
+360.2,
+231.9,
+351.8
+],
+"text": "Small Elemental · CR 1/2 · AC 11 · HP 18 · Claw, Fire Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-steam-mephit",
+"title": "Steam Mephit",
+"chapter": "Monsters A–Z",
+"page": 308,
+"rect": [
+61.5,
+36.6,
+231.1,
+416.3
+],
+"text": "Small Elemental · CR 1/4 · AC 10 · HP 17 · Claw, Steam Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-merfolk-skirmisher",
+"title": "Merfolk Skirmisher",
+"chapter": "Monsters A–Z",
+"page": 308,
+"rect": [
+61.5,
+478.9,
+228.0,
+192.2
+],
+"text": "Medium Elemental · CR 1/8 · AC 11 · HP 11 · Ocean Spear",
+"kind": "monster",
+"cont": [
+[
+308,
+[
+311.5,
+37.6,
+232.7,
+92.3
+]
+]
+]
+},
+{
+"id": "srd-mon-merrow",
+"title": "Merrow",
+"chapter": "Monsters A–Z",
+"page": 308,
+"rect": [
+311.5,
+155.8,
+232.2,
+360.8
+],
+"text": "Large Monstrosity · CR 2 · AC 13 · HP 45 · Bite, Claw, Harpoon",
+"kind": "monster"
+},
+{
+"id": "srd-mon-mimic",
+"title": "Mimic",
+"chapter": "Monsters A–Z",
+"page": 308,
+"rect": [
+311.5,
+542.7,
+228.0,
+180.2
+],
+"text": "Medium Monstrosity · CR 2 · AC 12 · HP 58 · Bite, Pseudopod",
+"kind": "monster",
+"cont": [
+[
+309,
+[
+61.5,
+37.6,
+232.1,
+299.0
+]
+]
+]
+},
+{
+"id": "srd-mon-minotaur-of-baphomet",
+"title": "Minotaur of Baphomet",
+"chapter": "Monsters A–Z",
+"page": 309,
+"rect": [
+61.5,
+362.5,
+229.1,
+304.7
+],
+"text": "Large Monstrosity · CR 3 · AC 14 · HP 85 · Abyssal Glaive, Gore",
+"kind": "monster"
+},
+{
+"id": "srd-mon-mummy",
+"title": "Mummy",
+"chapter": "Monsters A–Z",
+"page": 309,
+"rect": [
+311.5,
+60.1,
+229.5,
+405.2
+],
+"text": "Medium or Small Undead · CR 3 · AC 11 · HP 58 · Rotting Fist, Dreadful Glare",
+"kind": "monster"
+},
+{
+"id": "srd-mon-mummy-lord",
+"title": "Mummy Lord",
+"chapter": "Monsters A–Z",
+"page": 309,
+"rect": [
+311.5,
+468.7,
+228.0,
+204.2
+],
+"text": "Medium or Small Undead (Cleric) · CR 15 · AC 17 · HP 187 · Rotting Fist, Channel Negative Energy, Dreadful Glare",
+"kind": "monster",
+"cont": [
+[
+310,
+[
+61.5,
+37.6,
+230.8,
+613.9
+]
+],
+[
+310,
+[
+311.5,
+37.6,
+229.8,
+179.8
+]
+]
+]
+},
+{
+"id": "srd-mon-nalfeshnee",
+"title": "Nalfeshnee",
+"chapter": "Monsters A–Z",
+"page": 310,
+"rect": [
+311.5,
+243.3,
+232.2,
+467.9
+],
+"text": "Large Fiend (Demon) · CR 13 · AC 18 · HP 184 · Rend, Horror Nimbus",
+"kind": "monster",
+"cont": [
+[
+311,
+[
+61.5,
+38.3,
+228.0,
+109.4
+]
+]
+]
+},
+{
+"id": "srd-mon-night-hag",
+"title": "Night Hag",
+"chapter": "Monsters A–Z",
+"page": 311,
+"rect": [
+61.5,
+173.7,
+231.3,
+545.3
+],
+"text": "Medium Fiend · CR 5 · AC 17 · HP 112 · Claw, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+311,
+[
+311.5,
+38.3,
+231.3,
+274.4
+]
+]
+]
+},
+{
+"id": "srd-mon-nightmare",
+"title": "Nightmare",
+"chapter": "Monsters A–Z",
+"page": 311,
+"rect": [
+311.5,
+338.7,
+228.7,
+351.3
+],
+"text": "Large Fiend · CR 3 · AC 13 · HP 68 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-noble",
+"title": "Noble",
+"chapter": "Monsters A–Z",
+"page": 312,
+"rect": [
+61.5,
+60.1,
+228.0,
+287.3
+],
+"text": "Medium or Small Humanoid · CR 1/8 · AC 15 · HP 9 · Rapier",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ochre-jelly",
+"title": "Ochre Jelly",
+"chapter": "Monsters A–Z",
+"page": 312,
+"rect": [
+61.5,
+373.4,
+228.0,
+339.8
+],
+"text": "Large Ooze · CR 2 · AC 8 · HP 52 · Pseudopod",
+"kind": "monster",
+"cont": [
+[
+312,
+[
+311.5,
+37.6,
+230.9,
+104.2
+]
+]
+]
+},
+{
+"id": "srd-mon-ogre",
+"title": "Ogre",
+"chapter": "Monsters A–Z",
+"page": 312,
+"rect": [
+311.5,
+167.8,
+229.3,
+244.7
+],
+"text": "Large Giant · CR 2 · AC 11 · HP 68 · Greatclub, Javelin",
+"kind": "monster"
+},
+{
+"id": "srd-mon-oni",
+"title": "Oni",
+"chapter": "Monsters A–Z",
+"page": 312,
+"rect": [
+311.5,
+438.6,
+228.3,
+287.3
+],
+"text": "Large Fiend · CR 7 · AC 17 · HP 119 · Claw, Nightmare Ray, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+313,
+[
+61.5,
+38.2,
+228.1,
+271.5
+]
+]
+]
+},
+{
+"id": "srd-mon-otyugh",
+"title": "Otyugh",
+"chapter": "Monsters A–Z",
+"page": 313,
+"rect": [
+61.5,
+335.7,
+232.1,
+369.2
+],
+"text": "Large Aberration · CR 5 · AC 14 · HP 104 · Bite, Tentacle, Tentacle Slam",
+"kind": "monster",
+"cont": [
+[
+313,
+[
+311.5,
+38.2,
+231.5,
+62.4
+]
+]
+]
+},
+{
+"id": "srd-mon-owlbear",
+"title": "Owlbear",
+"chapter": "Monsters A–Z",
+"page": 313,
+"rect": [
+311.5,
+126.6,
+228.0,
+232.7
+],
+"text": "Large Monstrosity · CR 3 · AC 13 · HP 59 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-pegasus",
+"title": "Pegasus",
+"chapter": "Monsters A–Z",
+"page": 313,
+"rect": [
+311.5,
+385.3,
+228.0,
+228.2
+],
+"text": "Large Celestial · CR 2 · AC 12 · HP 59 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-phase-spider",
+"title": "Phase Spider",
+"chapter": "Monsters A–Z",
+"page": 313,
+"rect": [
+311.5,
+639.5,
+228.0,
+74.8
+],
+"text": "Large Monstrosity · CR 3 · AC 14 · HP 45 · Bite",
+"kind": "monster",
+"cont": [
+[
+314,
+[
+61.5,
+40.2,
+232.0,
+380.2
+]
+]
+]
+},
+{
+"id": "srd-mon-pirate",
+"title": "Pirate",
+"chapter": "Monsters A–Z",
+"page": 314,
+"rect": [
+61.5,
+446.4,
+230.6,
+256.7
+],
+"text": "Medium or Small Humanoid · CR 1 · AC 14 · HP 33 · Dagger, Enthralling Panache",
+"kind": "monster",
+"cont": [
+[
+314,
+[
+311.5,
+38.2,
+228.0,
+50.4
+]
+]
+]
+},
+{
+"id": "srd-mon-pirate-captain",
+"title": "Pirate Captain",
+"chapter": "Monsters A–Z",
+"page": 314,
+"rect": [
+311.5,
+92.0,
+228.4,
+451.4
+],
+"text": "Medium or Small Humanoid · CR 6 · AC 17 · HP 84 · Rapier, Pistol, Captain’s Charm",
+"kind": "monster"
+},
+{
+"id": "srd-mon-pit-fiend",
+"title": "Pit Fiend",
+"chapter": "Monsters A–Z",
+"page": 314,
+"rect": [
+311.5,
+569.4,
+228.0,
+74.8
+],
+"text": "Large Fiend (Devil) · CR 20 · AC 21 · HP 337 · Bite, Devilish Claw, Fiery Mace",
+"kind": "monster",
+"cont": [
+[
+315,
+[
+61.5,
+40.2,
+231.3,
+615.1
+]
+]
+]
+},
+{
+"id": "srd-mon-planetar",
+"title": "Planetar",
+"chapter": "Monsters A–Z",
+"page": 315,
+"rect": [
+311.5,
+60.1,
+228.8,
+589.4
+],
+"text": "Large Celestial (Angel) · CR 16 · AC 19 · HP 262 · Radiant Sword, Holy Burst, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-priest-acolyte",
+"title": "Priest Acolyte",
+"chapter": "Monsters A–Z",
+"page": 316,
+"rect": [
+61.5,
+60.1,
+228.0,
+360.8
+],
+"text": "Medium or Small Humanoid (Cleric) · CR 1/4 · AC 13 · HP 11 · Mace, Radiant Flame, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-priest",
+"title": "Priest",
+"chapter": "Monsters A–Z",
+"page": 316,
+"rect": [
+61.5,
+424.3,
+228.0,
+285.2
+],
+"text": "Medium or Small Humanoid (Cleric) · CR 2 · AC 13 · HP 38 · Mace, Radiant Flame, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+316,
+[
+311.5,
+38.2,
+228.0,
+126.0
+]
+]
+]
+},
+{
+"id": "srd-mon-pseudodragon",
+"title": "Pseudodragon",
+"chapter": "Monsters A–Z",
+"page": 316,
+"rect": [
+311.5,
+190.2,
+232.0,
+404.3
+],
+"text": "Tiny Dragon · CR 1/4 · AC 14 · HP 10 · Bite, Sting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-purple-worm",
+"title": "Purple Worm",
+"chapter": "Monsters A–Z",
+"page": 316,
+"rect": [
+311.5,
+620.5,
+228.0,
+74.8
+],
+"text": "Gargantuan Monstrosity · CR 15 · AC 18 · HP 247 · Bite, Tail Stinger, Swallow",
+"kind": "monster",
+"cont": [
+[
+317,
+[
+61.5,
+40.2,
+230.0,
+531.7
+]
+]
+]
+},
+{
+"id": "srd-mon-quasit",
+"title": "Quasit",
+"chapter": "Monsters A–Z",
+"page": 317,
+"rect": [
+61.5,
+597.9,
+228.0,
+74.8
+],
+"text": "Tiny Fiend (Demon) · CR 1 · AC 13 · HP 25 · Rend, Scare",
+"kind": "monster",
+"cont": [
+[
+317,
+[
+311.5,
+40.2,
+232.5,
+405.1
+]
+]
+]
+},
+{
+"id": "srd-mon-rakshasa",
+"title": "Rakshasa",
+"chapter": "Monsters A–Z",
+"page": 317,
+"rect": [
+311.5,
+471.3,
+232.2,
+204.2
+],
+"text": "Medium Fiend · CR 13 · AC 17 · HP 221 · Cursed Touch, Baleful Command, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+318,
+[
+61.5,
+37.6,
+228.0,
+401.8
+]
+]
+]
+},
+{
+"id": "srd-mon-red-dragon-wyrmling",
+"title": "Red Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 318,
+"rect": [
+61.5,
+465.4,
+228.0,
+256.7
+],
+"text": "Medium Dragon (Chromatic) · CR 4 · AC 17 · HP 75 · Rend, Fire Breath",
+"kind": "monster",
+"cont": [
+[
+318,
+[
+311.5,
+38.1,
+228.0,
+38.4
+]
+]
+]
+},
+{
+"id": "srd-mon-young-red-dragon",
+"title": "Young Red Dragon",
+"chapter": "Monsters A–Z",
+"page": 318,
+"rect": [
+311.5,
+79.9,
+228.0,
+297.2
+],
+"text": "Large Dragon (Chromatic) · CR 10 · AC 18 · HP 178 · Rend, Fire Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-red-dragon",
+"title": "Adult Red Dragon",
+"chapter": "Monsters A–Z",
+"page": 318,
+"rect": [
+311.5,
+380.5,
+232.6,
+339.8
+],
+"text": "Huge Dragon (Chromatic) · CR 17 · AC 19 · HP 256 · Rend, Fire Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+319,
+[
+61.5,
+38.1,
+232.2,
+302.0
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-red-dragon",
+"title": "Ancient Red Dragon",
+"chapter": "Monsters A–Z",
+"page": 319,
+"rect": [
+61.5,
+343.5,
+232.1,
+380.3
+],
+"text": "Gargantuan Dragon (Chromatic) · CR 24 · AC 22 · HP 507 · Rend, Fire Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+319,
+[
+311.5,
+38.1,
+229.8,
+261.5
+]
+]
+]
+},
+{
+"id": "srd-mon-remorhaz",
+"title": "Remorhaz",
+"chapter": "Monsters A–Z",
+"page": 319,
+"rect": [
+311.5,
+325.6,
+230.9,
+406.4
+],
+"text": "Huge Monstrosity · CR 11 · AC 17 · HP 195 · Bite, Swallow",
+"kind": "monster",
+"cont": [
+[
+320,
+[
+61.5,
+38.3,
+230.7,
+158.3
+]
+]
+]
+},
+{
+"id": "srd-mon-roc",
+"title": "Roc",
+"chapter": "Monsters A–Z",
+"page": 320,
+"rect": [
+61.5,
+222.6,
+230.3,
+368.3
+],
+"text": "Gargantuan Monstrosity · CR 11 · AC 15 · HP 248 · Beak, Talons",
+"kind": "monster"
+},
+{
+"id": "srd-mon-roper",
+"title": "Roper",
+"chapter": "Monsters A–Z",
+"page": 320,
+"rect": [
+61.5,
+616.9,
+228.0,
+74.8
+],
+"text": "Large Aberration · CR 5 · AC 20 · HP 93 · Bite, Tentacle",
+"kind": "monster",
+"cont": [
+[
+320,
+[
+311.5,
+40.2,
+232.7,
+369.1
+]
+]
+]
+},
+{
+"id": "srd-mon-rust-monster",
+"title": "Rust Monster",
+"chapter": "Monsters A–Z",
+"page": 320,
+"rect": [
+311.5,
+435.3,
+228.0,
+279.8
+],
+"text": "Medium Monstrosity · CR 1/2 · AC 14 · HP 33 · Bite, Antennae",
+"kind": "monster",
+"cont": [
+[
+321,
+[
+61.5,
+38.1,
+228.0,
+222.0
+]
+]
+]
+},
+{
+"id": "srd-mon-sahuagin-warrior",
+"title": "Sahuagin Warrior",
+"chapter": "Monsters A–Z",
+"page": 321,
+"rect": [
+61.5,
+286.1,
+232.1,
+419.9
+],
+"text": "Medium Fiend · CR 1/2 · AC 12 · HP 22 · Claw",
+"kind": "monster"
+},
+{
+"id": "srd-mon-salamander",
+"title": "Salamander",
+"chapter": "Monsters A–Z",
+"page": 321,
+"rect": [
+311.5,
+60.1,
+232.5,
+452.3
+],
+"text": "Large Elemental · CR 5 · AC 15 · HP 90 · Flame Spear, Constrict",
+"kind": "monster"
+},
+{
+"id": "srd-mon-satyr",
+"title": "Satyr",
+"chapter": "Monsters A–Z",
+"page": 321,
+"rect": [
+311.5,
+538.4,
+228.0,
+168.2
+],
+"text": "Medium Fey · CR 1/2 · AC 13 · HP 31 · Hooves, Mockery",
+"kind": "monster",
+"cont": [
+[
+322,
+[
+61.5,
+37.6,
+228.0,
+155.9
+]
+]
+]
+},
+{
+"id": "srd-mon-scout",
+"title": "Scout",
+"chapter": "Monsters A–Z",
+"page": 322,
+"rect": [
+61.5,
+219.4,
+229.5,
+285.2
+],
+"text": "Medium or Small Humanoid · CR 1/2 · AC 13 · HP 16 · Shortsword, Longbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-sea-hag",
+"title": "Sea Hag",
+"chapter": "Monsters A–Z",
+"page": 322,
+"rect": [
+61.5,
+530.7,
+228.0,
+192.2
+],
+"text": "Medium Fey · CR 2 · AC 14 · HP 52 · Claw, Death Glare",
+"kind": "monster",
+"cont": [
+[
+322,
+[
+311.5,
+38.1,
+231.8,
+327.0
+]
+]
+]
+},
+{
+"id": "srd-mon-shadow",
+"title": "Shadow",
+"chapter": "Monsters A–Z",
+"page": 322,
+"rect": [
+311.5,
+391.1,
+228.0,
+316.7
+],
+"text": "Medium Undead · CR 1/2 · AC 12 · HP 27 · Draining Swipe",
+"kind": "monster",
+"cont": [
+[
+323,
+[
+61.5,
+37.6,
+228.0,
+127.4
+]
+]
+]
+},
+{
+"id": "srd-mon-shambling-mound",
+"title": "Shambling Mound",
+"chapter": "Monsters A–Z",
+"page": 323,
+"rect": [
+61.5,
+190.9,
+231.7,
+500.3
+],
+"text": "Large Plant · CR 5 · AC 15 · HP 110 · Charged Tendril, Engulf",
+"kind": "monster"
+},
+{
+"id": "srd-mon-shield-guardian",
+"title": "Shield Guardian",
+"chapter": "Monsters A–Z",
+"page": 323,
+"rect": [
+311.5,
+60.1,
+231.5,
+635.9
+],
+"text": "Large Construct · CR 7 · AC 17 · HP 142 · Fist",
+"kind": "monster"
+},
+{
+"id": "srd-mon-silver-dragon-wyrmling",
+"title": "Silver Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 324,
+"rect": [
+61.5,
+72.1,
+231.6,
+385.7
+],
+"text": "Medium Dragon (Metallic) · CR 2 · AC 17 · HP 45 · Rend, Cold Breath, Paralyzing Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-young-silver-dragon",
+"title": "Young Silver Dragon",
+"chapter": "Monsters A–Z",
+"page": 324,
+"rect": [
+61.5,
+461.2,
+228.0,
+240.2
+],
+"text": "Large Dragon (Metallic) · CR 9 · AC 18 · HP 168 · Rend, Cold Breath, Paralyzing Breath",
+"kind": "monster",
+"cont": [
+[
+324,
+[
+311.5,
+38.2,
+232.3,
+155.4
+]
+]
+]
+},
+{
+"id": "srd-mon-adult-silver-dragon",
+"title": "Adult Silver Dragon",
+"chapter": "Monsters A–Z",
+"page": 324,
+"rect": [
+311.5,
+197.0,
+232.5,
+521.3
+],
+"text": "Huge Dragon (Metallic) · CR 16 · AC 19 · HP 216 · Rend, Cold Breath, Paralyzing Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+325,
+[
+61.5,
+38.2,
+228.0,
+280.9
+]
+]
+]
+},
+{
+"id": "srd-mon-ancient-silver-dragon",
+"title": "Ancient Silver Dragon",
+"chapter": "Monsters A–Z",
+"page": 325,
+"rect": [
+61.5,
+322.6,
+228.0,
+392.3
+],
+"text": "Gargantuan Dragon (Metallic) · CR 23 · AC 22 · HP 468 · Rend, Cold Breath, Paralyzing Breath, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+325,
+[
+311.5,
+38.2,
+232.5,
+434.0
+]
+]
+]
+},
+{
+"id": "srd-mon-skeleton",
+"title": "Skeleton",
+"chapter": "Monsters A–Z",
+"page": 325,
+"rect": [
+311.5,
+498.2,
+231.5,
+204.2
+],
+"text": "Medium Undead · CR 1/4 · AC 14 · HP 13 · Shortsword, Shortbow",
+"kind": "monster",
+"cont": [
+[
+326,
+[
+61.5,
+37.6,
+232.0,
+72.8
+]
+]
+]
+},
+{
+"id": "srd-mon-warhorse-skeleton",
+"title": "Warhorse Skeleton",
+"chapter": "Monsters A–Z",
+"page": 326,
+"rect": [
+61.5,
+113.7,
+228.0,
+264.2
+],
+"text": "Large Undead · CR 1/2 · AC 13 · HP 22 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-minotaur-skeleton",
+"title": "Minotaur Skeleton",
+"chapter": "Monsters A–Z",
+"page": 326,
+"rect": [
+61.5,
+381.4,
+228.0,
+304.7
+],
+"text": "Large Undead · CR 2 · AC 12 · HP 45 · Gore, Slam",
+"kind": "monster"
+},
+{
+"id": "srd-mon-solar",
+"title": "Solar",
+"chapter": "Monsters A–Z",
+"page": 326,
+"rect": [
+311.5,
+60.1,
+232.6,
+653.9
+],
+"text": "Large Celestial (Angel) · CR 21 · AC 21 · HP 297 · Flying Sword, Slaying Bow, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+327,
+[
+61.5,
+37.6,
+232.1,
+187.2
+]
+]
+]
+},
+{
+"id": "srd-mon-specter",
+"title": "Specter",
+"chapter": "Monsters A–Z",
+"page": 327,
+"rect": [
+61.5,
+250.8,
+231.0,
+399.8
+],
+"text": "Medium Undead · CR 1 · AC 12 · HP 22 · Life Drain",
+"kind": "monster"
+},
+{
+"id": "srd-mon-sphinx-of-wonder",
+"title": "Sphinx of Wonder",
+"chapter": "Monsters A–Z",
+"page": 327,
+"rect": [
+311.5,
+60.1,
+231.7,
+334.4
+],
+"text": "Tiny Celestial · CR 1 · AC 13 · HP 24 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-sphinx-of-lore",
+"title": "Sphinx of Lore",
+"chapter": "Monsters A–Z",
+"page": 327,
+"rect": [
+311.5,
+397.9,
+232.0,
+316.7
+],
+"text": "Large Celestial · CR 11 · AC 17 · HP 170 · Claw, Mind-Rending Roar, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+328,
+[
+61.5,
+37.6,
+232.1,
+396.3
+]
+]
+]
+},
+{
+"id": "srd-mon-sphinx-of-valor",
+"title": "Sphinx of Valor",
+"chapter": "Monsters A–Z",
+"page": 328,
+"rect": [
+61.5,
+437.3,
+231.5,
+264.2
+],
+"text": "Large Celestial · CR 17 · AC 17 · HP 199 · Claw, Roar, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+328,
+[
+311.5,
+38.2,
+232.6,
+598.1
+]
+]
+]
+},
+{
+"id": "srd-mon-spirit-naga",
+"title": "Spirit Naga",
+"chapter": "Monsters A–Z",
+"page": 329,
+"rect": [
+61.5,
+60.1,
+229.9,
+449.3
+],
+"text": "Large Fiend · CR 8 · AC 17 · HP 135 · Bite, Necrotic Ray, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-sprite",
+"title": "Sprite",
+"chapter": "Monsters A–Z",
+"page": 329,
+"rect": [
+61.5,
+535.4,
+228.0,
+168.2
+],
+"text": "Tiny Fey · CR 1/4 · AC 15 · HP 10 · Needle Sword, Enchanting Bow, Heart Sight",
+"kind": "monster",
+"cont": [
+[
+329,
+[
+311.5,
+37.6,
+230.9,
+189.7
+]
+]
+]
+},
+{
+"id": "srd-mon-spy",
+"title": "Spy",
+"chapter": "Monsters A–Z",
+"page": 329,
+"rect": [
+311.5,
+253.3,
+230.8,
+327.8
+],
+"text": "Medium or Small Humanoid · CR 1 · AC 12 · HP 27 · Shortsword, Hand Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-stirge",
+"title": "Stirge",
+"chapter": "Monsters A–Z",
+"page": 329,
+"rect": [
+311.5,
+607.2,
+228.0,
+74.8
+],
+"text": "Tiny Monstrosity · CR 1/8 · AC 13 · HP 5 · Proboscis",
+"kind": "monster",
+"cont": [
+[
+330,
+[
+61.5,
+40.2,
+231.3,
+200.5
+]
+]
+]
+},
+{
+"id": "srd-mon-stone-giant",
+"title": "Stone Giant",
+"chapter": "Monsters A–Z",
+"page": 330,
+"rect": [
+61.5,
+266.7,
+231.3,
+404.3
+],
+"text": "Huge Giant · CR 7 · AC 17 · HP 126 · Stone Club, Boulder",
+"kind": "monster"
+},
+{
+"id": "srd-mon-stone-golem",
+"title": "Stone Golem",
+"chapter": "Monsters A–Z",
+"page": 330,
+"rect": [
+311.5,
+60.1,
+228.3,
+419.9
+],
+"text": "Large Construct · CR 10 · AC 18 · HP 220 · Slam, Force Bolt",
+"kind": "monster"
+},
+{
+"id": "srd-mon-storm-giant",
+"title": "Storm Giant",
+"chapter": "Monsters A–Z",
+"page": 330,
+"rect": [
+311.5,
+506.0,
+230.0,
+204.2
+],
+"text": "Huge Giant · CR 13 · AC 16 · HP 230 · Storm Sword, Thunderbolt, Lightning Storm, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+331,
+[
+61.5,
+37.6,
+231.5,
+305.8
+]
+]
+]
+},
+{
+"id": "srd-mon-succubus",
+"title": "Succubus",
+"chapter": "Monsters A–Z",
+"page": 331,
+"rect": [
+61.5,
+369.4,
+228.4,
+327.8
+],
+"text": "Medium Fiend · CR 4 · AC 15 · HP 71 · Fiendish Touch, Draining Kiss",
+"kind": "monster",
+"cont": [
+[
+331,
+[
+311.5,
+38.2,
+230.5,
+186.0
+]
+]
+]
+},
+{
+"id": "srd-mon-tarrasque",
+"title": "Tarrasque",
+"chapter": "Monsters A–Z",
+"page": 331,
+"rect": [
+311.5,
+250.2,
+230.2,
+461.3
+],
+"text": "Gargantuan Monstrosity (Titan) · CR 30 · AC 25 · HP 697 · Bite, Claw, Tail, Thunderous Bellow",
+"kind": "monster",
+"cont": [
+[
+332,
+[
+61.5,
+38.3,
+229.4,
+589.0
+]
+]
+]
+},
+{
+"id": "srd-mon-tough",
+"title": "Tough",
+"chapter": "Monsters A–Z",
+"page": 332,
+"rect": [
+61.5,
+653.3,
+228.0,
+74.8
+],
+"text": "Medium or Small Humanoid · CR 1/2 · AC 12 · HP 32 · Mace, Heavy Crossbow",
+"kind": "monster",
+"cont": [
+[
+332,
+[
+311.5,
+40.2,
+230.7,
+240.1
+]
+]
+]
+},
+{
+"id": "srd-mon-tough-boss",
+"title": "Tough Boss",
+"chapter": "Monsters A–Z",
+"page": 332,
+"rect": [
+311.5,
+283.7,
+232.6,
+368.3
+],
+"text": "Medium or Small Humanoid · CR 4 · AC 16 · HP 82 · Warhammer, Heavy Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-treant",
+"title": "Treant",
+"chapter": "Monsters A–Z",
+"page": 333,
+"rect": [
+61.5,
+60.1,
+232.2,
+432.8
+],
+"text": "Huge Plant · CR 9 · AC 16 · HP 138 · Slam, Hail of Bark",
+"kind": "monster"
+},
+{
+"id": "srd-mon-troll",
+"title": "Troll",
+"chapter": "Monsters A–Z",
+"page": 333,
+"rect": [
+61.5,
+518.9,
+228.0,
+168.2
+],
+"text": "Large Giant · CR 5 · AC 15 · HP 94 · Rend",
+"kind": "monster",
+"cont": [
+[
+333,
+[
+311.5,
+37.6,
+231.1,
+279.5
+]
+]
+]
+},
+{
+"id": "srd-mon-troll-limb",
+"title": "Troll Limb",
+"chapter": "Monsters A–Z",
+"page": 333,
+"rect": [
+311.5,
+320.4,
+228.6,
+339.8
+],
+"text": "Small Giant · CR 1/2 · AC 13 · HP 14 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-unicorn",
+"title": "Unicorn",
+"chapter": "Monsters A–Z",
+"page": 334,
+"rect": [
+61.5,
+60.1,
+231.8,
+655.0
+],
+"text": "Large Celestial · CR 5 · AC 12 · HP 97 · Hooves, Radiant Horn, Spellcasting",
+"kind": "monster",
+"cont": [
+[
+334,
+[
+311.5,
+38.3,
+231.8,
+26.3
+]
+]
+]
+},
+{
+"id": "srd-mon-vampire-familiar",
+"title": "Vampire Familiar",
+"chapter": "Monsters A–Z",
+"page": 334,
+"rect": [
+311.5,
+90.6,
+228.6,
+470.9
+],
+"text": "Medium or Small Humanoid · CR 3 · AC 15 · HP 65 · Umbral Dagger",
+"kind": "monster"
+},
+{
+"id": "srd-mon-vampire-spawn",
+"title": "Vampire Spawn",
+"chapter": "Monsters A–Z",
+"page": 334,
+"rect": [
+311.5,
+564.9,
+228.0,
+74.8
+],
+"text": "Medium or Small Undead · CR 5 · AC 16 · HP 90 · Claw, Bite",
+"kind": "monster",
+"cont": [
+[
+335,
+[
+61.5,
+40.2,
+231.3,
+564.7
+]
+]
+]
+},
+{
+"id": "srd-mon-vampire",
+"title": "Vampire",
+"chapter": "Monsters A–Z",
+"page": 335,
+"rect": [
+61.5,
+608.3,
+228.0,
+74.8
+],
+"text": "Medium or Small Undead · CR 13 · AC 16 · HP 195 · Grave Strike, Bite",
+"kind": "monster",
+"cont": [
+[
+335,
+[
+311.5,
+40.2,
+232.4,
+682.6
+]
+],
+[
+336,
+[
+61.5,
+54.8,
+230.5,
+472.0
+]
+]
+]
+},
+{
+"id": "srd-mon-vrock",
+"title": "Vrock",
+"chapter": "Monsters A–Z",
+"page": 336,
+"rect": [
+61.5,
+552.8,
+228.0,
+74.8
+],
+"text": "Large Fiend (Demon) · CR 6 · AC 15 · HP 152 · Shred, Spores, Stunning Screech",
+"kind": "monster",
+"cont": [
+[
+336,
+[
+311.5,
+56.7,
+232.6,
+433.6
+]
+]
+]
+},
+{
+"id": "srd-mon-warrior-infantry",
+"title": "Warrior Infantry",
+"chapter": "Monsters A–Z",
+"page": 336,
+"rect": [
+311.5,
+516.3,
+228.0,
+168.2
+],
+"text": "Medium or Small Humanoid · CR 1/8 · AC 13 · HP 9 · Spear",
+"kind": "monster",
+"cont": [
+[
+337,
+[
+61.5,
+37.6,
+228.0,
+115.4
+]
+]
+]
+},
+{
+"id": "srd-mon-warrior-veteran",
+"title": "Warrior Veteran",
+"chapter": "Monsters A–Z",
+"page": 337,
+"rect": [
+61.5,
+156.3,
+228.8,
+344.3
+],
+"text": "Medium or Small Humanoid · CR 3 · AC 17 · HP 65 · Greatsword, Heavy Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-water-elemental",
+"title": "Water Elemental",
+"chapter": "Monsters A–Z",
+"page": 337,
+"rect": [
+61.5,
+526.7,
+228.0,
+192.2
+],
+"text": "Large Elemental · CR 5 · AC 14 · HP 114 · Slam, Whelm",
+"kind": "monster",
+"cont": [
+[
+337,
+[
+311.5,
+37.6,
+232.7,
+320.8
+]
+]
+]
+},
+{
+"id": "srd-mon-werebear",
+"title": "Werebear",
+"chapter": "Monsters A–Z",
+"page": 337,
+"rect": [
+311.5,
+384.4,
+228.6,
+328.7
+],
+"text": "Medium or Small Monstrosity (Lycanthrope) · CR 5 · AC 15 · HP 135 · Bite, Handaxe, Rend",
+"kind": "monster",
+"cont": [
+[
+338,
+[
+61.5,
+38.2,
+228.1,
+178.4
+]
+]
+]
+},
+{
+"id": "srd-mon-wereboar",
+"title": "Wereboar",
+"chapter": "Monsters A–Z",
+"page": 338,
+"rect": [
+61.5,
+242.7,
+228.6,
+457.7
+],
+"text": "Medium or Small Monstrosity (Lycanthrope) · CR 4 · AC 15 · HP 97 · Gore, Javelin, Tusk",
+"kind": "monster",
+"cont": [
+[
+338,
+[
+311.5,
+37.6,
+228.3,
+80.3
+]
+]
+]
+},
+{
+"id": "srd-mon-wererat",
+"title": "Wererat",
+"chapter": "Monsters A–Z",
+"page": 338,
+"rect": [
+311.5,
+143.8,
+228.6,
+492.8
+],
+"text": "Medium or Small Monstrosity (Lycanthrope) · CR 2 · AC 13 · HP 60 · Bite, Scratch, Hand Crossbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-weretiger",
+"title": "Weretiger",
+"chapter": "Monsters A–Z",
+"page": 339,
+"rect": [
+61.5,
+60.1,
+231.3,
+545.3
+],
+"text": "Medium or Small Monstrosity (Lycanthrope) · CR 4 · AC 12 · HP 120 · Bite, Scratch, Longbow",
+"kind": "monster"
+},
+{
+"id": "srd-mon-werewolf",
+"title": "Werewolf",
+"chapter": "Monsters A–Z",
+"page": 339,
+"rect": [
+61.5,
+631.4,
+228.0,
+74.8
+],
+"text": "Medium or Small Monstrosity (Lycanthrope) · CR 3 · AC 15 · HP 71 · Bite, Scratch, Longbow",
+"kind": "monster",
+"cont": [
+[
+339,
+[
+311.5,
+40.2,
+232.0,
+488.2
+]
+]
+]
+},
+{
+"id": "srd-mon-white-dragon-wyrmling",
+"title": "White Dragon Wyrmling",
+"chapter": "Monsters A–Z",
+"page": 339,
+"rect": [
+311.5,
+554.4,
+228.0,
+74.8
+],
+"text": "Medium Dragon (Chromatic) · CR 2 · AC 16 · HP 32 · Rend, Cold Breath",
+"kind": "monster",
+"cont": [
+[
+340,
+[
+61.5,
+40.2,
+231.8,
+292.6
+]
+]
+]
+},
+{
+"id": "srd-mon-young-white-dragon",
+"title": "Young White Dragon",
+"chapter": "Monsters A–Z",
+"page": 340,
+"rect": [
+61.5,
+336.2,
+232.1,
+368.3
+],
+"text": "Large Dragon (Chromatic) · CR 6 · AC 17 · HP 123 · Rend, Cold Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-adult-white-dragon",
+"title": "Adult White Dragon",
+"chapter": "Monsters A–Z",
+"page": 340,
+"rect": [
+311.5,
+36.6,
+232.6,
+639.4
+],
+"text": "Huge Dragon (Chromatic) · CR 13 · AC 18 · HP 200 · Rend, Cold Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ancient-white-dragon",
+"title": "Ancient White Dragon",
+"chapter": "Monsters A–Z",
+"page": 341,
+"rect": [
+61.5,
+36.6,
+229.9,
+639.4
+],
+"text": "Gargantuan Dragon (Chromatic) · CR 20 · AC 20 · HP 333 · Rend, Cold Breath",
+"kind": "monster"
+},
+{
+"id": "srd-mon-wight",
+"title": "Wight",
+"chapter": "Monsters A–Z",
+"page": 341,
+"rect": [
+311.5,
+60.1,
+229.1,
+504.8
+],
+"text": "Medium Undead · CR 3 · AC 14 · HP 82 · Necrotic Sword, Necrotic Bow, Life Drain",
+"kind": "monster"
+},
+{
+"id": "srd-mon-will-o-wisp",
+"title": "Will-o’-Wisp",
+"chapter": "Monsters A–Z",
+"page": 341,
+"rect": [
+311.5,
+590.9,
+228.0,
+74.8
+],
+"text": "Tiny Undead · CR 2 · AC 19 · HP 27 · Shock, Consume Life",
+"kind": "monster",
+"cont": [
+[
+342,
+[
+61.5,
+40.2,
+230.3,
+428.2
+]
+]
+]
+},
+{
+"id": "srd-mon-winter-wolf",
+"title": "Winter Wolf",
+"chapter": "Monsters A–Z",
+"page": 342,
+"rect": [
+61.5,
+494.4,
+228.0,
+180.2
+],
+"text": "Large Monstrosity · CR 3 · AC 13 · HP 75 · Bite, Cold Breath",
+"kind": "monster",
+"cont": [
+[
+342,
+[
+311.5,
+37.6,
+232.4,
+167.9
+]
+]
+]
+},
+{
+"id": "srd-mon-worg",
+"title": "Worg",
+"chapter": "Monsters A–Z",
+"page": 342,
+"rect": [
+311.5,
+231.4,
+228.0,
+240.2
+],
+"text": "Large Fey · CR 1/2 · AC 13 · HP 26 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-wraith",
+"title": "Wraith",
+"chapter": "Monsters A–Z",
+"page": 342,
+"rect": [
+311.5,
+497.7,
+228.0,
+216.2
+],
+"text": "Medium or Small Undead · CR 5 · AC 13 · HP 67 · Life Drain",
+"kind": "monster",
+"cont": [
+[
+343,
+[
+61.5,
+37.6,
+231.7,
+256.3
+]
+]
+]
+},
+{
+"id": "srd-mon-wyvern",
+"title": "Wyvern",
+"chapter": "Monsters A–Z",
+"page": 343,
+"rect": [
+61.5,
+319.9,
+230.3,
+297.2
+],
+"text": "Large Dragon · CR 6 · AC 14 · HP 127 · Bite, Sting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-xorn",
+"title": "Xorn",
+"chapter": "Monsters A–Z",
+"page": 343,
+"rect": [
+61.5,
+643.2,
+228.0,
+74.8
+],
+"text": "Medium Elemental · CR 5 · AC 19 · HP 84 · Bite, Claw",
+"kind": "monster",
+"cont": [
+[
+343,
+[
+311.5,
+40.2,
+232.5,
+356.2
+]
+]
+]
+},
+{
+"id": "srd-mon-zombie",
+"title": "Zombie",
+"chapter": "Monsters A–Z",
+"page": 343,
+"rect": [
+311.5,
+422.4,
+231.5,
+264.2
+],
+"text": "Medium Undead · CR 1/4 · AC 8 · HP 15 · Slam",
+"kind": "monster",
+"cont": [
+[
+344,
+[
+61.5,
+37.6,
+229.8,
+44.3
+]
+]
+]
+},
+{
+"id": "srd-mon-ogre-zombie",
+"title": "Ogre Zombie",
+"chapter": "Monsters A–Z",
+"page": 344,
+"rect": [
+61.5,
+85.2,
+229.2,
+311.3
+],
+"text": "Large Undead · CR 2 · AC 8 · HP 85 · Slam",
+"kind": "monster"
+},
+{
+"id": "srd-mon-allosaurus",
+"title": "Allosaurus",
+"chapter": "Animals",
+"page": 344,
+"rect": [
+61.5,
+440.2,
+228.0,
+268.7
+],
+"text": "Large Beast (Dinosaur) · CR 2 · AC 13 · HP 51 · Bite, Claws",
+"kind": "monster",
+"cont": [
+[
+344,
+[
+311.5,
+38.3,
+228.0,
+26.3
+]
+]
+]
+},
+{
+"id": "srd-mon-ankylosaurus",
+"title": "Ankylosaurus",
+"chapter": "Monsters A–Z",
+"page": 344,
+"rect": [
+311.5,
+68.0,
+228.0,
+232.7
+],
+"text": "Huge Beast (Dinosaur) · CR 3 · AC 15 · HP 68 · Tail",
+"kind": "monster"
+},
+{
+"id": "srd-mon-ape",
+"title": "Ape",
+"chapter": "Monsters A–Z",
+"page": 344,
+"rect": [
+311.5,
+304.1,
+228.0,
+261.2
+],
+"text": "Medium Beast · CR 1/2 · AC 12 · HP 19 · Fist, Rock",
+"kind": "monster"
+},
+{
+"id": "srd-mon-archelon",
+"title": "Archelon",
+"chapter": "Animals",
+"page": 344,
+"rect": [
+311.5,
+568.7,
+228.0,
+74.8
+],
+"text": "Huge Beast (Dinosaur) · CR 4 · AC 17 · HP 90 · Bite",
+"kind": "monster",
+"cont": [
+[
+345,
+[
+61.5,
+40.2,
+232.1,
+192.1
+]
+]
+]
+},
+{
+"id": "srd-mon-baboon",
+"title": "Baboon",
+"chapter": "Animals",
+"page": 345,
+"rect": [
+61.5,
+235.7,
+231.5,
+275.3
+],
+"text": "Small Beast · CR 0 · AC 12 · HP 3 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-badger",
+"title": "Badger",
+"chapter": "Animals",
+"page": 345,
+"rect": [
+61.5,
+514.4,
+228.0,
+180.2
+],
+"text": "Tiny Beast · CR 0 · AC 11 · HP 5 · Bite",
+"kind": "monster",
+"cont": [
+[
+345,
+[
+311.5,
+37.6,
+228.0,
+44.3
+]
+]
+]
+},
+{
+"id": "srd-mon-bat",
+"title": "Bat",
+"chapter": "Animals",
+"page": 345,
+"rect": [
+311.5,
+85.2,
+228.0,
+204.2
+],
+"text": "Tiny Beast · CR 0 · AC 12 · HP 1 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-black-bear",
+"title": "Black Bear",
+"chapter": "Animals",
+"page": 345,
+"rect": [
+311.5,
+292.9,
+232.3,
+232.7
+],
+"text": "Medium Beast · CR 1/2 · AC 11 · HP 19 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-blood-hawk",
+"title": "Blood Hawk",
+"chapter": "Animals",
+"page": 345,
+"rect": [
+311.5,
+529.0,
+228.0,
+168.2
+],
+"text": "Small Beast · CR 1/8 · AC 12 · HP 7 · Beak",
+"kind": "monster",
+"cont": [
+[
+346,
+[
+61.5,
+37.6,
+231.6,
+127.4
+]
+]
+]
+},
+{
+"id": "srd-mon-boar",
+"title": "Boar",
+"chapter": "Animals",
+"page": 346,
+"rect": [
+61.5,
+168.3,
+230.6,
+287.3
+],
+"text": "Medium Beast · CR 1/4 · AC 11 · HP 13 · Gore",
+"kind": "monster"
+},
+{
+"id": "srd-mon-brown-bear",
+"title": "Brown Bear",
+"chapter": "Animals",
+"page": 346,
+"rect": [
+61.5,
+459.1,
+228.0,
+244.7
+],
+"text": "Large Beast · CR 1 · AC 11 · HP 22 · Bite, Claw",
+"kind": "monster",
+"cont": [
+[
+346,
+[
+311.5,
+38.2,
+230.4,
+38.4
+]
+]
+]
+},
+{
+"id": "srd-mon-camel",
+"title": "Camel",
+"chapter": "Animals",
+"page": 346,
+"rect": [
+311.5,
+80.0,
+228.0,
+204.2
+],
+"text": "Large Beast · CR 1/8 · AC 10 · HP 17 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-cat",
+"title": "Cat",
+"chapter": "Animals",
+"page": 346,
+"rect": [
+311.5,
+287.6,
+230.2,
+263.3
+],
+"text": "Tiny Beast · CR 0 · AC 12 · HP 2 · Scratch",
+"kind": "monster"
+},
+{
+"id": "srd-mon-constrictor-snake",
+"title": "Constrictor Snake",
+"chapter": "Animals",
+"page": 346,
+"rect": [
+311.5,
+554.3,
+228.0,
+168.2
+],
+"text": "Large Beast · CR 1/4 · AC 13 · HP 13 · Bite, Constrict",
+"kind": "monster",
+"cont": [
+[
+347,
+[
+61.5,
+37.6,
+231.3,
+96.8
+]
+]
+]
+},
+{
+"id": "srd-mon-crab",
+"title": "Crab",
+"chapter": "Animals",
+"page": 347,
+"rect": [
+61.5,
+137.7,
+228.0,
+251.3
+],
+"text": "Tiny Beast · CR 0 · AC 11 · HP 3 · Claw",
+"kind": "monster"
+},
+{
+"id": "srd-mon-crocodile",
+"title": "Crocodile",
+"chapter": "Animals",
+"page": 347,
+"rect": [
+61.5,
+392.5,
+228.0,
+299.3
+],
+"text": "Large Beast · CR 1/2 · AC 12 · HP 13 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-deer",
+"title": "Deer",
+"chapter": "Animals",
+"page": 347,
+"rect": [
+311.5,
+36.6,
+230.1,
+263.3
+],
+"text": "Medium Beast · CR 0 · AC 13 · HP 4 · Ram",
+"kind": "monster"
+},
+{
+"id": "srd-mon-dire-wolf",
+"title": "Dire Wolf",
+"chapter": "Animals",
+"page": 347,
+"rect": [
+311.5,
+303.3,
+231.1,
+299.3
+],
+"text": "Large Beast · CR 1 · AC 14 · HP 22 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-draft-horse",
+"title": "Draft Horse",
+"chapter": "Animals",
+"page": 347,
+"rect": [
+311.5,
+606.0,
+228.0,
+74.8
+],
+"text": "Large Beast · CR 1/4 · AC 10 · HP 15 · Hooves",
+"kind": "monster",
+"cont": [
+[
+348,
+[
+61.5,
+40.2,
+228.0,
+128.5
+]
+]
+]
+},
+{
+"id": "srd-mon-eagle",
+"title": "Eagle",
+"chapter": "Animals",
+"page": 348,
+"rect": [
+61.5,
+172.1,
+228.1,
+216.2
+],
+"text": "Small Beast · CR 0 · AC 12 · HP 4 · Talons",
+"kind": "monster"
+},
+{
+"id": "srd-mon-elephant",
+"title": "Elephant",
+"chapter": "Animals",
+"page": 348,
+"rect": [
+61.5,
+391.7,
+228.0,
+315.8
+],
+"text": "Huge Beast · CR 4 · AC 12 · HP 76 · Gore, Trample",
+"kind": "monster"
+},
+{
+"id": "srd-mon-elk",
+"title": "Elk",
+"chapter": "Animals",
+"page": 348,
+"rect": [
+311.5,
+36.6,
+230.5,
+264.2
+],
+"text": "Large Beast · CR 1/4 · AC 10 · HP 11 · Ram",
+"kind": "monster"
+},
+{
+"id": "srd-mon-flying-snake",
+"title": "Flying Snake",
+"chapter": "Animals",
+"page": 348,
+"rect": [
+311.5,
+304.2,
+228.0,
+251.3
+],
+"text": "Tiny Monstrosity · CR 1/8 · AC 14 · HP 5 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-frog",
+"title": "Frog",
+"chapter": "Animals",
+"page": 348,
+"rect": [
+311.5,
+558.9,
+228.0,
+168.2
+],
+"text": "Tiny Beast · CR 0 · AC 11 · HP 1 · Bite",
+"kind": "monster",
+"cont": [
+[
+349,
+[
+61.5,
+37.6,
+228.0,
+119.9
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-ape",
+"title": "Giant Ape",
+"chapter": "Animals",
+"page": 349,
+"rect": [
+61.5,
+160.8,
+228.0,
+356.3
+],
+"text": "Huge Beast · CR 7 · AC 12 · HP 168 · Fist, Boulder Toss",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-badger",
+"title": "Giant Badger",
+"chapter": "Animals",
+"page": 349,
+"rect": [
+61.5,
+520.6,
+228.0,
+180.2
+],
+"text": "Medium Beast · CR 1/4 · AC 13 · HP 15 · Bite",
+"kind": "monster",
+"cont": [
+[
+349,
+[
+311.5,
+37.6,
+228.0,
+44.3
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-bat",
+"title": "Giant Bat",
+"chapter": "Animals",
+"page": 349,
+"rect": [
+311.5,
+85.2,
+228.0,
+204.2
+],
+"text": "Large Beast · CR 1/4 · AC 13 · HP 22 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-boar",
+"title": "Giant Boar",
+"chapter": "Animals",
+"page": 349,
+"rect": [
+311.5,
+292.9,
+230.4,
+287.3
+],
+"text": "Large Beast · CR 2 · AC 13 · HP 42 · Gore",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-centipede",
+"title": "Giant Centipede",
+"chapter": "Animals",
+"page": 349,
+"rect": [
+311.5,
+583.6,
+228.0,
+74.8
+],
+"text": "Small Beast · CR 1/4 · AC 14 · HP 9 · Bite",
+"kind": "monster",
+"cont": [
+[
+350,
+[
+61.5,
+40.2,
+228.0,
+140.5
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-constrictor-snake",
+"title": "Giant Constrictor Snake",
+"chapter": "Animals",
+"page": 350,
+"rect": [
+61.5,
+184.1,
+228.0,
+297.2
+],
+"text": "Huge Beast · CR 2 · AC 12 · HP 60 · Bite, Constrict",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-crab",
+"title": "Giant Crab",
+"chapter": "Animals",
+"page": 350,
+"rect": [
+61.5,
+484.7,
+228.0,
+204.2
+],
+"text": "Medium Beast · CR 1/8 · AC 15 · HP 13 · Claw",
+"kind": "monster",
+"cont": [
+[
+350,
+[
+311.5,
+37.6,
+230.2,
+68.3
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-crocodile",
+"title": "Giant Crocodile",
+"chapter": "Animals",
+"page": 350,
+"rect": [
+311.5,
+109.2,
+232.5,
+368.3
+],
+"text": "Huge Beast · CR 5 · AC 14 · HP 85 · Bite, Tail",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-eagle",
+"title": "Giant Eagle",
+"chapter": "Animals",
+"page": 350,
+"rect": [
+311.5,
+481.0,
+231.6,
+228.2
+],
+"text": "Large Celestial · CR 1 · AC 13 · HP 26 · Rend",
+"kind": "monster",
+"cont": [
+[
+351,
+[
+61.5,
+38.2,
+231.2,
+26.4
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-elk",
+"title": "Giant Elk",
+"chapter": "Animals",
+"page": 351,
+"rect": [
+61.5,
+68.0,
+229.6,
+288.2
+],
+"text": "Huge Celestial · CR 2 · AC 14 · HP 42 · Ram",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-fire-beetle",
+"title": "Giant Fire Beetle",
+"chapter": "Animals",
+"page": 351,
+"rect": [
+61.5,
+359.6,
+228.1,
+251.3
+],
+"text": "Small Beast · CR 0 · AC 13 · HP 4 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-frog",
+"title": "Giant Frog",
+"chapter": "Animals",
+"page": 351,
+"rect": [
+61.5,
+614.3,
+228.0,
+74.8
+],
+"text": "Medium Beast · CR 1/4 · AC 11 · HP 18 · Bite",
+"kind": "monster",
+"cont": [
+[
+351,
+[
+311.5,
+40.2,
+230.9,
+364.6
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-goat",
+"title": "Giant Goat",
+"chapter": "Animals",
+"page": 351,
+"rect": [
+311.5,
+408.2,
+228.0,
+252.2
+],
+"text": "Large Beast · CR 1/2 · AC 11 · HP 19 · Ram",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-hyena",
+"title": "Giant Hyena",
+"chapter": "Animals",
+"page": 352,
+"rect": [
+61.5,
+36.6,
+231.5,
+275.3
+],
+"text": "Large Beast · CR 1 · AC 12 · HP 45 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-lizard",
+"title": "Giant Lizard",
+"chapter": "Animals",
+"page": 352,
+"rect": [
+61.5,
+315.3,
+228.0,
+263.3
+],
+"text": "Large Beast · CR 1/4 · AC 12 · HP 19 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-octopus",
+"title": "Giant Octopus",
+"chapter": "Animals",
+"page": 352,
+"rect": [
+61.5,
+582.0,
+228.0,
+74.8
+],
+"text": "Large Beast · CR 1 · AC 11 · HP 45 · Tentacles",
+"kind": "monster",
+"cont": [
+[
+352,
+[
+311.5,
+40.2,
+232.2,
+318.7
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-owl",
+"title": "Giant Owl",
+"chapter": "Animals",
+"page": 352,
+"rect": [
+311.5,
+362.3,
+228.0,
+356.3
+],
+"text": "Large Celestial · CR 1/4 · AC 12 · HP 19 · Talons, Spellcasting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-rat",
+"title": "Giant Rat",
+"chapter": "Animals",
+"page": 353,
+"rect": [
+61.5,
+36.6,
+228.0,
+287.3
+],
+"text": "Small Beast · CR 1/8 · AC 13 · HP 7 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-scorpion",
+"title": "Giant Scorpion",
+"chapter": "Animals",
+"page": 353,
+"rect": [
+61.5,
+327.3,
+230.6,
+285.2
+],
+"text": "Large Beast · CR 3 · AC 15 · HP 52 · Claw, Sting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-seahorse",
+"title": "Giant Seahorse",
+"chapter": "Animals",
+"page": 353,
+"rect": [
+61.5,
+615.9,
+228.0,
+74.8
+],
+"text": "Large Beast · CR 1/2 · AC 14 · HP 16 · Ram",
+"kind": "monster",
+"cont": [
+[
+353,
+[
+311.5,
+40.2,
+228.4,
+258.7
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-shark",
+"title": "Giant Shark",
+"chapter": "Animals",
+"page": 353,
+"rect": [
+311.5,
+302.3,
+232.6,
+279.8
+],
+"text": "Huge Beast · CR 5 · AC 13 · HP 92 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-spider",
+"title": "Giant Spider",
+"chapter": "Animals",
+"page": 353,
+"rect": [
+311.5,
+585.5,
+228.0,
+74.8
+],
+"text": "Large Beast · CR 1 · AC 14 · HP 26 · Bite, Web",
+"kind": "monster",
+"cont": [
+[
+354,
+[
+61.5,
+40.2,
+229.8,
+304.6
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-toad",
+"title": "Giant Toad",
+"chapter": "Animals",
+"page": 354,
+"rect": [
+61.5,
+348.2,
+231.9,
+380.3
+],
+"text": "Large Beast · CR 1 · AC 11 · HP 39 · Bite",
+"kind": "monster",
+"cont": [
+[
+354,
+[
+311.5,
+38.3,
+230.1,
+62.3
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-venomous-snake",
+"title": "Giant Venomous Snake",
+"chapter": "Animals",
+"page": 354,
+"rect": [
+311.5,
+104.0,
+232.3,
+216.2
+],
+"text": "Medium Beast · CR 1/4 · AC 14 · HP 11 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-vulture",
+"title": "Giant Vulture",
+"chapter": "Animals",
+"page": 354,
+"rect": [
+311.5,
+323.6,
+228.0,
+311.3
+],
+"text": "Large Monstrosity · CR 1 · AC 10 · HP 25 · Gouge",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-wasp",
+"title": "Giant Wasp",
+"chapter": "Animals",
+"page": 354,
+"rect": [
+311.5,
+638.3,
+228.0,
+74.8
+],
+"text": "Medium Beast · CR 1/2 · AC 13 · HP 22 · Sting",
+"kind": "monster",
+"cont": [
+[
+355,
+[
+61.5,
+40.2,
+231.3,
+175.6
+]
+]
+]
+},
+{
+"id": "srd-mon-giant-weasel",
+"title": "Giant Weasel",
+"chapter": "Animals",
+"page": 355,
+"rect": [
+61.5,
+219.2,
+228.0,
+216.2
+],
+"text": "Medium Beast · CR 1/8 · AC 13 · HP 9 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-giant-wolf-spider",
+"title": "Giant Wolf Spider",
+"chapter": "Animals",
+"page": 355,
+"rect": [
+61.5,
+438.8,
+228.0,
+287.3
+],
+"text": "Medium Beast · CR 1/4 · AC 13 · HP 11 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-goat",
+"title": "Goat",
+"chapter": "Animals",
+"page": 355,
+"rect": [
+311.5,
+36.6,
+228.0,
+240.2
+],
+"text": "Medium Beast · CR 0 · AC 10 · HP 4 · Ram",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hawk",
+"title": "Hawk",
+"chapter": "Animals",
+"page": 355,
+"rect": [
+311.5,
+280.2,
+228.0,
+216.2
+],
+"text": "Tiny Beast · CR 0 · AC 13 · HP 1 · Talons",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hippopotamus",
+"title": "Hippopotamus",
+"chapter": "Animals",
+"page": 355,
+"rect": [
+311.5,
+499.8,
+230.6,
+216.2
+],
+"text": "Large Beast · CR 4 · AC 14 · HP 82 · Bite",
+"kind": "monster",
+"cont": [
+[
+356,
+[
+61.5,
+37.6,
+228.0,
+60.8
+]
+]
+]
+},
+{
+"id": "srd-mon-hunter-shark",
+"title": "Hunter Shark",
+"chapter": "Animals",
+"page": 356,
+"rect": [
+61.5,
+101.7,
+228.0,
+263.3
+],
+"text": "Large Beast · CR 2 · AC 12 · HP 45 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-hyena",
+"title": "Hyena",
+"chapter": "Animals",
+"page": 356,
+"rect": [
+61.5,
+368.5,
+230.5,
+287.3
+],
+"text": "Medium Beast · CR 0 · AC 11 · HP 5 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-jackal",
+"title": "Jackal",
+"chapter": "Animals",
+"page": 356,
+"rect": [
+311.5,
+36.6,
+228.0,
+216.2
+],
+"text": "Small Beast · CR 0 · AC 12 · HP 3 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-killer-whale",
+"title": "Killer Whale",
+"chapter": "Animals",
+"page": 356,
+"rect": [
+311.5,
+256.2,
+228.0,
+263.3
+],
+"text": "Huge Beast · CR 3 · AC 12 · HP 90 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-lion",
+"title": "Lion",
+"chapter": "Animals",
+"page": 356,
+"rect": [
+311.5,
+522.9,
+228.0,
+168.2
+],
+"text": "Large Beast · CR 1 · AC 12 · HP 22 · Rend, Roar",
+"kind": "monster",
+"cont": [
+[
+357,
+[
+61.5,
+37.6,
+231.1,
+212.9
+]
+]
+]
+},
+{
+"id": "srd-mon-lizard",
+"title": "Lizard",
+"chapter": "Animals",
+"page": 357,
+"rect": [
+61.5,
+253.8,
+228.0,
+263.3
+],
+"text": "Tiny Beast · CR 0 · AC 10 · HP 2 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-mammoth",
+"title": "Mammoth",
+"chapter": "Animals",
+"page": 357,
+"rect": [
+61.5,
+520.6,
+228.0,
+192.2
+],
+"text": "Huge Beast · CR 6 · AC 13 · HP 126 · Gore, Trample",
+"kind": "monster",
+"cont": [
+[
+357,
+[
+311.5,
+38.2,
+231.7,
+121.5
+]
+]
+]
+},
+{
+"id": "srd-mon-mastiff",
+"title": "Mastiff",
+"chapter": "Animals",
+"page": 357,
+"rect": [
+311.5,
+163.1,
+228.0,
+228.2
+],
+"text": "Medium Beast · CR 1/8 · AC 12 · HP 5 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-mule",
+"title": "Mule",
+"chapter": "Animals",
+"page": 357,
+"rect": [
+311.5,
+394.7,
+231.5,
+251.3
+],
+"text": "Medium Beast · CR 1/8 · AC 10 · HP 11 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-octopus",
+"title": "Octopus",
+"chapter": "Animals",
+"page": 357,
+"rect": [
+311.5,
+649.4,
+228.0,
+74.8
+],
+"text": "Small Beast · CR 0 · AC 12 · HP 3 · Tentacles",
+"kind": "monster",
+"cont": [
+[
+358,
+[
+61.5,
+40.2,
+228.0,
+335.2
+]
+]
+]
+},
+{
+"id": "srd-mon-owl",
+"title": "Owl",
+"chapter": "Animals",
+"page": 358,
+"rect": [
+61.5,
+378.8,
+228.0,
+263.3
+],
+"text": "Tiny Beast · CR 0 · AC 11 · HP 1 · Talons",
+"kind": "monster"
+},
+{
+"id": "srd-mon-panther",
+"title": "Panther",
+"chapter": "Animals",
+"page": 358,
+"rect": [
+61.5,
+645.5,
+228.0,
+74.8
+],
+"text": "Medium Beast · CR 1/4 · AC 13 · HP 13 · Rend",
+"kind": "monster",
+"cont": [
+[
+358,
+[
+311.5,
+40.2,
+231.7,
+187.6
+]
+]
+]
+},
+{
+"id": "srd-mon-piranha",
+"title": "Piranha",
+"chapter": "Animals",
+"page": 358,
+"rect": [
+311.5,
+231.2,
+232.6,
+263.3
+],
+"text": "Tiny Beast · CR 0 · AC 13 · HP 1 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-plesiosaurus",
+"title": "Plesiosaurus",
+"chapter": "Animals",
+"page": 358,
+"rect": [
+311.5,
+497.9,
+228.0,
+216.2
+],
+"text": "Large Beast (Dinosaur) · CR 2 · AC 13 · HP 68 · Bite",
+"kind": "monster",
+"cont": [
+[
+359,
+[
+61.5,
+37.6,
+228.0,
+44.3
+]
+]
+]
+},
+{
+"id": "srd-mon-polar-bear",
+"title": "Polar Bear",
+"chapter": "Animals",
+"page": 359,
+"rect": [
+61.5,
+85.2,
+230.2,
+244.7
+],
+"text": "Large Beast · CR 2 · AC 12 · HP 42 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-pony",
+"title": "Pony",
+"chapter": "Animals",
+"page": 359,
+"rect": [
+61.5,
+333.4,
+228.0,
+204.2
+],
+"text": "Medium Beast · CR 1/8 · AC 10 · HP 11 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-pteranodon",
+"title": "Pteranodon",
+"chapter": "Animals",
+"page": 359,
+"rect": [
+61.5,
+541.0,
+228.0,
+168.2
+],
+"text": "Medium Beast (Dinosaur) · CR 1/4 · AC 13 · HP 13 · Bite",
+"kind": "monster",
+"cont": [
+[
+359,
+[
+311.5,
+37.6,
+230.2,
+91.4
+]
+]
+]
+},
+{
+"id": "srd-mon-rat",
+"title": "Rat",
+"chapter": "Animals",
+"page": 359,
+"rect": [
+311.5,
+132.3,
+228.0,
+263.3
+],
+"text": "Tiny Beast · CR 0 · AC 10 · HP 1 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-raven",
+"title": "Raven",
+"chapter": "Animals",
+"page": 359,
+"rect": [
+311.5,
+399.1,
+228.1,
+287.3
+],
+"text": "Tiny Beast · CR 0 · AC 12 · HP 2 · Beak",
+"kind": "monster"
+},
+{
+"id": "srd-mon-reef-shark",
+"title": "Reef Shark",
+"chapter": "Animals",
+"page": 360,
+"rect": [
+61.5,
+36.6,
+231.1,
+303.8
+],
+"text": "Medium Beast · CR 1/2 · AC 12 · HP 22 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-rhinoceros",
+"title": "Rhinoceros",
+"chapter": "Animals",
+"page": 360,
+"rect": [
+61.5,
+343.8,
+230.0,
+240.2
+],
+"text": "Large Beast · CR 2 · AC 13 · HP 45 · Gore",
+"kind": "monster"
+},
+{
+"id": "srd-mon-riding-horse",
+"title": "Riding Horse",
+"chapter": "Animals",
+"page": 360,
+"rect": [
+61.5,
+587.4,
+228.0,
+74.8
+],
+"text": "Large Beast · CR 1/4 · AC 11 · HP 13 · Hooves",
+"kind": "monster",
+"cont": [
+[
+360,
+[
+311.5,
+40.2,
+228.0,
+128.5
+]
+]
+]
+},
+{
+"id": "srd-mon-saber-toothed-tiger",
+"title": "Saber-Toothed Tiger",
+"chapter": "Animals",
+"page": 360,
+"rect": [
+311.5,
+172.1,
+228.0,
+326.8
+],
+"text": "Large Beast · CR 2 · AC 13 · HP 52 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-scorpion",
+"title": "Scorpion",
+"chapter": "Animals",
+"page": 360,
+"rect": [
+311.5,
+503.1,
+228.0,
+204.2
+],
+"text": "Tiny Beast · CR 0 · AC 11 · HP 1 · Sting",
+"kind": "monster"
+},
+{
+"id": "srd-mon-seahorse",
+"title": "Seahorse",
+"chapter": "Animals",
+"page": 361,
+"rect": [
+61.5,
+37.2,
+228.0,
+275.3
+],
+"text": "Tiny Beast · CR 0 · AC 12 · HP 1",
+"kind": "monster"
+},
+{
+"id": "srd-mon-spider",
+"title": "Spider",
+"chapter": "Animals",
+"page": 361,
+"rect": [
+61.5,
+316.0,
+228.1,
+315.8
+],
+"text": "Tiny Beast · CR 0 · AC 12 · HP 1 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-swarm-of-bats",
+"title": "Swarm of Bats",
+"chapter": "Animals",
+"page": 361,
+"rect": [
+61.5,
+635.2,
+228.0,
+74.8
+],
+"text": "Large Swarm of Tiny Beasts · CR 1/4 · AC 12 · HP 11 · Bites",
+"kind": "monster",
+"cont": [
+[
+361,
+[
+311.5,
+40.2,
+231.7,
+247.6
+]
+]
+]
+},
+{
+"id": "srd-mon-swarm-of-insects",
+"title": "Swarm of Insects",
+"chapter": "Animals",
+"page": 361,
+"rect": [
+311.5,
+291.2,
+231.7,
+363.8
+],
+"text": "Medium Swarm of Tiny Beasts · CR 1/2 · AC 11 · HP 19 · Bites",
+"kind": "monster"
+},
+{
+"id": "srd-mon-swarm-of-piranhas",
+"title": "Swarm of Piranhas",
+"chapter": "Animals",
+"page": 362,
+"rect": [
+61.5,
+37.2,
+228.2,
+375.8
+],
+"text": "Medium Swarm of Tiny Beasts · CR 1 · AC 13 · HP 28 · Bites",
+"kind": "monster"
+},
+{
+"id": "srd-mon-swarm-of-rats",
+"title": "Swarm of Rats",
+"chapter": "Animals",
+"page": 362,
+"rect": [
+61.5,
+416.5,
+231.2,
+264.2
+],
+"text": "Medium Swarm of Tiny Beasts · CR 1/4 · AC 10 · HP 14 · Bites",
+"kind": "monster",
+"cont": [
+[
+362,
+[
+311.5,
+37.7,
+228.0,
+56.3
+]
+]
+]
+},
+{
+"id": "srd-mon-swarm-of-ravens",
+"title": "Swarm of Ravens",
+"chapter": "Animals",
+"page": 362,
+"rect": [
+311.5,
+97.3,
+231.7,
+399.8
+],
+"text": "Medium Swarm of Tiny Beasts · CR 1/4 · AC 12 · HP 11 · Beaks, Cacophony",
+"kind": "monster"
+},
+{
+"id": "srd-mon-swarm-of-venomous-snakes",
+"title": "Swarm of Venomous Snakes",
+"chapter": "Animals",
+"page": 362,
+"rect": [
+311.5,
+500.6,
+228.0,
+192.2
+],
+"text": "Medium Swarm of Tiny Beasts · CR 2 · AC 14 · HP 36 · Bites",
+"kind": "monster",
+"cont": [
+[
+363,
+[
+61.5,
+37.7,
+231.2,
+127.4
+]
+]
+]
+},
+{
+"id": "srd-mon-tiger",
+"title": "Tiger",
+"chapter": "Animals",
+"page": 363,
+"rect": [
+61.5,
+168.4,
+228.0,
+275.3
+],
+"text": "Large Beast · CR 1 · AC 13 · HP 30 · Rend",
+"kind": "monster"
+},
+{
+"id": "srd-mon-triceratops",
+"title": "Triceratops",
+"chapter": "Animals",
+"page": 363,
+"rect": [
+61.5,
+447.2,
+228.0,
+256.7
+],
+"text": "Huge Beast (Dinosaur) · CR 5 · AC 14 · HP 114 · Gore",
+"kind": "monster"
+},
+{
+"id": "srd-mon-tyrannosaurus-rex",
+"title": "Tyrannosaurus Rex",
+"chapter": "Animals",
+"page": 363,
+"rect": [
+311.5,
+37.2,
+232.5,
+321.2
+],
+"text": "Huge Beast (Dinosaur) · CR 8 · AC 13 · HP 136 · Bite, Tail",
+"kind": "monster"
+},
+{
+"id": "srd-mon-venomous-snake",
+"title": "Venomous Snake",
+"chapter": "Animals",
+"page": 363,
+"rect": [
+311.5,
+361.9,
+228.0,
+204.2
+],
+"text": "Tiny Beast · CR 1/8 · AC 12 · HP 5 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-vulture",
+"title": "Vulture",
+"chapter": "Animals",
+"page": 363,
+"rect": [
+311.5,
+569.5,
+228.0,
+74.8
+],
+"text": "Medium Beast · CR 0 · AC 10 · HP 5 · Beak",
+"kind": "monster",
+"cont": [
+[
+364,
+[
+61.5,
+40.2,
+228.0,
+211.6
+]
+]
+]
+},
+{
+"id": "srd-mon-warhorse",
+"title": "Warhorse",
+"chapter": "Animals",
+"page": 364,
+"rect": [
+61.5,
+255.2,
+231.9,
+240.2
+],
+"text": "Large Beast · CR 1/2 · AC 11 · HP 19 · Hooves",
+"kind": "monster"
+},
+{
+"id": "srd-mon-weasel",
+"title": "Weasel",
+"chapter": "Animals",
+"page": 364,
+"rect": [
+61.5,
+498.8,
+228.0,
+216.2
+],
+"text": "Tiny Beast · CR 0 · AC 13 · HP 1 · Bite",
+"kind": "monster"
+},
+{
+"id": "srd-mon-wolf",
+"title": "Wolf",
+"chapter": "Animals",
+"page": 364,
+"rect": [
+311.5,
+37.2,
+228.0,
+299.3
+],
+"text": "Medium Beast · CR 1/4 · AC 12 · HP 11 · Bite",
+"kind": "monster"
 }
 ]
