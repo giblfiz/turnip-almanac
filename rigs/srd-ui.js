@@ -5,8 +5,8 @@
 // Levelling (the heart of this rig): XP awards and level-ups are advancement entries filed under the latest session
 // (advEntry/refreshAdv); the level step shows what the next level brings before it is committed, and takes one back.
 const WORDS = { xp: 'XP', xpVerb: 'Advancement', char: 'adventurer', Char: 'Adventurer', party: 'The adventurers',
-  quickHint: 'Jump or do: mira stealth, roll d20+5, roll 2d6+3, xp mira 300, level mira, new adventurer…',
-  helpCommands: '<i>mira stealth</i>, <i>mira dex save</i>, <i>mira longsword</i>, <i>roll d20+5</i>, <i>roll 2d6+3</i>, <i>xp mira 300</i>, <i>level mira</i>, <i>damage mira 7</i>, <i>heal mira</i>, <i>initiative</i>, <i>new adventurer</i>' };
+  quickHint: 'Jump or do: monster goblin, mira stealth, roll d20+5, roll 2d6+3, xp mira 300, level mira, new adventurer…',
+  helpCommands: '<i>monster goblin</i>, <i>add 3 goblin</i>, <i>mira stealth</i>, <i>mira dex save</i>, <i>mira longsword</i>, <i>roll d20+5</i>, <i>roll 2d6+3</i>, <i>xp mira 300</i>, <i>level mira</i>, <i>damage mira 7</i>, <i>heal mira</i>, <i>initiative</i>, <i>new adventurer</i>' };
 const RIG_NO_UNDO = new Set(['roll', 'rollchars']);
 const P = R.P;
 const LVTXT = l => `${R.CLS[l.cls]?.name || l.cls} ${l.cn || ''}`.trim();
@@ -336,7 +336,7 @@ function renderSheet(pc) {
   if (!tableReady || tableSig() !== lastTableSig) renderQuick(); dirty = true;
 }
 let lastTableSig = '';
-function tableSig() { return PCS.map(pc => { const L = liveOf(pc), ch = choicesOf(pc); return [pc.id, ch.name, ch.cls, ch.species, ch.abil?.base?.dex, state.portraits[pc.id], L.lost, L.temp, L.cond.join(), JSON.stringify(state.adv[pc.id] || []), state.asof[pc.id], initRoll[pc.id]?.total].join('|'); }).join(';') + fightN + ':' + turn.round + ':' + turn.at + ':' + (state.rolls._free || []).length + JSON.stringify(qdice2); }
+function tableSig() { return JSON.stringify(state.foes || []) + PCS.map(pc => { const L = liveOf(pc), ch = choicesOf(pc); return [pc.id, ch.name, ch.cls, ch.species, ch.abil?.base?.dex, state.portraits[pc.id], L.lost, L.temp, L.cond.join(), JSON.stringify(state.adv[pc.id] || []), state.asof[pc.id], initRoll[pc.id]?.total].join('|'); }).join(';') + fightN + ':' + turn.round + ':' + turn.at + ':' + (state.rolls._free || []).length + JSON.stringify(qdice2); }
 function box_who(pc) { renderSheet(pc); }
 
 // ---------------------------------------------------------------- round order and dice tray
@@ -351,13 +351,16 @@ function freeRoll(spec, label, at) { const r = R.rollDice(spec); pushRoll(null, 
 function tstep2(k) { return `<span class="stepper"><button data-ts="${k}" data-d="-1" aria-label="Lower">−</button><output>${k === 'mod' ? sgn(qdice2.mod) : qdice2[k]}</output><button data-ts="${k}" data-d="1" aria-label="Raise">+</button></span>`; }
 function rollInitiative(at) { fightN++; turn.at = 0; turn.round = 1;
   PCS.filter(pc => choicesOf(pc).name).forEach(pc => { const S = sheetOf(pc); initRoll[pc.id] = R.roll(S.init, 0); });
-  logPush({ kind: 'note', who: 'gm', text: `initiative for fight ${fightN}: ` + initiative().map(x => `${choicesOf(x.pc).name} ${x.r.total}`).join(', ') }); historyNote(`Rolled initiative (fight ${fightN})`); renderTable(); }
+  (state.foes || []).filter(f => f.s === state.prepN && monOf(f.mon)).forEach(f => { const m = monOf(f.mon); initRoll[f.id] = R.roll(m.init ?? m.abil.dex?.mod ?? 0, 0); });
+  logPush({ kind: 'note', who: 'gm', text: `initiative for fight ${fightN}: ` + initiative().map(x => `${x.foe ? foeName(x.foe) : choicesOf(x.pc).name} ${x.r.total}`).join(', ') }); historyNote(`Rolled initiative (fight ${fightN})`); renderTable(); }
 function renderTable() {
   lastTableSig = tableSig();
   const o = initiative(); if (turn.at >= o.length) turn.at = 0; const rolled = o.some(x => x.r);
-  roundCard.innerHTML = `<div class="fit"><h3>Round order ${printIndex[P.init] ? `<span class="chip" data-go="${P.init}">p.${printIndex[P.init].page}</span>` : ''}</h3><div class="t">Initiative is rolled once when a fight starts: d20 + Dex (Alert adds the proficiency bonus); highest goes first, ties to the higher Dex. It stands until the next fight.</div>
+  roundCard.innerHTML = `<div class="fit"><h3>Round order ${printIndex[P.init] ? `<span class="chip" data-go="${P.init}">p.${printIndex[P.init].page}</span>` : ''}</h3><div class="t">Initiative is rolled once when a fight starts: d20 + Dex (Alert adds the proficiency bonus), and d20 + its Initiative for each monster in the session being prepared; highest goes first, ties to the higher Dex. It stands until the next fight.</div>
     <div class="rmeta">${rolled ? `Fight ${fightN} · round ${turn.round}` : 'No fight yet'} <button class="tb" data-srd="init">${rolled ? 'New fight: roll again' : 'Roll initiative'}</button><button class="tb" data-turn="next">Next ›</button><button class="tb" data-turn="reset">New round</button></div>
-    <ol class="init">${o.map(({ pc, S, r }, i) => { const live = liveOf(pc), tok = portraitOf(pc, S).src, now = Math.max(0, S.hp - live.lost);
+    <ol class="init">${o.map(({ pc, S, r, foe, m }, i) => { if (foe) { const now = m.hp - foe.lost;
+        return `<li class="${i === turn.at && rolled ? 'on' : ''} foeli"><span class="closeup rimg mdot">⚔</span><span class="who2" data-go="idx-${m.src}">${esc(foeName(foe))}</span><span class="nums">${r ? `<b>${r.total}</b> (d20 ${r.pick} ${sgn(m.init ?? 0)})` : `initiative ${sgn(m.init ?? 0)}`} · AC ${m.ac} · HP ${now}/${m.hp}</span></li>`; }
+      const live = liveOf(pc), tok = portraitOf(pc, S).src, now = Math.max(0, S.hp - live.lost);
       return `<li class="${i === turn.at && rolled ? 'on' : ''}"><span class="closeup rimg"><img src="${tok}" alt="" draggable="false"></span><span class="who2" data-go="${pc.id}">${esc(choicesOf(pc).name)}</span><span class="nums">${r ? `<b>${r.total}</b> (d20 ${r.pick} ${sgn(S.init)})` : `initiative ${sgn(S.init)}`} · AC ${S.ac} · HP ${now}/${S.hp}${live.cond.length ? ' · ' + live.cond.map(c => R.COND[c]?.name).join(', ') : ''}</span></li>`; }).join('')}</ol></div>`; fitCard(roundCard);
   diceCard.innerHTML = `<div class="fit"><h3>Dice tray ${printIndex[P.d20] ? `<span class="chip" data-go="${P.d20}">p.${printIndex[P.d20].page}</span>` : ''}</h3><div class="t">A pool of dice plus a modifier, or a d20 with advantage (higher of two) or disadvantage (lower of two).</div>
     <div class="qdice"><label>Dice ${tstep2('n')}</label><label>d ${tstep2('f')}</label><label>Mod ${tstep2('mod')}</label><button class="tb go" data-troll="1">Roll ${qdice2.n}d${qdice2.f}${qdice2.mod ? (qdice2.mod > 0 ? '+' : '') + qdice2.mod : ''}</button></div>
@@ -385,6 +388,19 @@ function rigCommands(q, ws, nums, pcw) {
     if (ws[0] === 'level' || ws[0] === 'levelup') out.push({ k: 'cmd', t: `${name}: level up (${S.canLevel ? `level ${S.level + 1} is ready` : S.next ? `${(S.next - S.xp).toLocaleString()} XP to level ${S.level + 1}` : 'at level 20'})`, run: () => flyTo(`b-${pcw.id}-level`) });
     if (ws[0] === 'damage' || ws[0] === 'hurt' || ws[0] === 'hit') { const n = nums[0] || 1; out.push({ k: 'cmd', t: `${name} takes ${n} damage`, run: () => { pushUndo(); hpChange(pcw, -n); } }); }
     if (ws[0] === 'heal') { const n = nums[0]; out.push({ k: 'cmd', t: n ? `Heal ${name} ${n}` : `Heal ${name} to full`, run: () => { pushUndo(); hpChange(pcw, n || 9999); } }); }
+  }
+  // the bestiary: "monster goblin" opens its stat card, "add goblin" puts one in the session being prepared,
+  // "damage goblin 5" / "heal goblin" for a monster already there
+  if (['monster', 'monsters', 'mon', 'creature', 'add', 'foe'].includes(ws[0]) && ws.length > 1) {
+    const ph = ws.slice(1).filter(w => isNaN(+w)).join(' '), n = Math.max(1, Math.min(12, nums[0] || 1));
+    const hits = R.D.monsters.filter(m => m.name.toLowerCase().includes(ph)).sort((a, b) => (b.name.toLowerCase().startsWith(ph) - a.name.toLowerCase().startsWith(ph)) || a.name.length - b.name.length).slice(0, ws[0] === 'add' ? 3 : 4);
+    hits.forEach(m => { if (ws[0] !== 'add') out.push({ k: 'cmd', t: `${m.name}: stat card (challenge ${m.cr}, AC ${m.ac}, ${m.hp} Hit Points)`, run: () => flyTo('idx-' + m.src) });
+      out.push({ k: 'cmd', t: `Add ${n > 1 ? n + ' × ' : ''}${m.name} to S${state.prepN}, the session being prepared`, run: () => { for (let i = 0; i < n; i++) addFoe(m.id, qb); flyTo('s' + state.prepN); } }); });
+  }
+  if (!pcw && ['damage', 'hurt', 'hit', 'heal'].includes(ws[0]) && ws.length > 1) {
+    const ph = ws.slice(1).filter(w => isNaN(+w)).join(' '), L = foesIn(state.prepN).filter(f => foeName(f).toLowerCase().startsWith(ph) || foeName(f).toLowerCase().includes(' ' + ph));
+    const f = L.find(x => x.lost < monOf(x.mon).hp) || L[0], d = nums[0];
+    if (f && ph.length >= 2) out.push({ k: 'cmd', t: ws[0] === 'heal' ? `Heal ${foeName(f)} ${d || 'to full'}` : `${foeName(f)} takes ${d || 1} damage`, run: () => { foeAct({ dataset: { foe: f.id, fa: 'hp', d: ws[0] === 'heal' ? (d || 9999) : -(d || 1) } }); } });
   }
   if (['initiative', 'init', 'fight'].some(w => ws[0] === w) && ws.length === 1) out.push({ k: 'cmd', t: 'Roll initiative for a new fight', run: () => { rollInitiative(qb); flyTo('round'); } });
   return out;
@@ -472,3 +488,186 @@ function applyPack(ch) {
   const k = C ? C.equip[eq.cls] || C.equip.A : {}, w = new Set([...(k.weapons || []), ...(eq.bg !== 'B' ? bg?.weapons || [] : [])]);
   ch.weapons = [...w]; ch.armor = k.armor || null; ch.shield = !!k.shield;
 }
+
+// ---------------------------------------------------------------- the bestiary: a stat card per creature, beside its pages
+// The Monsters A–Z and Animals chapters hold a card for each stat block where other chapters hold index slips (the engine
+// leaves the slot; parts with cards: true). The card carries the stat block's names and numbers, every number that rolls
+// is a keycap, every name goes to its region on the reader's own page. The words stay on the page.
+// Monsters the GM adds go to the session being prepared (state.foes): each keeps its own Hit Points there and joins the
+// round order. Monster rolls take the same path as the party's (toast, log, the Turnip Works link) and are the GM's.
+state.foes = saved.foes || [];
+const MON = R.MON || {}, monOf = id => MON[id];
+const persistFoes = () => { try { const o = store.get(); o.foes = state.foes; lsSet(STORE_KEY, JSON.stringify(o)); } catch {} };
+{ const s0 = store.set; store.set = v => s0.call(store, { ...v, foes: state.foes }); }   // persist() carries them too
+const FEET = n => `${n} feet`;
+const SPEED_WORD = { walk: '', burrow: 'burrow', climb: 'climb', fly: 'fly', swim: 'swim' };
+const speedText = sp => Object.entries(sp || {}).filter(([k]) => k !== 'hover').map(([k, v]) => `${SPEED_WORD[k] ? SPEED_WORD[k] + ' ' : ''}${FEET(v)}${k === 'fly' && sp.hover ? ' (hovers)' : ''}`).join(', ');
+const capital = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+function monDie(m, mod, what, kind, lab) {
+  return `<button class="die wide" data-mon="${m.id}" data-mroll="d20" data-mod="${mod}" data-kind="${kind}" data-label="${esc(m.name + ' · ' + what)}" aria-label="Roll ${esc(m.name + ' ' + what)}">⚄ ${lab ?? sgn(mod)}</button>`;
+}
+function monDmg(m, spec, what, lab) {
+  return `<button class="die wide" data-mon="${m.id}" data-mroll="dmg" data-dmg="${esc(spec)}" data-label="${esc(m.name + ' · ' + what)}" aria-label="Roll ${esc(m.name + ' ' + what)}: ${esc(spec)}">⚄ ${esc(lab || spec)}</button>`;
+}
+const dmgKeys = (m, list, what) => (list || []).map(d => d.dice ? monDmg(m, d.dice, `${what} damage`, `${d.dice} ${d.type}`) : `<span class="mflat">${d.avg} ${esc(d.type)}</span>`).join('');
+function multiText(e) {
+  const M = e.multi || [], alt = M.filter(p => p.alt).flatMap(p => p.of);
+  return [...M.filter(p => !p.alt).map(p => p.per ? `${p.of.join(' or ')} once for each head` : `${p.n} × ${p.of.join(' or ')}`), alt.length ? `can use ${alt.join(' or ')}` : ''].filter(Boolean).join('; ');
+}
+function monEntry(m, e, sec) {
+  const what = e.name, bits = [];
+  const tags = [e.recharge ? monDmg(m, '1d6', `${what}: recharge ${e.recharge.replace('-', '–')}`, `Recharge ${e.recharge.replace('-', '–')}`) : '',
+    e.uses ? `<span class="mtag">${e.uses.n} a day${e.uses.lair ? ` (${e.uses.lair} in its lair)` : ''}</span>` : '', e.cost ? `<span class="mtag">costs ${e.cost} uses</span>` : '', e.form ? `<span class="mtag">${esc(e.form)}</span>` : ''].join('');
+  if (e.atk) { const a = e.atk;
+    bits.push(monDie(m, a.bonus, `${what} attack`, 'atk', `${sgn(a.bonus)} to hit`));
+    bits.push(`<span class="mflat">${esc(a.kind)}${a.reach ? ` · reach ${FEET(a.reach)}` : ''}${a.range ? ` · range ${a.range.join('/')} feet` : ''}</span>`);
+    bits.push(dmgKeys(m, a.dmg, what)); if (a.twoHands) bits.push(monDmg(m, a.twoHands, `${what} damage, two hands`, `${a.twoHands} with two hands`)); }
+  if (e.save) { const s = e.save;
+    bits.push(`<span class="mflat">${ABN[s.ab]}${s.or ? ' or ' + ABN[s.or] : ''} save, DC ${s.dc}</span>`); bits.push(dmgKeys(m, s.dmg, what)); if (s.half) bits.push(`<span class="mflat">half on a success</span>`); }
+  if (e.dmg) bits.push(dmgKeys(m, e.dmg, what));
+  if (e.heal) bits.push(monDmg(m, e.heal, `${what} healing`, `heals ${e.heal}`));
+  if (e.multi) bits.push(`<span class="mflat">${esc(multiText(e))}</span>`);
+  if (e.cast) { const c = e.cast;
+    bits.push(`<span class="mflat">${c.ab ? ABN[c.ab] : ''}${c.dc ? `, save DC ${c.dc}` : ''}</span>`); if (c.hit != null) bits.push(monDie(m, c.hit, 'spell attack', 'atk', `spell attack ${sgn(c.hit)}`));
+    (c.lists || []).forEach(L => bits.push(`<span class="mspl"><i>${esc(capital(L.uses.replace(/(\d+)\/Day/, '$1 a day').replace('At Will', 'at will')))}:</i> ${L.spells.map((n, i) => L.ids?.[i] && printIndex[L.ids[i]] ? `<span class="chip" data-go="${L.ids[i]}">${esc(n)}</span>` : esc(n)).join(', ')}</span>`)); }
+  return `<div class="ment"><span class="k" data-go="${m.src}" role="link" tabindex="0">${esc(what)}</span>${tags}${bits.join('')}</div>`;
+}
+function statCardHtml(m) {
+  const sec = (k, title, extra = '') => m[k]?.length ? `<div class="msec"><h4>${title}${extra}</h4>${m[k].map(e => monEntry(m, e, k)).join('')}</div>` : '';
+  const abil = AB.map(k => { const a = m.abil[k]; if (!a) return '';
+    return `<div class="srdabx"><div class="k">${ABN[k]}</div><span class="pv mid">${a.score}</span><div class="srdmod">${monDie(m, a.mod, ABN[k] + ' check', 'chk')}</div><div class="srdsv${a.save !== a.mod ? ' on' : ''}"><span>save</span>${monDie(m, a.save, ABN[k] + ' save', 'save')}</div></div>`; }).join('');
+  const skills = Object.entries(m.skills || {}).map(([k, v]) => monDie(m, v, R.SKL[k]?.name || capital(k.replace(/-/g, ' ')), 'chk', `${esc(R.SKL[k]?.name || capital(k.replace(/-/g, ' ')))} ${sgn(v)}`)).join('');
+  const line = (k, v) => v ? `<div class="mline"><span class="k">${k}</span> ${esc(v)}</div>` : '';
+  const senses = [...Object.entries(m.senses || {}).map(([k, v]) => `${capital(k)} ${FEET(v)}`), m.passive != null ? `passive Perception ${m.passive}` : ''].filter(Boolean).join(', ');
+  const n = (state.foes || []).filter(f => f.mon === m.id && f.s === state.prepN).length;
+  return `<div class="fit mfit">
+    <div class="mhead"><div><h3 class="mname" data-go="${m.src}">${esc(m.name)}</h3><div class="mwho">${esc([m.size, m.type].filter(Boolean).join(' '))}${m.alignment ? ', ' + esc(m.alignment) : ''}</div></div><span class="chip" data-go="${m.src}">page ${printIndex[m.src]?.page || ''}</span></div>
+    <div class="der mder">
+      <div><div class="k">Armour Class</div><span class="pv mid">${m.ac}</span></div>
+      <div><div class="k">Hit points</div><span class="pv mid">${m.hp}</span>${m.hd ? `<small>${monDmg(m, m.hd, 'Hit Points', m.hd)}</small>` : ''}</div>
+      <div><div class="k">Initiative</div>${m.init != null ? monDie(m, m.init, 'Initiative', 'chk') : '<span class="pv">none</span>'}</div>
+      <div><div class="k">Challenge</div><span class="pv mid">${esc(m.cr || '')}</span><small>${(m.xp || 0).toLocaleString()} XP${m.xpLair ? ` (${m.xpLair.toLocaleString()} in its lair)` : ''} · proficiency ${sgn(m.pb || 2)}</small></div>
+    </div>
+    <div class="mline"><span class="k">Speed</span> ${esc(speedText(m.speed))}</div>
+    <div class="srdabg mab">${abil}</div>
+    ${skills ? `<div class="mskills"><span class="k">Skills</span>${skills}</div>` : ''}
+    ${line('Resistances', (m.resist || []).join(', '))}${line('Vulnerabilities', (m.vuln || []).join(', '))}${line('Immune to', [(m.immune || []).join(', '), (m.condImmune || []).map(capital).join(', ')].filter(Boolean).join('; '))}
+    ${line('Senses', senses)}${line('Languages', (m.languages || '').replace(/(\d+) ft\.?/g, '$1 feet'))}${line('Gear', (m.gear || []).join(', '))}
+    ${sec('traits', 'Traits')}${sec('actions', 'Actions')}${sec('bonus', 'Bonus actions')}${sec('reactions', 'Reactions')}${sec('legendary', 'Legendary actions', m.legendaryUses ? ` <span>${m.legendaryUses} uses a round${m.legendaryLair ? `, ${m.legendaryLair} in its lair` : ''}</span>` : '')}
+    <div class="mfoot"><button class="btn madd" data-madd="${m.id}">+ Add to S${state.prepN}, the session being prepared</button>${n ? `<span class="mn">${n} in S${state.prepN}</span>` : ''}</div>
+  </div>`;
+}
+// fitting: a card's contents are scaled to fill it (E6, E7). Fits are kept per creature, so a visit after the first
+// draws every card at its size at once; the rest are fitted in idle moments after the page is up.
+let STATFIT_KEY = '', statFit = {};
+let statFitSave = 0; const saveStatFit = () => { if (!statFitSave) statFitSave = setTimeout(() => { statFitSave = 0; try { localStorage.setItem(STATFIT_KEY, JSON.stringify(statFit)); } catch {} }, 1000); };
+// (the contents are laid out at width W / z and scaled by z with a transform: a width change relays only the card, where
+// a CSS zoom change measured ~8 ms each on this page, which made fitting 331 cards take half a minute)
+const setStat = (f, W, z) => { f.style.width = (W / z) + 'px'; f.style.transform = `scale(${z})`; };
+// Three arrangements: the six abilities in one row; three to a row; three to a row with the four numbers two by two. A
+// short stat block stops growing at its width and would leave paper empty below (E6), so the next arrangement is tried
+// while a card is less than 86% full, and the one that draws largest wins.
+const STAT_LAYOUTS = [[], ['m3'], ['m3', 'm2']];
+function fitStat(card) {
+  const f = card.firstElementChild; if (!f) return;
+  const W = CARDW - 40, H = CARDH - IGAP - 36;
+  const ok = z => { f.style.width = (W / z) + 'px'; return f.offsetHeight * z <= H && f.scrollWidth <= f.clientWidth + 1; };
+  const search = (lo, hi) => { if (!ok(lo)) lo = 0.2; for (let i = 0; i < 10; i++) { const mid = (lo + hi) / 2; if (ok(mid)) lo = mid; else hi = mid; } return lo; };
+  const use = n => { card.classList.remove('m3', 'm2'); STAT_LAYOUTS[n].forEach(k => card.classList.add(k)); };
+  const c = statFit[card.dataset.pid], cz = Array.isArray(c) ? c[0] : c;
+  use(Array.isArray(c) ? c[1] : 0);
+  if (cz && ok(cz) && !ok(Math.min(2.4, cz * 1.02))) { setStat(f, W, cz); return; }
+  let best = null;
+  for (let n = 0; n < STAT_LAYOUTS.length; n++) { use(n); const z = search(0.2, 2.4); ok(z); const full = f.offsetHeight * z / H;
+    if (!best || z > best.z * 1.03) best = { z, n }; if (full >= 0.86) break; }
+  use(best.n); setStat(f, W, best.z); statFit[card.dataset.pid] = [+best.z.toFixed(3), best.n]; saveStatFit();
+}
+// Drawing all 331 cards before the first paint cost ~2 s (the style and layout of ~50,000 elements), so a card starts as
+// the slip the engine draws (its name, line and page) and is drawn in full right after the page is up: the ones in view
+// first, the rest in small slices (10 ms of every 30; this page is rarely idle, so idle callbacks would only come late).
+// Nothing waits on zoom: every card is drawn within seconds of opening the table, wherever you are looking.
+const statQ = new Set(); let statT = 0;
+const statDo = c => { if (!c.isConnected) return; if (!c._drawn) renderStat(c); fitStat(c); decorateCounts(c); };
+function statIdle() { statT = 0; const t0 = performance.now();
+  for (const c of statQ) { if (performance.now() - t0 > 10) break; statQ.delete(c); statDo(c); }
+  if (statQ.size) statT = setTimeout(statIdle, 20); }
+const statQueue = c => { statQ.add(c); if (!statT) statT = setTimeout(statIdle, 30); };
+function renderStat(card, now) {
+  const m = monOf(card.dataset.pid.replace(/^srd-mon-/, '')); if (!m) return;
+  card.innerHTML = statCardHtml(m); card._drawn = true; card.classList.add('drawn'); const f = card.firstElementChild, c = statFit[card.dataset.pid], z = Array.isArray(c) ? c[0] : c;
+  if (Array.isArray(c)) STAT_LAYOUTS[c[1]]?.forEach(k => card.classList.add(k));
+  // before its first fit a card draws at a size estimated from how much it holds (small rather than cut)
+  const est = z || Math.min(1.2, 1.15 * Math.sqrt(800 / Math.max(800, f.textContent.length)));
+  setStat(f, CARDW - 40, est);
+  if (now) { statQ.delete(card); fitStat(card); decorateCounts(card); }
+}
+// a card in view is drawn and fitted at once (the engine's frame loop runs pagesPass whenever the view moves)
+function statPass() {
+  if (!statQ.size) return; const vw = W(), vh = H(); let n = 0;
+  for (const c of statQ) { const b = nodes['idx-' + c.dataset.pid]?.box; if (!b) continue;
+    const x0 = (b.x - cam.x) * cam.s, y0 = (b.y - cam.y) * cam.s, h = b.h * cam.s;
+    if (h > 120 && x0 < vw && y0 < vh && x0 + b.w * cam.s > 0 && y0 + h > 0) { statQ.delete(c); statDo(c); if (++n >= 6) { dirty = true; break; } } }
+}
+{ const p0 = pagesPass; pagesPass = function () { p0(); statPass(); }; }
+const statCards = () => [...document.querySelectorAll('.bookcard[data-pid^="srd-mon-"]')];
+// the rig's code runs before the rest of the app is set up; the cards are queued once it is
+Promise.resolve().then(() => {
+  STATFIT_KEY = 'turnip-almanac-statfit4:' + STYLE(); try { statFit = JSON.parse(localStorage.getItem(STATFIT_KEY) || '{}'); } catch {}
+  statCards().forEach(c => { c.classList.add('statcard'); statQ.add(c); });
+  requestAnimationFrame(() => { dirty = true; statT = setTimeout(statIdle, 30); });
+});
+
+// ---------------------------------------------------------------- rolling for a monster
+const lastMonCrit = {};
+function monRoll(b) {
+  const m = monOf(b.dataset.mon), label = b.dataset.label; if (!m) return;
+  let rec;
+  if (b.dataset.mroll === 'd20') { const r = R.roll(+b.dataset.mod, 0); rec = { ...r, label, kind: b.dataset.kind }; if (b.dataset.kind === 'atk') lastMonCrit[m.id] = r.crit; }
+  else { const crit = !!lastMonCrit[m.id] && / damage/.test(label), r = R.rollDice(b.dataset.dmg, crit); lastMonCrit[m.id] = false;
+    rec = { kind: 'dmg', label, spec: b.dataset.dmg, crit, dice: r.dice, mod: r.mod, total: r.total }; }
+  (state.rolls['mon:' + m.id] = state.rolls['mon:' + m.id] || []).unshift(rec); state.rolls['mon:' + m.id] = state.rolls['mon:' + m.id].slice(0, 4);
+  persist(); toast(rec, b); logPush({ kind: 'roll', who: 'gm', rec });
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest?.('[data-mroll]'); if (b && !b.disabled) { monRoll(b); return; }
+  const a = ev.target.closest?.('[data-madd]'); if (a) { addFoe(a.dataset.madd, a); return; }
+  const f = ev.target.closest?.('[data-foe]'); if (f) { foeAct(f); return; }
+});
+
+// ---------------------------------------------------------------- monsters in the session being prepared
+// each one: { id, mon, s (the session it is filed under), n (its number among its kind there), lost (Hit Points) }
+const foeName = f => { const m = monOf(f.mon), same = state.foes.filter(x => x.mon === f.mon && x.s === f.s); return `${m?.name || f.mon}${same.length > 1 ? ' ' + f.n : ''}`; };
+const foesIn = s => state.foes.filter(f => f.s === s && monOf(f.mon));
+function refreshFoes(s, monId) {
+  persistFoes(); const x = sessionEls.find(q => q.s.n === s); if (x) { renderSessionCard(x); }
+  if (monId) { const c = document.querySelector(`.statcard[data-pid="srd-mon-${monId}"]`); if (c) renderStat(c, true); }
+  renderTable();
+}
+function addFoe(monId, at) {
+  const m = monOf(monId); if (!m) return; const s = state.prepN;
+  const n = Math.max(0, ...state.foes.filter(f => f.mon === monId && f.s === s).map(f => f.n)) + 1;
+  const f = { id: 'foe-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), mon: monId, s, n, lost: 0 }; state.foes.push(f);
+  historyNote(`Added ${foeName(f)} to S${s}`); logPush({ kind: 'note', who: 'gm', text: `${foeName(f)} joins S${s}` });
+  toast({ msg: `${foeName(f)} added to S${s}`, note: `${m.hp} Hit Points · AC ${m.ac} · on the S${s} card and in the round order` }, at);
+  refreshFoes(s, monId); return f;
+}
+function foeAct(b) {
+  const f = state.foes.find(x => x.id === b.dataset.foe); if (!f) return; const m = monOf(f.mon), act = b.dataset.fa;
+  if (act === 'hp') { f.lost = Math.max(0, Math.min(m.hp, f.lost - +b.dataset.d)); historyNote(`${foeName(f)}: ${m.hp - f.lost} of ${m.hp} Hit Points`); }
+  if (act === 'rm') { state.foes = state.foes.filter(x => x !== f); delete initRoll[f.id]; historyNote(`Took ${foeName(f)} out of S${f.s}`); }
+  refreshFoes(f.s, f.mon);
+}
+// the session card shows its monsters as one group, under the notes (the engine's card, with this group added)
+function foeGroupHtml(s) {
+  const L = foesIn(s); if (!L.length) return '';
+  return `<div class="sgroup foes"><div class="sgh"><span class="tdot">⚔</span><b>Monsters</b></div>${L.map(f => { const m = monOf(f.mon), now = m.hp - f.lost;
+    return `<div class="foe${now ? '' : ' down'}"><span class="chip" data-go="idx-${m.src}">${esc(foeName(f))}</span><span class="fhp">${now} of ${m.hp} Hit Points · AC ${m.ac}</span>${[[-5, '−5'], [-1, '−1'], [1, '+1'], [5, '+5']].map(([d, l]) => `<button class="btn sm" data-foe="${f.id}" data-fa="hp" data-d="${d}" aria-label="${d < 0 ? 'Damage' : 'Heal'} ${esc(foeName(f))} ${Math.abs(d)}">${l}</button>`).join('')}<button class="btn sm" data-foe="${f.id}" data-fa="rm" aria-label="Take ${esc(foeName(f))} out of the session">Remove</button></div>`; }).join('')}</div>`;
+}
+{ const r0 = renderSessionCard; renderSessionCard = function (x, measuring) {
+  r0(x, measuring); const g = foeGroupHtml(x.s.n); if (!g) return;
+  const at = x.card.querySelector('.sgroups'); if (at) at.insertAdjacentHTML('beforeend', g);
+  if (!measuring) fitCard(x.card); }; }
+// the round order: the party and the monsters of the session being prepared, each by its own initiative roll
+{ const i0 = initiative; initiative = function () {
+  const foes = foesIn(state.prepN).map(f => ({ foe: f, m: monOf(f.mon), r: initRoll[f.id] }));
+  return [...i0(), ...foes].sort((a, b) => ((b.r?.total ?? -99) - (a.r?.total ?? -99)) || ((b.S?.a.dex ?? b.m?.abil.dex?.score ?? 10) - (a.S?.a.dex ?? a.m?.abil.dex?.score ?? 10))); }; }

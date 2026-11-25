@@ -73,3 +73,58 @@
 .srdwrap button:disabled { opacity: .35; cursor: not-allowed; }
 /* each section has a fixed box, so its layout can be contained: refitting one section never relays the rest of the sheet */
 .sheet .srdA, .sheet .srdSk, .sheet .srdAb, .sheet .srdCb, .sheet .srdFt, .sheet .srdSp, .sheet .srdP { contain: strict; }
+/* the bestiary's stat cards (a card per creature beside its pages): paper like a sheet, every number that rolls a keycap */
+.statcard { padding: 18px 20px; border-radius: 14px; contain: strict; overflow: hidden; }
+.statcard .mfit { display: flex; flex-direction: column; gap: 8px; }
+.mhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.mname { font: 700 34px/1.05 var(--f-display); cursor: pointer; margin: 0; }
+.mwho { font-style: italic; font-size: 16px; color: var(--ink-2); }
+.statcard .mder { grid-template-columns: repeat(4, 1fr); }
+.statcard .mder small { display: block; font-size: 12px; color: var(--ink-3); }
+.statcard .mder .die.wide, .statcard .srdabx .die.wide, .mskills .die.wide { margin-left: 0; height: 32px; padding: 0 10px; font-size: 15px; }
+.statcard .mab { grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.statcard .mab .srdabx { padding: 6px 4px; }
+.statcard .mab .srdabx > .k { font-size: 11px; letter-spacing: .04em; }
+.statcard .mab .pv { font: 700 24px var(--f-display); }
+.mline { font-size: 15px; color: var(--ink-2); }
+.mline .k, .mskills .k { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
+.mskills { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.msec h4 { font: 700 20px var(--f-display); border-bottom: 2px solid var(--ochre); margin: 4px 0 4px; }
+.msec h4 span { font: 600 13px var(--f-body); color: var(--ink-3); }
+.ment { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; padding: 4px 0; border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
+.ment:first-of-type { border-top: 0; }
+.ment > .k { font: 700 17px var(--f-display); color: var(--ink); cursor: pointer; }
+.ment .die.wide { margin-left: 0; height: 30px; padding: 0 9px; font-size: 14px; }
+.mflat, .mtag { font-size: 14px; color: var(--ink-2); }
+.mtag { background: var(--band); border-radius: 7px; padding: 1px 7px; }
+.mspl { flex-basis: 100%; font-size: 14px; color: var(--ink-2); }
+.mspl .chip { font-size: 13px; }
+.mfoot { margin-top: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 6px; }
+.mfoot .madd { font-size: 16px; }
+.mn { font-size: 14px; color: var(--ochre); font-weight: 600; }
+.sgroup.foes .foe { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; padding: 3px 0 3px 64px; }
+.sgroup.foes .fhp { font-size: 18px; }
+.sgroup.foes .foe.down .fhp { color: #b3412c; }
+.sgroup.foes .fhp { color: var(--ink-2); }
+.sgroup.foes .btn.sm { padding: 3px 10px; font-size: 15px; }
+.sgroup.foes .chip { font-size: 18px; }
+.init .mdot { display: inline-flex; align-items: center; justify-content: center; font-size: 22px; background: var(--band); }
+.entry .stag { font-size: 12px; color: var(--ochre); }
+.region.cont { border-top: 2px dashed #a8770f44; }
+.statcard .die.wide { white-space: nowrap; }
+.statcard .srdabx .die.wide { height: 28px; padding: 0 7px; font-size: 14px; }
+.statcard .srdmod { font-size: 16px; }
+.statcard .mfit { transform-origin: 0 0; }
+/* a stat card off screen is not laid out or painted (it holds ~150 elements; there are 331) */
+.bookcard { content-visibility: auto; contain-intrinsic-size: 800px 1000px; contain: strict; }
+.statcard:not(.drawn) { padding: 30px; }
+.statcard:not(.drawn) h3 { font-size: 46px; }
+.statcard:not(.drawn) .t { font-size: 24px; }
+.statcard.m3 .mab { grid-template-columns: repeat(3, 1fr); }
+.statcard.m2 .mder { grid-template-columns: repeat(2, 1fr); }
+.statcard .mder .k { font-size: 11px; letter-spacing: .03em; }
+.statcard .mab .srdabx > .k { font-size: 10px; letter-spacing: .02em; }
+.statcard .srdsv { font-size: 12px; gap: 3px; }
+/* the book's chapter blocks (fixed boxes) are laid out only when on screen: the sheets fit themselves at load with many
+   measurements, and each one otherwise laid out this whole 364-page book again (~0.7 s at first load) */
+.chapblk { content-visibility: auto; }

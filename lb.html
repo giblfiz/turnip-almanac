@@ -1094,7 +1094,7 @@ const lsSet = (k, v) => { if (!FROZEN) localStorage.setItem(k, v); };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } },
   // merge into the saved record: persist() names only its own keys, and must not drop what the other writers keep there
-  // (session notes, pockets, the log); before this, a roll after a note edit lost the note
+  // (session notes, pockets, the log, the GM's monsters); before this, a roll after a note edit lost the note
   set(v) { try { lsSet(STORE_KEY, JSON.stringify({ ...this.get(), ...v })); } catch {} },
 };
 const saved = store.get();
@@ -1162,17 +1162,24 @@ const BK = C.book, PW = 1000, PH = Math.round(PW * BK.ph / BK.pw), PG = 60;
 // The book is a cluster of chapter blocks (a squarified treemap in a golden box), each block an index column beside its
 // pages, scaled as a whole to fill its cell (E2, E6). The whole book is sized against the map so the map stays the
 // anchor (H, 14 Nov: "why is this thing 5 times bigger than the map?"): pages shrink, chapters get fading headlines (E1).
+// an entry lives in the part its page is in, unless it names another home (a creature printed inside an item's
+// description lives with the other creatures); a part with cards: true holds a card per entry instead of a slip
+// (the bestiary's stat cards: the rig fills them, see statCards in rigs/srd-ui.js)
 const allParts = (BK.parts || [{ title: BK.fullTitle || BK.title, from: 1, to: BK.pages }]).map(pt => ({ ...pt,
-  n: pt.to - pt.from + 1, entries: C.print.filter(p => p.page >= pt.from && p.page <= pt.to && p.kind !== 'art') }));
+  n: pt.to - pt.from + 1, entries: [...C.print.filter(p => !p.home && p.page >= pt.from && p.page <= pt.to && p.kind !== 'art'), ...C.print.filter(p => p.home === pt.title)] }));
 // reference parts cluster with the book (golden); adventure parts run in play order as a strip below the map (H, 14–15 Nov)
 const parts = allParts.filter(pt => pt.kind !== 'adventure'), advParts = allParts.filter(pt => pt.kind === 'adventure');
-const ICW = 316, IRH = 150, IGAP = 10, HEADH = 120, PPAD = 30;
-function partNatural(n, m, c, ic, stack = false) {   // natural size (u = 1) of a chapter block: c page columns, ic index columns,
+const ICW0 = 316, IRH0 = 150, IGAP = 10, HEADH = 120, PPAD = 30;
+const CARDW = 800, CARDH = 1010;   // a card slot (cards: true parts): about a page's shape, a little smaller
+allParts.forEach(pt => { pt.sw = pt.cards ? CARDW : ICW0; pt.sh = pt.cards ? CARDH : pt.slipH || IRH0; });   // slipH: a part whose slips carry more (an item's kind and rarity)
+// an index slip: the entry's name, its one line, an optional tag (an item's kind and rarity), and its page
+function slipHtml(p) { return `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span>${p.tag ? ` <span class="stag">${esc(p.tag)}</span>` : ''} <span class="backs"></span></div>`; }
+function partNatural(n, m, c, ic, stack = false, ICW = ICW0, IRH = IRH0) {   // natural size (u = 1) of a chapter block: c page columns, ic index columns,
   const rows = Math.ceil(n / c), ih = ic ? Math.ceil(m / ic) * IRH : 0;   // the index beside the pages, or stacked below them
   if (stack) return { w: PPAD * 2 + Math.max(c * (PW + PG) - PG, ic * (ICW + IGAP) - IGAP), h: HEADH + rows * (PH + PG) - PG + (ic ? 40 + ih - IGAP : 0) + PPAD, rows, stack };
   return { w: PPAD * 2 + (ic ? ic * (ICW + IGAP) + 40 : 0) + c * (PW + PG) - PG, h: HEADH + Math.max(rows * (PH + PG) - PG, ih - IGAP) + PPAD, rows, stack };
 }
-const natArea = pt => { let best = 1e18; for (let c = 1; c <= pt.n; c++) { const ic = pt.entries.length ? Math.max(1, Math.ceil(pt.entries.length * IRH / ((Math.ceil(pt.n / c)) * (PH + PG)))) : 0; const d = partNatural(pt.n, pt.entries.length, c, ic); best = Math.min(best, d.w * d.h); } return best; };
+const natArea = pt => { let best = 1e18; for (let c = 1; c <= pt.n; c++) { const ic = pt.entries.length ? Math.max(1, Math.ceil(pt.entries.length * pt.sh / ((Math.ceil(pt.n / c)) * (PH + PG)))) : 0; const d = partNatural(pt.n, pt.entries.length, c, ic, false, pt.sw, pt.sh); best = Math.min(best, d.w * d.h); } return best; };
 parts.forEach(pt => pt.area = natArea(pt));
 const INTERP = { title: 'Where this book is open', interp: true, area: 0 };
 // size: at most ~40% of the map's area (the map is MW × MH, laid out above), never larger than the natural size
@@ -1220,7 +1227,7 @@ function goldenLayout(items, x, y, w, h) {
 // the book's own outline may flex (1.0–2.2) if that lets every chapter come out nearer golden; it must leave room for the
 // help card and the launcher above the map's right end (PX − 1900)
 let bookW, bookH, cells;
-const SHELF_KEY = 'turnip-almanac-shelf:' + [C.id, Math.round(bookArea), PX, ...parts.map(p => p.title + p.n + p.entries.length)].join('|');
+const SHELF_KEY = 'turnip-almanac-shelf:' + [C.id, Math.round(bookArea), PX, ...parts.map(p => p.title + p.n + p.entries.length + (p.cards ? 'c' : '') + (p.slipH || ''))].join('|');
 const shelfSaved = (() => { try { return JSON.parse(localStorage.getItem(SHELF_KEY) || 'null'); } catch { return null; } })();
 if (shelfSaved) { bookW = shelfSaved.w; bookH = shelfSaved.h; const byT = Object.fromEntries([...parts, INTERP].map(p => [p.title, p])); cells = shelfSaved.cells.map(c => ({ ...c, i: byT[c.t] })); }
 else { let bestL = null;
@@ -1243,7 +1250,7 @@ cells.forEach(cell => {
   const cx = cell.x + CGAP / 2, cy = cell.y + CGAP / 2, cw = cell.w - CGAP, chh = cell.h - CGAP, pt = cell.i;
   if (pt.interp) { const e = add(bk, 'card interpcard', cx, cy, cw / U0, chh / U0, `<div class="fit"><h3>Where this book is open, the Almanac decides</h3><div class="t">${R.interpretations.map(esc).join('<br>')}</div></div>`); e.style.transformOrigin = '0 0'; e.style.transform = `scale(${U0})`; requestAnimationFrame(() => fitCard(e)); document.fonts?.ready.then(() => fitCard(e)); return; }
   // the block's own layout: the page-column count and index-column count that let it fill its cell at the largest scale
-  let best = null; const m = pt.entries.length;
+  let best = null; const m = pt.entries.length, ICW = pt.sw, IRH = pt.sh;
   // the index wraps into as many columns as it needs to stay no taller than the pages beside it (H, 16 Nov: a long
   // index next to one page left a tall strip of nothing); among those, the layout that fills the cell at the largest scale
   // Two arrangements: the index beside the pages (wide cells) or stacked below them (tall cells); the block may also
@@ -1252,7 +1259,7 @@ cells.forEach(cell => {
   // scored by the area the pages and slips actually cover, so a long index beside short pages (or the reverse) loses
   const content = pt.n * PW * PH + m * ICW * (IRH - IGAP);
   for (const stack of [false, true]) for (let c = 1; c <= pt.n; c++) for (let ic = m ? 1 : 0; ic <= (m ? Math.min(m, 16) : 0); ic++) {
-    const d = partNatural(pt.n, m, c, ic, stack), u = Math.min(cw / d.w, chh / d.h, 2.5), fill = u * u * content / (cw * chh);
+    const d = partNatural(pt.n, m, c, ic, stack, ICW, IRH), u = Math.min(cw / d.w, chh / d.h, 2.5), fill = u * u * content / (cw * chh);
     if (!best || fill > best.fill + 1e-6) best = { c, ic, u, d, fill };
   }
   const { c, ic, u, d } = best, stack = d.stack;
@@ -1270,7 +1277,8 @@ cells.forEach(cell => {
     // beside: fill columns top to bottom; stacked: fill rows left to right
     const per = Math.ceil(m / ic), col = stack ? i % ic : Math.floor(i / per), row = stack ? Math.floor(i / ic) : i % per;
     const x = ix0 + col * (ICW + IGAP), y = iy0 + row * IRH;
-    const ce = add(blk, 'entry card', x, y, ICW, IRH - IGAP, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+    const ce = add(blk, 'entry card' + (pt.cards ? ' bookcard' : ''), x, y, ICW, IRH - IGAP, slipHtml(p));
+    if (pt.cards) ce.dataset.pid = p.id;
     reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: W(x, y, ICW, IRH - IGAP) });
   });
   const px0 = stack ? PPAD + gx : x0 + (ic ? ic * (ICW + IGAP) + 40 + gx : 0);
@@ -1290,7 +1298,7 @@ if (advParts.length) {
   label(world, 'The adventure', 0, ay0 - 640, 420);
   advParts.forEach(pt => {
     // the same rule as the chapter blocks: one index column if it fits within ~20% of the pages' height, else as many as needed
-    const m = pt.entries.length; let ic = m ? 1 : 0; while (ic && ic < m && Math.ceil(m / ic) * IRH - IGAP > PH * 1.2) ic++;
+    const m = pt.entries.length, ICW = ICW0, IRH = IRH0; let ic = m ? 1 : 0; while (ic && ic < m && Math.ceil(m / ic) * IRH - IGAP > PH * 1.2) ic++;
     const d = partNatural(pt.n, m, pt.n, ic), w = d.w * u, h = d.h * u;
     if (x > 0 && x + w > SWID) { x = 0; y += rowH + gap; rowH = 0; }
     const blk = add(world, 'chapblk advblk', x, y, d.w, d.h, `<div class="chaphead"><b>${esc(pt.title)}</b> <span>pages ${pt.from}–${pt.to}</span></div>`);
@@ -1298,7 +1306,7 @@ if (advParts.length) {
     reg('part-' + pt.from, { el: blk, title: pt.title, kind: 'chapter', box: { x, y, w, h } });
     const W = (px, py, pw, ph) => ({ x: x + px * u, y: y + py * u, w: pw * u, h: ph * u }), x0 = PPAD;
     pt.entries.forEach((p, i) => { const per = Math.ceil(m / ic), cx = x0 + Math.floor(i / per) * (ICW + IGAP), cy = HEADH + (i % per) * IRH;
-      const ce = add(blk, 'entry card', cx, cy, ICW, IRH - IGAP, `<h3>${esc(p.title)}</h3><div class="t">${esc(p.text)}</div><div class="pg"><span class="chip" data-go="${p.id}">page ${p.page}</span> <span class="backs"></span></div>`);
+      const ce = add(blk, 'entry card', cx, cy, ICW, IRH - IGAP, slipHtml(p));
       reg('idx-' + p.id, { el: ce, title: p.title, kind: 'index', box: W(cx, cy, ICW, IRH - IGAP) }); });
     const px0 = x0 + (ic ? ic * (ICW + IGAP) + 40 : 0);
     for (let n = pt.from; n <= pt.to; n++) { const px = px0 + (n - pt.from) * (PW + PG), py = HEADH;
@@ -1310,12 +1318,14 @@ if (advParts.length) {
   });
   ADV_BOTTOM = y + rowH;
 }
-C.print.forEach(p => {
-  const k = PW / BK.pw, [x, y, w, h] = p.rect, pf = nodes['page-' + p.page]; if (!pf) return;
+// each entry's region on its page; an entry that runs on into the next column or page (a long stat block) draws
+// those parts too, as regions of the same name (ids <id>~2, ~3), so the reader sees the whole of it
+C.print.forEach(p => [[p.page, p.rect], ...(p.cont || [])].forEach(([pg, rect], i) => {
+  const k = PW / BK.pw, [x, y, w, h] = rect, pf = nodes['page-' + pg]; if (!pf) return;
   const u = pf.box.w / PW;
-  const re = add(pf.el, 'region', x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}</span>`);
-  reg(p.id, { el: re, title: p.title, kind: 'rule', sub: `p.${p.page}`, text: p.text, box: { x: pf.box.x + (x * k - 6) * u, y: pf.box.y + (y * k - 6) * u, w: (w * k + 12) * u, h: (h * k + 12) * u } });
-});
+  const re = add(pf.el, 'region' + (i ? ' cont' : ''), x * k - 6, y * k - 6, w * k + 12, h * k + 12, `<span class="rt">${esc(p.title)}${i ? ' (continued)' : ''}</span>`);
+  reg(i ? `${p.id}~${i + 1}` : p.id, { el: re, title: p.title, kind: i ? 'rule part' : 'rule', sub: `p.${pg}`, text: p.text, box: { x: pf.box.x + (x * k - 6) * u, y: pf.box.y + (y * k - 6) * u, w: (w * k + 12) * u, h: (h * k + 12) * u } });
+}));
 
 // ------------------------------------------------------------------ party: sheets as rows down the map's left edge
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -2824,7 +2834,7 @@ let histNotes = [];
 function historyNote(t) { histNotes.push(t); }
 const HIST = { vs: [], db: null, last: null, lastRaw: null, settle: null, settleT: 0 };
 const HKEYS = { choices: 'characters', live: 'damage', rolls: 'rolls', notes: 'notes', log: 'the log', pockets: 'pockets', snotes: 'session notes', smeta: 'sessions', sessx: 'sessions', prepN: 'sessions',
-  portraits: 'portraits', art: 'pictures', order: 'the party', removed: 'the party', rollCount: 'roll counts', extra: 'the party', done: 'builds', summons: 'summons', npcx: 'people', threadx: 'threads', pins: 'pins' };
+  portraits: 'portraits', art: 'pictures', order: 'the party', removed: 'the party', rollCount: 'roll counts', extra: 'the party', done: 'builds', summons: 'summons', npcx: 'people', threadx: 'threads', pins: 'pins', foes: 'monsters' };
 function histRebuild(upto = Infinity) { const o = {}; for (const v of HIST.vs) { if (v.id > upto) break; Object.assign(o, v.set); (v.del || []).forEach(k => delete o[k]); } return o; }
 function histTx(mode) { return HIST.db.transaction('versions', mode).objectStore('versions'); }
 (async () => {
